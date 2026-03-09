@@ -1,0 +1,623 @@
+Printing all command line arguments
+	whitelist_flags_str = None
+	bin_name = cutlass_profiler
+	dryrun = False
+	sweep_heurgen = False
+	cutlass_flags_str = None
+	API_log_test = False
+	partition_str = None
+	labels_path = cudnn_default.label
+	layers_path = cudnn_default.layer
+	cache_freq = -1
+	cache_path = None
+	bin_path = /home/manigupta/cutlass_trees/cutlass_tree_1/build/tools/profiler
+	whitelist_layer_name = TestLayer_conv
+	dump_to_log_str = None
+	use_dir = False
+	device = 1
+	global_flags_str = R:conv
+	testsList_batch_size = 1
+	filter_config_str = FAST
+	pre_flags_str = 
+	lib_path = ./../../../bin/x86_64_Linux_release
+
+
+Printing current LD_LIBRARY_PATH path
+./../../../bin/x86_64_Linux_release:.:../_internal/mkl/lib/intel64/
+
+** cuBlas/cuDNN ** commandline: -Rconv -A1 -B0 -b -dimA1,64,56,56 -filtA256,64,1,1 -pad_h0 -pad_w0 -u1 -v1 -n32 -d1 (Layer Name: TestLayer_conv_0)
+** cuBlas/cuDNN ** commandline: -Rconv -A1 -B0 -b -dimA1,64,56,56 -filtA64,64,1,1 -pad_h0 -pad_w0 -u1 -v1 -n32 -d1 (Layer Name: TestLayer_conv_1)
+** cuBlas/cuDNN ** commandline: -Rconv -A1 -B0 -b -dimA1,64,56,56 -filtA64,64,3,3 -pad_h1 -pad_w1 -u1 -v1 -n32 -d1 (Layer Name: TestLayer_conv_2)
+[CUTLASS RUN] START test TestLayer_conv_0 : '/home/manigupta/cutlass_trees/cutlass_tree_1/build/tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1'
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_0
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=256 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 256, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 256, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 115638272  bytes
+       FLOPs: 3288334336  flops
+
+     Runtime: 0.284415  ms
+      Memory: 378.66 GB/s
+        Math: 11561.7 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_0
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=256 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 256, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 128, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 115638272  bytes
+       FLOPs: 3288334336  flops
+
+     Runtime: 0.288444  ms
+      Memory: 373.371 GB/s
+        Math: 11400.3 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_0
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=256 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 256, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 64, 64, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 115638272  bytes
+       FLOPs: 3288334336  flops
+
+     Runtime: 0.422634  ms
+      Memory: 254.822 GB/s
+        Math: 7780.57 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_0
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=256 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 256, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 256, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 64258048  bytes
+       FLOPs: 3288334336  flops
+
+     Runtime: 0.184632  ms
+      Memory: 324.131 GB/s
+        Math: 17810.2 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_0
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=256 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 256, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 128, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 64258048  bytes
+       FLOPs: 3288334336  flops
+
+     Runtime: 0.169335  ms
+      Memory: 353.412 GB/s
+        Math: 19419.1 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_0
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=256 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 256, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 64, 64, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 64258048  bytes
+       FLOPs: 3288334336  flops
+
+     Runtime: 0.348698  ms
+      Memory: 171.624 GB/s
+        Math: 9430.32 GFLOP/s
+
+
+=============================
+
+CSV Results:
+
+Problem,Provider,Schema,Type,Function,Disposition,Status,input-size::n,input-size::h,input-size::w,input-size::c,filter-size::k,filter-size::r,filter-size::s,filter-size::c,Activation,Filter,Output,epilogue::alpha,epilogue::beta,pad::top,pad::bottom,pad::left,pad::right,stride::h,stride::w,dilation::h,dilation::w,opcode-class,accumulator-type,conv-mode,cta-tile::m,cta-tile::n,cta-tile::k,warp-tile::m,warp-tile::n,warp-tile::k,op-tile::m,op-tile::n,op-tile::k,cuBLAS,cuDNN,Bytes,Flops,Runtime,GB/s,GFLOPs
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,256,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,256,128,32,64,64,8,16,8,8,not_verified,not_supported,115638272,3288334336,0.284415,378.66,11561.7
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,256,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,128,128,32,64,64,8,16,8,8,not_verified,not_supported,115638272,3288334336,0.288444,373.371,11400.3
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,256,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,64,64,32,64,64,8,16,8,8,not_verified,not_supported,115638272,3288334336,0.422634,254.822,7780.57
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,256,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,256,128,32,64,64,8,16,8,8,not_verified,passed,64258048,3288334336,0.184632,324.131,17810.2
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,256,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,128,128,32,64,64,8,16,8,8,not_verified,passed,64258048,3288334336,0.169335,353.412,19419.1
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,256,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,64,64,32,64,64,8,16,8,8,not_verified,passed,64258048,3288334336,0.348698,171.624,9430.32
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+[CUTLASS RUN] END test [92mPASSED[00m cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=256 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+[CUTLASS RUN] START test TestLayer_conv_1 : '/home/manigupta/cutlass_trees/cutlass_tree_1/build/tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1'
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_1
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 64, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 256, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 38543360  bytes
+       FLOPs: 822083584  flops
+
+     Runtime: 0.0799104  ms
+      Memory: 449.207 GB/s
+        Math: 10287.6 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_1
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 64, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 128, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 38543360  bytes
+       FLOPs: 822083584  flops
+
+     Runtime: 0.0773907  ms
+      Memory: 463.832 GB/s
+        Math: 10622.5 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_1
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 64, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 64, 64, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 38543360  bytes
+       FLOPs: 822083584  flops
+
+     Runtime: 0.0948253  ms
+      Memory: 378.552 GB/s
+        Math: 8669.46 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_1
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 64, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 256, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 25698304  bytes
+       FLOPs: 822083584  flops
+
+     Runtime: 0.0671942  ms
+      Memory: 356.182 GB/s
+        Math: 12234.4 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_1
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 64, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 128, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 25698304  bytes
+       FLOPs: 822083584  flops
+
+     Runtime: 0.0577808  ms
+      Memory: 414.21 GB/s
+        Math: 14227.6 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_1
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=1 * --filter-size::s=1 * --pad::top=0 * --pad::bottom=0 * --pad::left=0 * --pad::right=0 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 64, 1, 1, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, tensorop, f32, , 64, 64, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 25698304  bytes
+       FLOPs: 822083584  flops
+
+     Runtime: 0.093961  ms
+      Memory: 254.717 GB/s
+        Math: 8749.2 GFLOP/s
+
+
+=============================
+
+CSV Results:
+
+Problem,Provider,Schema,Type,Function,Disposition,Status,input-size::n,input-size::h,input-size::w,input-size::c,filter-size::k,filter-size::r,filter-size::s,filter-size::c,Activation,Filter,Output,epilogue::alpha,epilogue::beta,pad::top,pad::bottom,pad::left,pad::right,stride::h,stride::w,dilation::h,dilation::w,opcode-class,accumulator-type,conv-mode,cta-tile::m,cta-tile::n,cta-tile::k,warp-tile::m,warp-tile::n,warp-tile::k,op-tile::m,op-tile::n,op-tile::k,cuBLAS,cuDNN,Bytes,Flops,Runtime,GB/s,GFLOPs
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,64,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,256,128,32,64,64,8,16,8,8,not_verified,not_supported,38543360,822083584,0.0799104,449.207,10287.6
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,64,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,128,128,32,64,64,8,16,8,8,not_verified,not_supported,38543360,822083584,0.0773907,463.832,10622.5
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,64,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,64,64,32,64,64,8,16,8,8,not_verified,not_supported,38543360,822083584,0.0948253,378.552,8669.46
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,64,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,256,128,32,64,64,8,16,8,8,not_verified,passed,25698304,822083584,0.0671942,356.182,12234.4
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,64,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,128,128,32,64,64,8,16,8,8,not_verified,passed,25698304,822083584,0.0577808,414.21,14227.6
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad0x0x0x0_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,64,1,1,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,0,0,0,0,1,1,1,1,tensorop,f32,,64,64,32,64,64,8,16,8,8,not_verified,passed,25698304,822083584,0.093961,254.717,8749.2
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+[CUTLASS RUN] END test [92mPASSED[00m cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=1 --filter-size::s=1 --pad::top=0 --pad::bottom=0 --pad::left=0 --pad::right=0 --stride::h=1 --stride::w=1
+
+[CUTLASS RUN] START test TestLayer_conv_2 : '/home/manigupta/cutlass_trees/cutlass_tree_1/build/tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1'
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_2
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=3 * --filter-size::s=3 * --pad::top=1 * --pad::bottom=1 * --pad::left=1 * --pad::right=1 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 64, 3, 3, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, tensorop, f32, , 256, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 38608896  bytes
+       FLOPs: 7398752256  flops
+
+     Runtime: 0.199721  ms
+      Memory: 180.038 GB/s
+        Math: 37045.4 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_2
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=3 * --filter-size::s=3 * --pad::top=1 * --pad::bottom=1 * --pad::left=1 * --pad::right=1 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 64, 3, 3, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, tensorop, f32, , 128, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 38608896  bytes
+       FLOPs: 7398752256  flops
+
+     Runtime: 0.179215  ms
+      Memory: 200.638 GB/s
+        Math: 41284.3 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_2
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=3 * --filter-size::s=3 * --pad::top=1 * --pad::bottom=1 * --pad::left=1 * --pad::right=1 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f32
+    Function: Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_float
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Not supported
+
+   Arguments: 32, 56, 56, 64, 64, 3, 3, 64, f16:packed_nhwc, f16:packed_nhwc, f32:packed_nhwc, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, tensorop, f32, , 64, 64, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 38608896  bytes
+       FLOPs: 7398752256  flops
+
+     Runtime: 0.252722  ms
+      Memory: 142.28 GB/s
+        Math: 29276.3 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_2
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=3 * --filter-size::s=3 * --pad::top=1 * --pad::bottom=1 * --pad::left=1 * --pad::right=1 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 64, 3, 3, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, tensorop, f32, , 256, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 25763840  bytes
+       FLOPs: 7398752256  flops
+
+     Runtime: 0.251511  ms
+      Memory: 95.401 GB/s
+        Math: 29417.2 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_2
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=3 * --filter-size::s=3 * --pad::top=1 * --pad::bottom=1 * --pad::left=1 * --pad::right=1 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 64, 3, 3, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, tensorop, f32, , 128, 128, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 25763840  bytes
+       FLOPs: 7398752256  flops
+
+     Runtime: 0.240764  ms
+      Memory: 99.6597 GB/s
+        Math: 30730.3 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1
+
+&&&& RUNNING [ repro below kernel using: ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1 ]
+Layer Name: TestLayer_conv_2
+Test Flags: --device=1 * --function=Conv2dFprop * --input-size::n=32 * --input-size::c=64 * --input-size::h=56 * --input-size::w=56 * --filter-size::k=64 * --filter-size::c=64 * --filter-size::r=3 * --filter-size::s=3 * --pad::top=1 * --pad::bottom=1 * --pad::left=1 * --pad::right=1 * --stride::h=1 * --stride::w=1
+Unique Flags: 
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 2
+    Provider: CUTLASS
+      Schema: Conv2dFprop
+        Type: implicit_gemm_fprop_f16
+    Function: Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_half_t
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Not verified
+       cuDNN: Passed
+
+   Arguments: 32, 56, 56, 64, 64, 3, 3, 64, f16:packed_nhwc, f16:packed_nhwc, f16:packed_nhwc, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, tensorop, f32, , 64, 64, 32, 64, 64, 8, 16, 8, 8
+       Bytes: 25763840  bytes
+       FLOPs: 7398752256  flops
+
+     Runtime: 0.30746  ms
+      Memory: 78.0409 GB/s
+        Math: 24064.1 GFLOP/s
+
+
+=============================
+
+CSV Results:
+
+Problem,Provider,Schema,Type,Function,Disposition,Status,input-size::n,input-size::h,input-size::w,input-size::c,filter-size::k,filter-size::r,filter-size::s,filter-size::c,Activation,Filter,Output,epilogue::alpha,epilogue::beta,pad::top,pad::bottom,pad::left,pad::right,stride::h,stride::w,dilation::h,dilation::w,opcode-class,accumulator-type,conv-mode,cta-tile::m,cta-tile::n,cta-tile::k,warp-tile::m,warp-tile::n,warp-tile::k,op-tile::m,op-tile::n,op-tile::k,cuBLAS,cuDNN,Bytes,Flops,Runtime,GB/s,GFLOPs
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,64,3,3,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,1,1,1,1,1,1,1,1,tensorop,f32,,256,128,32,64,64,8,16,8,8,not_verified,not_supported,38608896,7398752256,0.199721,180.038,37045.4
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,64,3,3,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,1,1,1,1,1,1,1,1,tensorop,f32,,128,128,32,64,64,8,16,8,8,not_verified,not_supported,38608896,7398752256,0.179215,200.638,41284.3
+1,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f32,Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_float,passed,success,32,56,56,64,64,3,3,64,f16:packed_nhwc,f16:packed_nhwc,f32:packed_nhwc,1,0,1,1,1,1,1,1,1,1,tensorop,f32,,64,64,32,64,64,8,16,8,8,not_verified,not_supported,38608896,7398752256,0.252722,142.28,29276.3
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_256x128x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,64,3,3,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,1,1,1,1,1,1,1,1,tensorop,f32,,256,128,32,64,64,8,16,8,8,not_verified,passed,25763840,7398752256,0.251511,95.401,29417.2
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_128x128x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,64,3,3,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,1,1,1,1,1,1,1,1,tensorop,f32,,128,128,32,64,64,8,16,8,8,not_verified,passed,25763840,7398752256,0.240764,99.6597,30730.3
+2,CUTLASS,Conv2dFprop,implicit_gemm_fprop_f16,Fprop_CrossCorrelation_64x64x32_64x64x8_hmma1688_pad1x1x1x1_stride1x1_dilation1x1_float_half_t,passed,success,32,56,56,64,64,3,3,64,f16:packed_nhwc,f16:packed_nhwc,f16:packed_nhwc,1,0,1,1,1,1,1,1,1,1,tensorop,f32,,64,64,32,64,64,8,16,8,8,not_verified,passed,25763840,7398752256,0.30746,78.0409,24064.1
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1
+
+[CUTLASS RUN] END test [92mPASSED[00m cutlass_profiler --device=1 --function=Conv2dFprop --input-size::n=32 --input-size::c=64 --input-size::h=56 --input-size::w=56 --filter-size::k=64 --filter-size::c=64 --filter-size::r=3 --filter-size::s=3 --pad::top=1 --pad::bottom=1 --pad::left=1 --pad::right=1 --stride::h=1 --stride::w=1
+
+
+*** LAYER TEST RESULT  ***
+Total tests   : 3
+Failures      : 0
+Successes     : 3
+Basic Sanity  : 100.00%
+Total tests number is the number of cutlass_profiler commands launched. Each cutlass_profiler command may launch multiple kernels.
+

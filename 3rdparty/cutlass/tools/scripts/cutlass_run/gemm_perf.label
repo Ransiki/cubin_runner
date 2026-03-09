@@ -1,0 +1,28 @@
+<transpose_all>
+    *
+    tb:
+    ta:
+    ta: * tb:
+
+<transpose_none_and_a>
+    *
+    ta:
+
+<transpose_none_and_b>
+    *
+    tb:
+
+<all_data_types>
+    Pin:h * P:h * Pout:h
+    Pin:h * P:s * Pout:h
+    Pin:s * P:s * Pout:s
+
+<sgemm_data_types>
+    Pin:s * P:s * Pout:s
+
+<hgemm_fp32_accumulation_fp32_output>
+    Pin:h * P:s * Pout:s
+
+<perf_regression_tests>
+    hgemm_fp32_accumulation_fp32_output * R:gemm * T:10 * b: * mathMode:0
+    

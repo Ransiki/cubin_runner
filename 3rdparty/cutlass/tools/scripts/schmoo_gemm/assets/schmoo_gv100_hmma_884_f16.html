@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
+    <title>HMMA.884.F16 SCHMOO</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
+    <script type="text/javascript" src="./data/schmoo_gv100_hmma_884_f16.js"></script>
+    <style type="text/css">
+      body {
+        max-width: 750px;
+      }
+      div.chart {
+        width: 1280px;
+        height: 720px;
+      }
+      * {
+        box-sizing : border-box;
+      }
+
+      .column {
+        width: 100%;
+      }
+
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+    </style>
+  </head>
+  <body>
+  <h2>HMMA.884.F16 SCHMOO M, K = 4096, N = {256, 1024, 2048, 4096}</h2>
+    <div class = "row">
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-NT-m.csv">DATA HMMA.884.F16 NT SCHMOO M</a></p>
+        <div id="graphdiv1" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g1 = new Dygraph(document.getElementById("graphdiv1"), data_hmma_884_f16_NT_m(), {title: "HMMA.884.F16 NT SCHMOO M", xlabel: "M - Size", ylabel : "GFLOPs"}); 
+          </script>
+          
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-TT-m.csv">DATA HMMA.884.F16 TT SCHMOO M</a></p>
+        <div id="graphdiv2" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g2 = new Dygraph(document.getElementById("graphdiv2"), data_hmma_884_f16_TT_m(), {title: "HMMA.884.F16 TT SCHMOO M", xlabel: "M - Size", ylabel : "GFLOPs"});
+          </script>
+        
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-TN-m.csv">DATA HMMA.884.F16 TN SCHMOO M</a></p>
+        <div id="graphdiv3" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g3 = new Dygraph(document.getElementById("graphdiv3"), data_hmma_884_f16_TN_m(), {title: "HMMA.884.F16 TN SCHMOO M", xlabel: "M - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-NN-m.csv">DATA HMMA.884.F16 NN SCHMOO M</a></p>
+        <div id="graphdiv4" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv4"), data_hmma_884_f16_NN_m(), {title: "HMMA.884.F16 NN SCHMOO M", xlabel: "M - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+    </div>
+    
+    <h2>HMMA.884.F16 SCHMOO N, K = 4096, M = {256, 1024, 2048, 4096}</h2>
+    <div class = "row">
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-NT-n.csv">DATA HMMA.884.F16 NT SCHMOO N</a></p>
+        <div id="graphdiv5" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g1 = new Dygraph(document.getElementById("graphdiv5"), data_hmma_884_f16_NT_n(), {title: "HMMA.884.F16 NT SCHMOO N", xlabel: "N - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-TT-n.csv">DATA HMMA.884.F16 TT SCHMOO N</a></p>
+        <div id="graphdiv6" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g2 = new Dygraph(document.getElementById("graphdiv6"), data_hmma_884_f16_TT_n(), {title: "HMMA.884.F16 TT SCHMOO N", xlabel: "N - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-TN-n.csv">DATA HMMA.884.F16 TN SCHMOO N</a></p>
+        <div id="graphdiv7" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g3 = new Dygraph(document.getElementById("graphdiv7"), data_hmma_884_f16_TN_n(), {title: "HMMA.884.F16 TN SCHMOO N", xlabel: "N - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-NN-n.csv">DATA HMMA.884.F16 NN SCHMOO N</a></p>
+        <div id="graphdiv8" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv8"), data_hmma_884_f16_NN_n(), {title: "HMMA.884.F16 NN SCHMOO N", xlabel: "N - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+    </div>
+
+
+    <h2>HMMA.884.F16 SCHMOO K, M = {256, 1024, 2048, 5120}, N = 4096</h2>
+    <div class = "row">
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-NT-k.csv">DATA HMMA.884.F16 NT SCHMOO K</a></p>
+        <div id="graphdiv9" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g1 = new Dygraph(document.getElementById("graphdiv9"), data_hmma_884_f16_NT_k(), {title: "HMMA.884.F16 NT SCHMOO K", xlabel: "K - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-TT-k.csv">DATA HMMA.884.F16 TT SCHMOO K</a></p>
+        <div id="graphdiv10" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g2 = new Dygraph(document.getElementById("graphdiv10"), data_hmma_884_f16_TT_k(), {title: "HMMA.884.F16 TT SCHMOO K", xlabel: "K - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-TN-k.csv">DATA HMMA.884.F16 TN SCHMOO K</a></p>
+        <div id="graphdiv11" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g3 = new Dygraph(document.getElementById("graphdiv11"), data_hmma_884_f16_TN_k(), {title: "HMMA.884.F16 TN SCHMOO K", xlabel: "K - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-HMMA.884.F16-NN-k.csv">DATA HMMA.884.F16 NN SCHMOO K</a></p>
+        <div id="graphdiv12" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv12"), data_hmma_884_f16_NN_k(), {title: "HMMA.884.F16 NN SCHMOO K", xlabel: "K - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <h2>HMMA.884.F16 SCHMOO M, N = 4096, K = 4096 CUTLASS vs cuBLAS</h2>
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-NN-m-sol.csv">DATA HMMA.884.F16 NN SCHMOO M SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv13" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv13"), data_hmma_884_f16_NN_m_sol(), {title: "HMMA.884.F16 NN SCHMOO M SOL", xlabel: "M - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-NT-m-sol.csv">DATA HMMA.884.F16 NT SCHMOO M SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv14" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv14"), data_hmma_884_f16_NT_m_sol(), {title: "HMMA.884.F16 NT SCHMOO M SOL", xlabel: "M - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-TT-m-sol.csv">DATA HMMA.884.F16 TT SCHMOO M SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv15" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv15"), data_hmma_884_f16_TT_m_sol(), {title: "HMMA.884.F16 TT SCHMOO M SOL", xlabel: "M - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-TN-m-sol.csv">DATA HMMA.884.F16 TN SCHMOO M SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv16" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv16"), data_hmma_884_f16_TN_m_sol(), {title: "HMMA.884.F16 TN SCHMOO M SOL", xlabel: "M - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+
+      <h2>HMMA.884.F16 SCHMOO N, M = 4096, K = 4096 CUTLASS vs cuBLAS</h2>
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-NN-n-sol.csv">DATA HMMA.884.F16 NN SCHMOO N SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv17" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv17"), data_hmma_884_f16_NN_n_sol(), {title: "HMMA.884.F16 NN SCHMOO N SOL", xlabel: "N - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-NT-n-sol.csv">DATA HMMA.884.F16 NT SCHMOO N SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv18" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv18"), data_hmma_884_f16_NT_n_sol(), {title: "HMMA.884.F16 NT SCHMOO N SOL", xlabel: "N - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-TT-n-sol.csv">DATA HMMA.884.F16 TT SCHMOO N SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv19" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv19"), data_hmma_884_f16_TT_n_sol(), {title: "HMMA.884.F16 TT SCHMOO N SOL", xlabel: "N - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-TN-n-sol.csv">DATA HMMA.884.F16 TN SCHMOO N SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv20" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv20"), data_hmma_884_f16_TN_n_sol(), {title: "HMMA.884.F16 TN SCHMOO M SOL", xlabel: "N - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+
+      <h2>HMMA.884.F16 SCHMOO K, N = 4096, M = 5120 CUTLASS vs cuBLAS</h2>
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-NN-k-sol.csv">DATA HMMA.884.F16 NN SCHMOO K SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv21" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv21"), data_hmma_884_f16_NN_k_sol(), {title: "HMMA.884.F16 NN SCHMOO K SOL", xlabel: "K - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-NT-k-sol.csv">DATA HMMA.884.F16 NT SCHMOO K SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv22" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv22"), data_hmma_884_f16_NT_k_sol(), {title: "HMMA.884.F16 NT SCHMOO K SOL", xlabel: "K - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-TT-k-sol.csv">DATA HMMA.884.F16 TT SCHMOO K SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv23" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv23"), data_hmma_884_f16_TT_k_sol(), {title: "HMMA.884.F16 TT SCHMOO K SOL", xlabel: "K - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-HMMA.884.F16-TN-k-sol.csv">DATA HMMA.884.F16 TN SCHMOO K SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv24" style="width:640px;height:360px">
+          <script type="text/javascript">
+            gxy = new Dygraph(document.getElementById("graphdiv24"), data_hmma_884_f16_TN_k_sol(), {title: "HMMA.884.F16 TN SCHMOO K SOL", xlabel: "K - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+
+
+    </div>
+  </body>
+</html>

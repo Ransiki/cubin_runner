@@ -1,0 +1,1178 @@
+Printing all command line arguments
+	whitelist_flags_str = None
+	bin_name = cutlass_profiler
+	dryrun = False
+	sweep_heurgen = False
+	cutlass_flags_str = None
+	API_log_test = False
+	partition_str = None
+	labels_path = cublas_default.label
+	layers_path = cublas_default.layer
+	cache_freq = -1
+	cache_path = None
+	bin_path = /home/manigupta/cutlass_trees/cutlass_tree_1/build/tools/profiler
+	whitelist_layer_name = TestLayer
+	dump_to_log_str = None
+	use_dir = False
+	device = 1
+	global_flags_str = tb:
+	testsList_batch_size = 1
+	filter_config_str = None
+	pre_flags_str = 
+	lib_path = ./../../../bin/x86_64_Linux_release
+
+
+Printing current LD_LIBRARY_PATH path
+./../../../bin/x86_64_Linux_release:.:../_internal/mkl/lib/intel64/
+
+** cuBlas/cuDNN ** commandline: -Pinh -Ps -Pouts -Rgemm -T10 -b -mathMode0 -m10240 -n1024 -k1024 -tb -d1 (Layer Name: TestLayer_0)
+** cuBlas/cuDNN ** commandline: -Pinh -Ps -Pouts -Rgemm -T10 -b -mathMode0 -m128 -n128 -k128 -tb -d1 (Layer Name: TestLayer_1)
+** cuBlas/cuDNN ** commandline: -Pinh -Ps -Pouts -Rgemm -T10 -b -mathMode0 -m128 -n512 -k512 -tb -d1 (Layer Name: TestLayer_3)
+[CUTLASS RUN] START test TestLayer_0 : '/home/manigupta/cutlass_trees/cutlass_tree_1/build/tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32'
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_0
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=10240 * --problem-size::n=1024 * --problem-size::k=1024 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 8
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.548886  ms
+      Memory: 110.309 GB/s
+        Math: 39124.4 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 8
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.549697  ms
+      Memory: 110.146 GB/s
+        Math: 39066.7 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_0
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=10240 * --problem-size::n=1024 * --problem-size::k=1024 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 8
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.488245  ms
+      Memory: 124.009 GB/s
+        Math: 43983.7 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 8
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.533872  ms
+      Memory: 113.411 GB/s
+        Math: 40224.7 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_0
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=10240 * --problem-size::n=1024 * --problem-size::k=1024 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 8
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.475748  ms
+      Memory: 127.267 GB/s
+        Math: 45139.1 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 8
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.451687  ms
+      Memory: 134.046 GB/s
+        Math: 47543.6 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_0
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=10240 * --problem-size::n=1024 * --problem-size::k=1024 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 4
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.787505  ms
+      Memory: 76.8844 GB/s
+        Math: 27269.5 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 4
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.432396  ms
+      Memory: 140.027 GB/s
+        Math: 49664.8 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_0
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=10240 * --problem-size::n=1024 * --problem-size::k=1024 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 4
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.732445  ms
+      Memory: 82.664 GB/s
+        Math: 29319.4 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 4
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.431188  ms
+      Memory: 140.419 GB/s
+        Math: 49803.8 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_0
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=10240 * --problem-size::n=1024 * --problem-size::k=1024 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 4
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.802159  ms
+      Memory: 75.4799 GB/s
+        Math: 26771.3 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 4
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.433058  ms
+      Memory: 139.812 GB/s
+        Math: 49588.8 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=32 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_0
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=10240 * --problem-size::n=1024 * --problem-size::k=1024 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=32 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=32 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 128, 32, 32, 64, 4
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 1.01041  ms
+      Memory: 59.9229 GB/s
+        Math: 21253.5 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 10240, 1024, 1024, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 128, 32, 32, 64, 4
+       Bytes: 65011712  bytes
+       FLOPs: 21474836480  flops
+
+     Runtime: 0.436134  ms
+      Memory: 138.826 GB/s
+        Math: 49239.1 GFLOP/s
+
+
+=============================
+
+CSV Results:
+
+Problem,Provider,Schema,Type,Function,Disposition,Status,problem-size::m,problem-size::n,problem-size::k,A,B,C,epilogue::alpha,epilogue::beta,split-count,opcode-class,accumulator-type,cta-tile::m,cta-tile::n,cta-tile::k,warp-tile::m,warp-tile::n,warp-tile::k,cuBLAS,cuDNN,Bytes,Flops,Runtime,GB/s,GFLOPs
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_256x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,8,passed,not_verified,65011712,21474836480,0.548886,110.309,39124.4
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_256x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,8,,,65011712,21474836480,0.549697,110.146,39066.7
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_128x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,8,passed,not_verified,65011712,21474836480,0.488245,124.009,43983.7
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_128x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,8,,,65011712,21474836480,0.533872,113.411,40224.7
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_64x64x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,8,passed,not_verified,65011712,21474836480,0.475748,127.267,45139.1
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_64x64x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,8,,,65011712,21474836480,0.451687,134.046,47543.6
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_256x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,4,passed,not_verified,65011712,21474836480,0.787505,76.8844,27269.5
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_256x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,4,,,65011712,21474836480,0.432396,140.027,49664.8
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_128x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,4,passed,not_verified,65011712,21474836480,0.732445,82.664,29319.4
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_128x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,4,,,65011712,21474836480,0.431188,140.419,49803.8
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x64x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,4,passed,not_verified,65011712,21474836480,0.802159,75.4799,26771.3
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x64x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,4,,,65011712,21474836480,0.433058,139.812,49588.8
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,128,32,32,64,4,passed,not_verified,65011712,21474836480,1.01041,59.9229,21253.5
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x128x32_f32,passed,success,10240,1024,1024,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,128,32,32,64,4,,,65011712,21474836480,0.436134,138.826,49239.1
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=32 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+[CUTLASS RUN] END test [92mPASSED[00m cutlass_profiler --device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32
+
+[CUTLASS RUN] START test TestLayer_1 : '/home/manigupta/cutlass_trees/cutlass_tree_1/build/tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32'
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_1
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=128 * --problem-size::k=128 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 8
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.013825  ms
+      Memory: 8.8297 GB/s
+        Math: 303.386 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 8
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00600064  ms
+      Memory: 20.3429 GB/s
+        Math: 698.976 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_1
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=128 * --problem-size::k=128 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 8
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00842368  ms
+      Memory: 14.4913 GB/s
+        Math: 497.918 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 8
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00628224  ms
+      Memory: 19.431 GB/s
+        Math: 667.645 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_1
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=128 * --problem-size::k=128 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 8
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00842848  ms
+      Memory: 14.4831 GB/s
+        Math: 497.635 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 8
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00743232  ms
+      Memory: 16.4243 GB/s
+        Math: 564.333 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_1
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=128 * --problem-size::k=128 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 4
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.0238746  ms
+      Memory: 5.11299 GB/s
+        Math: 175.681 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 4
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00597376  ms
+      Memory: 20.4344 GB/s
+        Math: 702.121 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_1
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=128 * --problem-size::k=128 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 4
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.0136688  ms
+      Memory: 8.93058 GB/s
+        Math: 306.852 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 4
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00596352  ms
+      Memory: 20.4695 GB/s
+        Math: 703.327 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_1
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=128 * --problem-size::k=128 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 4
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.0130832  ms
+      Memory: 9.33031 GB/s
+        Math: 320.587 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 4
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00598368  ms
+      Memory: 20.4005 GB/s
+        Math: 700.957 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=32 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_1
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=128 * --problem-size::k=128 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=32 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=32 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 128, 32, 32, 64, 4
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.0127632  ms
+      Memory: 9.56424 GB/s
+        Math: 328.625 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 128, 128, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 128, 32, 32, 64, 4
+       Bytes: 131072  bytes
+       FLOPs: 4194304  flops
+
+     Runtime: 0.00624384  ms
+      Memory: 19.5505 GB/s
+        Math: 671.751 GFLOP/s
+
+
+=============================
+
+CSV Results:
+
+Problem,Provider,Schema,Type,Function,Disposition,Status,problem-size::m,problem-size::n,problem-size::k,A,B,C,epilogue::alpha,epilogue::beta,split-count,opcode-class,accumulator-type,cta-tile::m,cta-tile::n,cta-tile::k,warp-tile::m,warp-tile::n,warp-tile::k,cuBLAS,cuDNN,Bytes,Flops,Runtime,GB/s,GFLOPs
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_256x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,8,passed,not_verified,131072,4194304,0.013825,8.8297,303.386
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_256x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,8,,,131072,4194304,0.00600064,20.3429,698.976
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_128x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,8,passed,not_verified,131072,4194304,0.00842368,14.4913,497.918
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_128x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,8,,,131072,4194304,0.00628224,19.431,667.645
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_64x64x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,8,passed,not_verified,131072,4194304,0.00842848,14.4831,497.635
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_64x64x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,8,,,131072,4194304,0.00743232,16.4243,564.333
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_256x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,4,passed,not_verified,131072,4194304,0.0238746,5.11299,175.681
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_256x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,4,,,131072,4194304,0.00597376,20.4344,702.121
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_128x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,4,passed,not_verified,131072,4194304,0.0136688,8.93058,306.852
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_128x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,4,,,131072,4194304,0.00596352,20.4695,703.327
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x64x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,4,passed,not_verified,131072,4194304,0.0130832,9.33031,320.587
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x64x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,4,,,131072,4194304,0.00598368,20.4005,700.957
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,128,32,32,64,4,passed,not_verified,131072,4194304,0.0127632,9.56424,328.625
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x128x32_f32,passed,success,128,128,128,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,128,32,32,64,4,,,131072,4194304,0.00624384,19.5505,671.751
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=32 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+[CUTLASS RUN] END test [92mPASSED[00m cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32
+
+[CUTLASS RUN] START test TestLayer_3 : '/home/manigupta/cutlass_trees/cutlass_tree_1/build/tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32'
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_3
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=512 * --problem-size::k=512 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 8
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0411648  ms
+      Memory: 20.7578 GB/s
+        Math: 1630.25 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 8
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0101366  ms
+      Memory: 84.2974 GB/s
+        Math: 6620.42 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_3
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=512 * --problem-size::k=512 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 8
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0218845  ms
+      Memory: 39.0456 GB/s
+        Math: 3066.5 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 8
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0101888  ms
+      Memory: 83.8658 GB/s
+        Math: 6586.53 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_3
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=512 * --problem-size::k=512 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=8 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 8
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0218954  ms
+      Memory: 39.0262 GB/s
+        Math: 3064.98 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s1688gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 8
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0102198  ms
+      Memory: 83.6111 GB/s
+        Math: 6566.53 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=8 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_3
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=512 * --problem-size::k=512 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=256 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 4
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0781507  ms
+      Memory: 10.9339 GB/s
+        Math: 858.711 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_256x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 256, 128, 32, 64, 64, 4
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0102179  ms
+      Memory: 83.6268 GB/s
+        Math: 6567.76 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=256 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_3
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=512 * --problem-size::k=512 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=128 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 4
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0408272  ms
+      Memory: 20.9295 GB/s
+        Math: 1643.73 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_128x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 128, 128, 32, 64, 64, 4
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0102256  ms
+      Memory: 83.564 GB/s
+        Math: 6562.83 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=128 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_3
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=512 * --problem-size::k=512 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=64 * --cta-tile::k=32 * --warp-tile::m=64 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 4
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.041703  ms
+      Memory: 20.4899 GB/s
+        Math: 1609.21 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x64x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 64, 32, 64, 64, 4
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0102016  ms
+      Memory: 83.7606 GB/s
+        Math: 6578.27 GFLOP/s
+
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=64 --cta-tile::k=32 --warp-tile::m=64 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+&&&& RUNNING run the below cutlass kernel use: ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=32 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+Layer Name: TestLayer_3
+Test Flags: --device=1 * --function=Gemm * --problem-size::m=128 * --problem-size::n=512 * --problem-size::k=512 * --A=f16:col * --B=f16:row * --C=f32 * --cta-tile::m=64 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=32 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+Unique Flags: --cta-tile::m=64 * --cta-tile::n=128 * --cta-tile::k=32 * --warp-tile::m=32 * --warp-tile::n=64 * --warp-tile::k=4 * --split-count=1 * --opcode-class=tensorop * --accumulator-type=f32
+=============================CUTLASS Kernel Performance Report=============================
+=============================
+  Problem ID: 1
+    Provider: CUTLASS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+      cuBLAS: Passed
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 128, 32, 32, 64, 4
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0402515  ms
+      Memory: 21.2288 GB/s
+        Math: 1667.24 GFLOP/s
+
+=============================
+  Problem ID: 1
+    Provider: cuBLAS
+      Schema: Gemm
+        Type: gemm_type_f16nf16tf32n
+    Function: s884gemm_nt_64x128x32_f32
+
+ Disposition: Passed
+      Status: Success
+
+Verification:
+       cuDNN: Not verified
+
+   Arguments: 128, 512, 512, f16:column, f16:row, f32:column, 1, 0, 1, tensorop, f32, 64, 128, 32, 32, 64, 4
+       Bytes: 917504  bytes
+       FLOPs: 67108864  flops
+
+     Runtime: 0.0102301  ms
+      Memory: 83.5274 GB/s
+        Math: 6559.96 GFLOP/s
+
+
+=============================
+
+CSV Results:
+
+Problem,Provider,Schema,Type,Function,Disposition,Status,problem-size::m,problem-size::n,problem-size::k,A,B,C,epilogue::alpha,epilogue::beta,split-count,opcode-class,accumulator-type,cta-tile::m,cta-tile::n,cta-tile::k,warp-tile::m,warp-tile::n,warp-tile::k,cuBLAS,cuDNN,Bytes,Flops,Runtime,GB/s,GFLOPs
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_256x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,8,passed,not_verified,917504,67108864,0.0411648,20.7578,1630.25
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_256x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,8,,,917504,67108864,0.0101366,84.2974,6620.42
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_128x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,8,passed,not_verified,917504,67108864,0.0218845,39.0456,3066.5
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_128x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,8,,,917504,67108864,0.0101888,83.8658,6586.53
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_64x64x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,8,passed,not_verified,917504,67108864,0.0218954,39.0262,3064.98
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s1688gemm_nt_64x64x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,8,,,917504,67108864,0.0102198,83.6111,6566.53
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_256x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,4,passed,not_verified,917504,67108864,0.0781507,10.9339,858.711
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_256x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,256,128,32,64,64,4,,,917504,67108864,0.0102179,83.6268,6567.76
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_128x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,4,passed,not_verified,917504,67108864,0.0408272,20.9295,1643.73
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_128x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,128,128,32,64,64,4,,,917504,67108864,0.0102256,83.564,6562.83
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x64x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,4,passed,not_verified,917504,67108864,0.041703,20.4899,1609.21
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x64x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,64,32,64,64,4,,,917504,67108864,0.0102016,83.7606,6578.27
+1,CUTLASS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,128,32,32,64,4,passed,not_verified,917504,67108864,0.0402515,21.2288,1667.24
+1,cuBLAS,Gemm,gemm_type_f16nf16tf32n,s884gemm_nt_64x128x32_f32,passed,success,128,512,512,f16:column,f16:row,f32:column,1,0,1,tensorop,f32,64,128,32,32,64,4,,,917504,67108864,0.0102301,83.5274,6559.96
+
+&&&& FINISHED ./tools/profiler/cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32 --cta-tile::m=64 --cta-tile::n=128 --cta-tile::k=32 --warp-tile::m=32 --warp-tile::n=64 --warp-tile::k=4 --split-count=1 --opcode-class=tensorop --accumulator-type=f32
+
+[CUTLASS RUN] END test [92mPASSED[00m cutlass_profiler --device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32
+
+
+*** LAYER TEST RESULT  ***
+Total tests   : 3
+Failures      : 0
+Successes     : 3
+Basic Sanity  : 100.00%
+Total tests number is the number of cutlass_profiler commands launched. Each cutlass_profiler command may launch multiple kernels.
+

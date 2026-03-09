@@ -1,0 +1,19 @@
+<config version="1.0">
+    <group>
+        <identifier>CUTLASS_WINDOWS_SILICON_L1</identifier>
+        <flow>cutlass.ExecTests</flow>
+        <test>
+            <identifier>cutlass.ExecTests</identifier>
+            <plugin>simple-host</plugin>
+            <command>
+              <![CDATA[ 
+                cd {build-out-dir} && 
+                cmd /c .\\tools\\scripts\\ci\\testplans\\ats_cutlass_level1_windows_silicon.bat &&
+                echo CUTLASS_WINDOWS_SILICON_L1_PASSED
+              ]]>
+            </command>
+            <regex-pass>CUTLASS_WINDOWS_SILICON_L1_PASSED</regex-pass>
+            <execute-timeout>2160</execute-timeout>
+        </test>
+    </group>
+</config>

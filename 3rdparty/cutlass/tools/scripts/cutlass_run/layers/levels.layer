@@ -1,0 +1,467 @@
+// All testing for routines: conv,dgrad,wgrad,bgrad
+"L3_conv_variousDims_bgrad_strideOut24000"                 = R:bgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  strideA:"3072,1,96,3"     *  strideOut:"240000,1,4800,96"
+"L3_conv_variousDims_bgrad_strideOut75000"                 = R:bgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  strideA:"1,30720,960,30"  *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_bgrad_strideOut240000"                = R:bgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  strideA:"3072,1024,32,1"  *  strideOut:"240000,2500,50,1"
+"L3_conv_variousDims_Pdhs_bgrad"                           = R:bgrad                     *  L3_req                               *  conv_variousDims     *  Pdhs
+"bug1724389"                                               = R:conv                      *  L4_req                               *  n:2                  *  c:32                 *  h:2                       *  w:2                                        *  pad_w:1                       *  pad_h:1                                 *  k:128                  *  r:3          *  s:3           *  algo:1       *  strideOut:"1024,4,2,1"  *  b:           *  P:s,h
+"bug1691655"                                               = R:conv                      *  L4_req                               *  n:1                  *  c:1                  *  h:256                     *  w:256                                      *  pad_w:1                       *  pad_h:1                                 *  k:1                    *  r:3          *  s:3           *  algo:5       *  b:                      *  P:s
+"bug1837934"                                               = R:conv                      *  L4_req                               *  n:1                  *  c:1                  *  h:32                      *  w:32                                       *  k:1                           *  r:1                                     *  s:1                    *  u:2          *  v:2           *  algo:5       *  b:                      *  P:s
+"bug1880190_conv"                                          = R:conv                      *  L4_req                               *  n:65537              *  c:1                  *  h:1                       *  w:1                                        *  k:1                           *  r:1                                     *  s:1                    *  algo:1       *  b:
+"bug1964365"                                               = R:conv * L4_req * algo:1 * dimA:"64,512,28,28" * filtA:"512,16,3,3" * groupCount:32 * pad_h:1 * pad_w:1 * A:1 * B:0 * Pmath:1 * P:h * b:
+"bug1969199"                                               = R:conv * L4_req * algo:0 * dimA:"32,32,75,75"  * filtA:"32,1,3,3"   * groupCount:32 * u:1 * v:1 * P:s * pad_h:2 * pad_w:0 * b:
+"bug1969837"                                               = R:conv                      *  L4_req                               *  n:1                  *  c:16                 *  h:1                       *  w:1                                        *  k:4                           *  r:1                                     *  s:1                    *  Pin:b        *  Pcomp:b       *  Pout:b       *  algo:1                  *  formatIn:2   *  filtFormat:2  *  formatOut:2    *  b:             *  p:i
+"bug1990896"                                               = R:conv                      *  L4_req                               *  n:1                  *  c:256                *  h:500                     *  w:1                                        *  k:256                         *  r:1                                     *  s:1                    *  algo:5       *  b:
+"bug200371954_1"                                           = R:wgrad  *  L3_req  *  algo:1  *  x:1  *  n:20  *  c:64  *  h:160  *  w:576  *  k:64  *  r:3   *  s:3  *  pad_h:1  *  pad_w:1  *  u:1  *  v:1  *  A:1  *  B:0  *  b:
+"bug200371954_2"                                           = R:wgrad  *  L3_req  *  algo:1  *  x:1  *  n:1  *  c:2048  *  h:1  *  w:661  *  k:9004  *  r:1   *  s:1  *  pad_h:0  *  pad_w:0  *  u:1  *  v:1  *  A:1  *  B:0  *  b:
+"bug200371954_3"                                           = R:dgrad  *  L3_req  *  algo:1  *  x:1  *  n:1  *  c:2048  *  h:1  *  w:661  *  k:9004  *  r:1   *  s:1  *  pad_h:0  *  pad_w:0  *  u:1  *  v:1  *  A:1  *  B:0  *  b:
+"L4_bug2034186" = L4_bug_2034186
+"max_32x32_tile"                                           = R:conv                      *  L4_req                               *  conv_corr            *  n:5                  *  h:32                      *  w:32                                       *  r:32                          *  s:32                                    *  A:2                    *  B:1          *  algo:5        *  b:           *  P:s,h
+"read_32x32_tile_large_filter"                             = R:conv                      *  L4_req                               *  conv_corr            *  n:7                  *  h:28                      *  w:26                                       *  pad_w:3                       *  pad_h:1                                 *  r:21                   *  s:15         *  A:2           *  B:1          *  algo:5                  *  b:           *  P:h,s
+"L3_conv_variousDims_conv_strideOut75000"                  = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"1,30720,960,30"                   *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_N100_conv_algo2_impulse"              = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:2                    *  strideA:"3072,1,96,3"                      *  strideOut:"240000,1,4800,96"  *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_algo2_strideOut240000"           = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:2                    *  strideA:"3072,1,96,3"                      *  strideOut:"240000,1,4800,96"
+"L3_conv_variousDims_conv_algo0_strideA30720"              = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"1,30720,960,30"                   *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_conv_algo0_strideOut240000"           = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1,96,3"                      *  strideOut:"240000,1,4800,96"
+"L3_conv_variousDims_conv_algo1_strideOut750000"           = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"1,30720,960,30"                   *  strideOut:"1,75000,1500,30"   *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_algo2_strideOut75000_impulse"    = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:2                    *  strideA:"1,30720,960,30"                   *  strideOut:"1,75000,1500,30"   *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_algo0_strideOut240000_impulse_1" = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1,96,3"                      *  strideOut:"240000,1,4800,96"  *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_algo2_strideOut75000"            = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:2                    *  strideA:"1,30720,960,30"                   *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_conv_algo1_strideOut240000_impulse_1" = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1,96,3"                      *  strideOut:"240000,1,4800,96"  *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_algo0_strideOut75000_impulse"    = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"1,30720,960,30"                   *  strideOut:"1,75000,1500,30"   *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_algo1_strideOut240000_1"         = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1,96,3"                      *  strideOut:"240000,1,4800,96"
+"L3_conv_variousDims_conv_algo0_strideOut240000_impulse_2" = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1024,32,1"                   *  strideOut:"240000,2500,50,1"  *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_algo1_strideOut240000_2"         = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1024,32,1"                   *  strideOut:"240000,2500,50,1"
+"L3_conv_variousDims_conv_algo1_strideOut240000_impulse_2" = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1024,32,1"                   *  strideOut:"240000,2500,50,1"  *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_algo2_strideA3072_impulse"       = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:2                    *  strideA:"3072,1024,32,1"                   *  strideOut:"240000,2500,50,1"  *  N:100                                   *  iFilt:1
+"L3_conv_variousDims_conv_strideOut240000"                 = R:conv                      *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0,2                  *  strideA:"3072,1024,32,1"                   *  strideOut:"240000,2500,50,1"
+"L3_conv_variousDims_Pdhs_conv_impulse"                    = R:conv                      *  L3_req                               *  conv_variousDims     *  Pdhs                 *  algo:0,2                  *  N:100                                      *  iFilt:1
+"L0_conv_algo7_hhh"                                        = R:conv                      *  L0_req                               *  n:1,2,8,9            *  A:1                  *  B:2                       *  Pcomp:h                                    *  Pmath:0,1                     *  algo:7                                  *  P:h
+"L0_L2_L3_conv_algo1"                                      = R:conv                      *  L0_L2_L3_conv_algo1_variousDims      *  algo:1
+"L3_rsNotEqual_conv_algo0_64x64image_hsh"                  = R:conv                      *  L3_rsNotEqual_variousTests           *  dimA:"8,32,64,64"    *  filtA:"16,32,7,7"    *  Pmath:1                   *  algo:0                                     *  P:h
+"L3_rsNotEqual_conv_algo0_64x64image__hsh_allNHWC"         = R:conv                      *  L3_rsNotEqual_variousTests           *  dimA:"8,32,64,64"    *  filtA:"16,32,7,7"    *  Pmath:1                   *  algo:0                                     *  formatIn:1                    *  filtFormat:1                            *  formatOut:1            *  P:h
+"L3_FFT_variousTests_conv"                                 = R:conv                      *  L3_FFT_variousTests                  *  conv_corr            *  algo:5
+"L2_3x3filter_conv_algo7"                                  = R:conv                      *  L2_variousDims                       *  Phs                  *  r:3                  *  s:3                       *  Pmath:0,1                                  *  algo:7
+"L2_5x5filter_conv_algo7"                                  = R:conv                      *  L2_variousDims                       *  Phs                  *  r:5                  *  s:5                       *  Pmath:0,1                                  *  algo:7
+"L2_L3_variousDims_conv_algo2"                             = R:conv                      *  L2_L3_conv_variousDims               *  algo:2
+"L3_A2_B5_n5_variousDims_conv_algo4"                       = R:conv                      *  L3_A2_B5_n5_variousDims              *  conv_corr            *  Phs                  *  algo:4
+"L3_A2_B5_n5_variousDims_conv_algo7_x"                     = R:conv                      *  L3_A2_B5_variousDims                 *  Phs                  *  algo:7               *  x:
+"L3_A2_B5_n5_variousDims_conv_algo7"                       = R:conv                      *  L3_A2_B5_variousDims                 *  Phs                  *  Pmath:0,1            *  algo:7
+"L1_L3_hhh_conv_algo1"                                     = R:conv                      *  L1_L3_Ph_Pcomph                      *  algo:1
+"L1_L3_variousDims_variousTypes_conv_algo0"                = R:conv                      *  L1_L3_variousDims_variousTypes       *  algo:0
+"L2_conv_variousDims_Phs_allNHWC_algo0_conv"               = R:conv                      *  L2_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  formatIn:1                                 *  filtFormat:1                  *  formatOut:1
+"L3_int8_allNHWC_algo1"                                    = R:conv,convBiasAct          *  L3_Pinb_Pcompb_pi                    *  algo:1               *  formatIn:1           *  filtFormat:1              *  formatOut:1
+"L3_conv_Pinb_Pcompb_pi_NCHWx4_conv_algo1"                 = R:conv,convBiasAct          *  L3_conv_Pinb_Pcompb_pi               *  algo:1               *  formatIn:2           *  filtFormat:2              *  formatOut:2
+"L2_testSweep_direct"                                      = L2_direct_testSweep
+"L2_allNCHW_dim3_algo1"                                    = R:conv,dgrad                *  L2_variousDims                       *  Phs                  *  dim:3                *  n:5                       *  A:0.5                                      *  B:0.25                        *  algo:1                                  *  formatIn:0             *  formatOut:0  *  p:i
+"L2_L3_variousDims_with_grouped"                           = R:conv,dgrad,wgrad          *  L2_L3_conv_variousDims_with_grouped  *  algo:0
+"L2_L3_variousDims_with_grouped_algo1_nhwc"                = R:wgrad                     *  Phs * L3_groupedConv_nhwc            *  algo:1
+"L2_L3_variousDims_with_grouped_algo1"                     = R:conv                      *  L3_groupedConv_variousDims_algo1     *  algo:1
+"bug1945060"                                               = R:conv,dgrad,wgrad          *  L4_req                               *  n:1                  *  c:1                  *  h:3                       *  w:3                                        *  k:1                           *  r:3                                     *  s:3                    *  A:1          *  B:0           *  algo:0       *  padA:"1,1"              *  ps:0.000001  *  p:r           *  P:d            *  pm:1.0
+"L3_conv_variousDims_Pdhs_algo1_impulse_N100"              = R:conv,dgrad,wgrad          *  L3_req                               *  conv_variousDims     *  Pdhs                 *  algo:1                    *  N:100                                      *  iFilt:1
+"L3_rsNotEqual_algo1_64x64image"                           = R:conv,dgrad,wgrad          *  L3_rsNotEqual_variousTests           *  dimA:"8,32,64,64"    *  filtA:"16,32,7,7"    *  Pmath:1                   *  algo:1                                     *  P:h
+"L3_rsNotEqual_algo1_64x64image_allNHWC"                   = R:conv,dgrad,wgrad          *  L3_rsNotEqual_variousTests           *  dimA:"8,32,64,64"    *  filtA:"16,32,7,7"    *  Pmath:1                   *  algo:1                                     *  formatIn:1                    *  filtFormat:1                            *  formatOut:1            *  P:h
+"L3_conv_variousDims_dim3_algo0"                           = R:conv,dgrad,wgrad,bgrad    *  L3_req                               *  conv_variousDims     *  Pdhs                 *  dim:3                     *  n:5                                        *  algo:0
+"L2_convBiasAct_variousDims_Phs"                           = R:convBiasAct               *  L2_variousDims                       *  Phs                  *  algo:6               *  r:3                       *  s:3
+"bug1837934"                                               = R:dgrad                     *  L4_req                               *  n:1                  *  c:1                  *  h:32                      *  w:32                                       *  k:1                           *  r:1                                     *  s:1                    *  u:1          *  v:2           *  algo:3       *  b:                      *  P:s
+"bug1838085"                                               = R:dgrad                     *  L4_req                               *  dim:3                *  algo:1               *  P:d
+"bug1853580"                                               = R:dgrad                     *  L4_req                               *  n:2                  *  c:2                  *  h:15                      *  w:15                                       *  k:2                           *  r:1                                     *  s:1                    *  u:2          *  v:2           *  A:16         *  B:0                     *  Pcomp:h      *  algo:1        *  b:             *  P:h
+"bug200271785"                                             = R:dgrad                     *  L4_req                               *  n:2                  *  c:1                  *  h:27                      *  w:64                                       *  pad_w:0                       *  pad_h:0                                 *  k:256                  *  r:7          *  s:64          *  u:1          *  v:1                     *  algo:1       *  b:            *  naiveCPU:1     *  P:s
+"bug1880190_dgrad"                                         = R:dgrad                     *  L4_req                               *  n:65537              *  c:1                  *  h:1                       *  w:1                                        *  k:1                           *  r:1                                     *  s:1                    *  algo:1       *  b:
+"bug200177459"                                             = R:dgrad                     *  L4_req                               *  r:20,21              *  s:22                 *  algo:1                    *  b:
+"L2_conv_variousDims_Phs_allNHWC_algo0_dgrad"              = R:dgrad                     *  L2_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  formatIn:1                                 *  filtFormat:1                  *  formatOut:1
+"L3_conv_variousDims_variousStride_dgrad_impulse"          = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"1,30720,960,30","3072,1024,32,1"  *  N:100                         *  iFilt:1
+"L3_conv_variousDims_dgrad_algo1_strideA3072_1"            = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_dgrad_algo1_strideA3072_impulse"      = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1,96,3"                      *  N:100                         *  iFilt:1
+"L3_conv_variousDims_dgrad_algo0_N100_impulse"             = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"1,30720,960,30"                   *  N:100                         *  iFilt:1
+"L3_conv_variousDims_dgrad_algo0_strideA3072"              = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_dgrad_algo0_strideA3072_impulse"      = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1024,32,1"                   *  N:100                         *  iFilt:1
+"L3_conv_variousDims_dgrad_algo0_strideA30720"             = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"1,30720,960,30"
+"L3_conv_variousDims_dgrad_algo1_strideA3072_2"            = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1024,32,1"
+"L3_conv_variousDims_Pdhs_dgrad_algo0_impulse"             = R:dgrad                     *  L3_req                               *  conv_variousDims     *  Pdhs                 *  algo:0                    *  N:100                                      *  iFilt:1
+"L0_dgrad_algo5_hhh"                                       = R:dgrad                     *  L0_req                               *  n:1,2,8,9            *  A:-1                 *  B:-2                      *  Pcomp:h                                    *  Pmath:0,1                     *  algo:5                                  *  P:h
+"L0_L1_L2_L3_dgrad_algo1"                                  = R:dgrad                     *  L0_L1_L2_L3_dgrad_algo1_variousDims  *  L0_L1_L2_L3_dgrad_algo1_variousStrides       *  algo:1
+"L3_FFT_variousTests_dgrad"                                = R:dgrad                     *  L3_FFT_variousTests                  *  conv_corr            *  algo:3
+"L2_3x3filter_dgrad"                                       = R:dgrad                     *  L2_variousDims                       *  Phs                  *  r:3                  *  s:3                       *  algo:4,5
+"L2_3x3filter_dgrad_algo5"                                 = R:dgrad                     *  L2_variousDims                       *  Phs                  *  r:3                  *  s:3                       *  Pmath:1                                    *  algo:5
+"L2_5x5filter_dgrad_algo5"                                 = R:dgrad                     *  L2_variousDims                       *  Phs                  *  r:5                  *  s:5                       *  Pmath:0,1                                  *  algo:5
+"L3_conv_dilated_variousDims_dgrad"                        = R:dgrad                     *  L3_conv_dilated_variousDims          *  Pdhs                 *  algo:0
+"L3_A2_B5_n5_variousDims_dgrad_algo5"                      = R:dgrad                     *  L3_A2_B5_variousDims                 *  Phs                  *  Pmath:0,1            *  algo:5
+"L3_rsNotEqual_allNHWC_hhs_hhh_5x5image"                   = R:dgrad,convBiasAct         *  L3_rsNotEqual_variousTests           *  dimA:"8,8,5,5"       *  filtA:"8,8,3,3"      *  Pin:h                     *  Pcomp:h,s                                  *  Pmath:1                       *  Pout:h                                  *  algo:1                 *  formatIn:1   *  filtFormat:1  *  formatOut:1  *  b:
+"L3_conv_variousDims_algo1_strideA30720"                   = R:dgrad,wgrad               *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"1,30720,960,30"
+"L3_conv_variousDims_algo0_strideA3072"                    = R:dgrad,wgrad               *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1024,32,1"
+"L3_conv_variousDims_algo0_strideA3072_impulse"            = R:dgrad,wgrad               *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1,96,3"                      *  N:100                         *  iFilt:1
+"L3_A2_B5_n5_variousDims_algo2"                            = R:dgrad,wgrad               *  L3_A2_B5_n5_variousDims              *  conv_corr            *  Phs                  *  algo:2
+"L3_A2_B5_n5_variousDims_algo5"                            = R:dgrad,wgrad               *  L3_A2_B5_variousDims                 *  Phs                  *  algo:5               *  x:
+"L3_rsNotEqual_allNHWC_sss_5x5image"                       = R:dgrad,wgrad,convBiasAct   *  L3_rsNotEqual_variousTests           *  dimA:"8,8,5,5"       *  filtA:"8,8,3,3"      *  Pin:s                     *  Pcomp:s                                    *  Pmath:1                       *  Pout:s                                  *  algo:1                 *  formatIn:1   *  filtFormat:1  *  formatOut:1  *  b:
+"L3_rsNotEqual_allNHWC_sss_5x5image_7outC"                 = R:dgrad,wgrad,convBiasAct   *  L3_rsNotEqual_variousTests           *  dimA:"8,8,5,5"       *  filtA:"7,8,3,3"      *  Pin:s                     *  Pcomp:s                                    *  Pmath:1                       *  Pout:s                                  *  algo:1                 *  formatIn:1   *  filtFormat:1  *  formatOut:1  *  b:
+"L3_rsNotEqual_allNHWC_hsh_5x5image_7outC"                 = R:dgrad,wgrad,convBiasAct   *  L3_rsNotEqual_variousTests           *  dimA:"8,8,5,5"       *  filtA:"7,8,3,3"      *  Pin:h                     *  Pcomp:s                                    *  Pmath:1                       *  Pout:h                                  *  algo:1                 *  formatIn:1   *  filtFormat:1  *  formatOut:1  *  b:                      *  off:12
+"L3_rsNotEqual_algo1_hhh_hsh_5x5image"                     = R:dgrad,wgrad,convBiasAct   *  L3_rsNotEqual_variousTests           *  dimA:"8,8,5,5"       *  filtA:"8,8,3,3"      *  Pin:h                     *  Pcomp:h,s                                  *  Pmath:1                       *  Pout:h                                  *  algo:1                 *  b:
+"L3_rsNotEqual_hsh_5x5image_off12"                         = R:dgrad,wgrad,convBiasAct   *  L3_rsNotEqual_variousTests           *  dimA:"8,8,5,5"       *  filtA:"8,8,3,3"      *  Pin:h                     *  Pcomp:s                                    *  Pmath:1                       *  Pout:h                                  *  algo:1                 *  b:           *  off:12
+"L3_rsNotEqual_sss_5x5image_algo1"                         = R:dgrad,wgrad,convBiasAct   *  L3_rsNotEqual_variousTests           *  dimA:"8,8,5,5"       *  filtA:"8,8,3,3"      *  Pin:s                     *  Pcomp:s                                    *  Pmath:1                       *  Pout:s                                  *  algo:1                 *  b:
+"L3_rsNotEqual_hhh_hsh_7inC"                               = R:dgrad,wgrad,convBiasAct   *  L3_rsNotEqual_variousTests           *  dimA:"8,7,5,5"       *  filtA:"8,7,3,3"      *  Pin:h                     *  Pcomp:h,s                                  *  Pmath:1                       *  Pout:h                                  *  algo:1                 *  b:
+"L3_rsNotEqual_sss_algo1_5x5image"                         = R:dgrad,wgrad,convBiasAct   *  L3_rsNotEqual_variousTests           *  dimA:"8,7,5,5"       *  filtA:"8,7,3,3"      *  Pin:s                     *  Pcomp:s                                    *  Pmath:1                       *  Pout:s                                  *  algo:1                 *  b:
+"bug1837934"                                               = R:wgrad                     *  L4_req                               *  n:1                  *  c:1                  *  h:32                      *  w:1                                        *  k:1                           *  r:30                                    *  s:1                    *  algo:6       *  u:1          *  v:2           *               *  b:                      *  P:s
+"bug1829391"                                               = R:wgrad                     *  L4_req                               *  n:4                  *  c:44                 *  h:8                       *  w:8                                        *  pad_w:1                       *  pad_h:1                                 *  k:38                   *  r:3          *  s:3           *  A:1          *  B:0                     *  algo:5       *  b:
+"bug1864395"                                               = R:wgrad                     *  L4_req                               *  dim:3                *  dimA:"8,1,20,12,15"  *  filtA:"5,1,6,12,4"        *  algo:3                                     *  b:                            *  padA:"5,11,3"                           *  convStrideA:"3,2,1"    *  P:s
+"bug1948726"                                               = R:wgrad                     *  L4_req                               *  dimA:"1,1,65536,10"  *  pad_w:0              *  pad_h:1                   *  filtA:"50,1,3,10"                          *  algo:1                        *  b:                                      *  dimOut:"1,50,65536,1"
+"write_32x32_tile_large_filter"                            = R:wgrad                     *  L4_req                               *  conv_corr            *  n:5                  *  h:28                      *  w:26                                       *  pad_w:3                       *  pad_h:2                                 *  r:25                   *  s:22         *  A:2           *  B:5          *  algo:2                  *  b:           *  P:h,s
+"true_fp16_support_hole"                                   = R:wgrad                     *  L4_req                               *  h:6                  *  w:6                  *  Pcomp:h                   *  algo:1                                     *  b:                            *  pref:1                                  *  P:h
+"L3_conv_variousDims_wgrad_strideA30720"                   = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"1,30720,960,30"
+"L3_conv_variousDims_wgrad_algo3_impulse_N100"             = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:3                    *  strideA:"3072,1024,32,1"                   *  N:100                         *  iFilt:1
+"L3_conv_variousDims_wgrad"                                = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1024,32,1"                   *  N:100                         *  iFilt:1
+"L3_conv_variousDims_wgrad_algo1_strideA3072_1"            = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1,96,3"                      *  N:100                         *  iFilt:1
+"L3_conv_variousDims_wgrad_algo3_strideA1,3072"            = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:3                    *  strideA:"1,30720,960,30"
+"L3_conv_variousDims_wgrad_algo0_strideA3072"              = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_wgrad_algo3_strideA30720_2"           = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  w:4                       *  v:2                                        *  algo:3                        *  strideA:"3072,1,96,3","1,30720,960,30"
+"L3_conv_variousDims_wgrad_algo4_strideA3072"              = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:3                    *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_wgrad_algo3_strideA30720_1"           = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0,1,3                *  strideA:"1,30720,960,30"                   *  N:100                         *  iFilt:1
+"L3_conv_variousDims_wgrad_algo1_strideA3072_2"            = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_wgrad_algo1_strideA3072_1024"         = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1024,32,1"
+"L3_conv_variousDims_wgrad_algo3_strideA3072_1"            = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:3                    *  strideA:"3072,1024,32,1"
+"L3_conv_variousDims_vwgrad_algo1_strideA3072_impulse"     = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:1                    *  strideA:"3072,1024,32,1"                   *  N:100                         *  iFilt:1
+"L3_conv_variousDims_wgrad_algo0_strideA3072_impulse"      = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:0                    *  strideA:"3072,1,96,3"                      *  N:100                         *  iFilt:1
+"L3_conv_variousDims_wgrad_algo3_strideA3072_N100_impulse" = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  algo:3                    *  strideA:"3072,1,96,3"                      *  N:100                         *  iFilt:1
+"L3_conv_variousDims_wgrad_algo3_strideA3072_2"            = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Phs                  *  w:4                       *  v:2                                        *  algo:3                        *  strideA:"3072,1024,32,1"
+"L3_conv_variousDims_Pdhs_wgrad_algo0_impulse"             = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Pdhs                 *  algo:0                    *  N:100                                      *  iFilt:1
+"L3_conv_variousDims_Pdhs_wgrad_algo3_impulse"             = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Pdhs                 *  algo:3                    *  N:100                                      *  iFilt:1
+"L3_conv_variousDims_Pdhs_wgrad_algo3"                     = R:wgrad                     *  L3_req                               *  conv_variousDims     *  Pdhs                 *  w:4                       *  v:2                                        *  algo:3
+"L2_conv_variousDims_Phs_allNHWC_"                         = R:wgrad                     *  L2_req                               *  conv_variousDims     *  Phs                  *  algo:0,1                  *  formatIn:1                                 *  filtFormat:1                  *  formatOut:1
+"L0_wgrad_algo5_hhh"                                       = R:wgrad                     *  L0_req                               *  n:1,2,8,9            *  A:0.5                *  B:0.75                    *  Pcomp:h                                    *  Pmath:0,1                     *  algo:5                                  *  P:h
+"L0_L2_L3_wgrad_algo1"                                     = R:wgrad                     *  L0_L2_L3_wgrad_algo1_variousDims     *  algo:1
+"L3_rsNotEqual_wgrad_algo1_allNHWC_hhs_5x5image"           = R:wgrad                     *  L3_rsNotEqual_variousTests           *  dimA:"8,8,5,5"       *  filtA:"8,8,3,3"      *  Pin:h                     *  Pcomp:s                                    *  Pmath:1                       *  Pout:h                                  *  algo:1                 *  formatIn:1   *  filtFormat:1  *  formatOut:1  *  b:
+"L2_allNCHW_dim3_algo3_w9"                                 = R:wgrad                     *  L2_variousDims                       *  Phs                  *  dim:3                *  n:5                       *  w:9                                        *  A:0.5                         *  B:0.25                                  *  algo:3                 *  formatIn:0   *  formatOut:0   *  p:i
+"L2_L3_variousDims_wgrad"                                  = R:wgrad                     *  L2_L3_conv_variousDims               *  algo:0,3
+"L2_L3_Phs_variousDims_wgrad_algo5"                        = R:wgrad                     *  L2_L3_Phs_variousDims                *  Pmath:0,1            *  algo:5
+"L3_conv_dilated_variousDims_wgrad"                        = R:wgrad                     *  L3_conv_dilated_variousDims          *  Pdhs                 *  algo:0,1
+"L2_wgrad_fft1_tiling_algo6"                               = R:wgrad                     *  L2_wgrad_fft1_tiling                 *  conv_corr            *  Pdhs                 *  algo:6
+"L3_groupedConv_wino"                                      = winograd_fused_nonfused     *  L3_groupedConv_wino_dims
+"L3_groupedConv_fft_explicit"                              = fft_and_explicit_conv_dgrad *  L3_groupedConv_fft_explicit_dims
+"L3_MXNET_RN50_workspace_mismatch"                         = R:wgrad *  L3_req * algo:1 * Pin:h * Pout:h * Pcomp:s * Pmath:1 * x: * dimA:"256,256,56,56" * strideA:"802816,1,14336,256" * filtA:"512,256,1,1" * filtFormat:1 * padA:"0,0" * convStrideA:"2,2" * dilationA:"1,1" * A:1.000000 * B:0.000000 * strideOut:"401408,1,14336,512" * b:
+"L4_Bug200430391"                                          = R:dgrad                     *  L4_req                               *  A:2                  *  pad_h:2              *  h:16                      *  n:37                                       * s:5                            *  r:5                                     *  w:16                   *  B:5          *  pad_w:2       *  Pin:h         *    Pout:s     *    Pmath:0
+"L2_Bug2333896"                                            = R:conv                      *  L2_req * n:32 * c:8   * h:38 * w:38 * k:4   * r:3 * s:3 * Pin:h * Pout:h * P:s * Pmath:1 * x: * pad_h:0 * pad_w:0 * algo:1 * T:1 * b:
+"L2_Bug2333896"                                            = R:conv                      *  L2_req * n:32 * c:256 * h:38 * w:38 * k:324 * r:3 * s:3 * Pin:h * Pout:h * P:s * Pmath:1 * x: * pad_h:1 * pad_w:1 * algo:1 * b:
+
+// All testing for routines: activationb,activationf
+"L4_Pdhs_batch4_Ractb_dim2_initnan"         = R:activationb  *  L4_Pdhs_batch4      *  dim:2    *  initnan:
+"L4_Pdhs_batch4_Ractb_dim2_propnan_initnan" = R:activationb  *  L4_Pdhs_batch4      *  dim:2    *  propnan:  *  initnan:
+"L4_Pdhs_batch4_Ractb_dim3"                 = R:activationb  *  L4_Pdhs_batch4      *  dim:3
+"L4_Pdhs_batch4_Ractb_dim3_initnan"         = R:activationb  *  L4_Pdhs_batch4      *  dim:3    *  initnan:
+"L4_Pdhs_batch4_Ractb_dim3_propnan_initnan" = R:activationb  *  L4_Pdhs_batch4      *  dim:3    *  propnan:  *  initnan:
+"L4_Pdhs_batch4_Ractb_dim4"                 = R:activationb  *  L4_Pdhs_batch4      *  dim:4
+"L1_L4_Pdhs_batch4_Ractb"                   = R:activationb  *  L1_L4_Pdhs_batch4   *  dim:2
+"L4_Pbdhs_batch4_Ractf_dim3"                = R:activationf  *  L4_Pbdhs_batch4     *  dim:3,4
+"L4_Pbdhs_batch4_Ractf_dim3_initnan"        = R:activationf  *  L4_Pbdhs_batch4     *  dim:3    *  initnan:
+"L4_Pbdhs_batch4_Ractf_propnan_initnan"     = R:activationf  *  L4_Pbdhs_batch4     *  dim:2,3  *  propnan:  *  initnan:
+"L4_Pbdhs_batch4_Ractf_dim2_initnan"        = R:activationf  *  L4_Pbdhs_batch4     *  dim:2    *  initnan:
+"L1_L4_Pdhs_batch4_Ractf"                   = R:activationf  *  L1_L4_Pbdhs_batch4  *  dim:2
+
+// All testing for routines: add,op
+"L4_Pdhs_batch4_Radd_mode4_c4096"      = R:add     *  L4_Pdhs_batch4      *  n:300       *  c:4096            *  h:1   *  w:1  *  mode:4  *  b:
+"L4_Pdhs_batch4_Radd_useScaleTensor"   = R:add     *  L4_Pdhs_batch4      *  A:0         *  useScaleTensor:1
+"L1_L4_Pbdhs_batch4_Radd"              = R:add     *  L1_L4_Pbdhs_batch4
+"L4_add_variousDims"                   = R:add     *  L4_variousDims      *  mode:0,1,2,3       *  b:
+"L4_add_noSpatial"                     = R:add     *  L4_noSpatial        *  mode:4             *  b:
+"L4_bug_2133597"                       = R:add     *  L4_req              *  n:8         *  c:20000000        *  h:1,4 *  w:1,4 *  mode:1,2,3,4  *  b:
+"L4_n4_Radd_op_w5"                     = R:add,op  *  L4_req              *  n:24        *  c:22              *  h:14  *  w:5   *  mode:1,2,3,4  *  b:
+"L4_n4_Radd_op_w5"                     = R:add,op  *  L4_req              *  n:24        *  c:22              *  h:11  *  w:3   *  mode:1,2,3,4  *  b:
+"L4_n4_Radd_op_w5"                     = R:add,op  *  L4_req              *  n:100       *  c:100             *  h:100 *  w:100 *  mode:1,2,3,4  *  b:
+"bug1987980"                           = R:add,op  *  L4_req              *  n:24        *  c:22              *  h:14  *  w:5   *  mode:2        *  b:      *  P:h
+"L4_Pdhs_batch4_Rop_mode4"             = R:op      *  L4_Pdhs_batch4      *  mode:4
+"L4_Pdhs_batch4_Rop_mode0_algo1_c4096" = R:op      *  L4_Pdhs_batch4      *  n:300       *  c:4096            *  h:1   *  w:1  *  algo:1        *  mode:0
+"L4_Pbdhs_batch4_Rop_propnan_initnan"  = R:op      *  L4_Pbdhs_batch4     *  propnan:    *  initnan:
+"L4_Pbdhs_batch4_Rop_inplace"          = R:op      *  L4_Pbdhs_batch4     *  inplace:
+"L4_Pbdhs_batch4_Rop_dim3"             = R:op      *  L4_Pbdhs_batch4     *  dim:3
+"L4_Pbdhs_batch4_Rop_mode3"            = R:op      *  L4_Pbdhs_batch4     *  mode:1,2,3
+"L4_Pbdhs_batch4_Rop_dim3_inplace"     = R:op      *  L4_Pbdhs_batch4     *  dim:3       *  inplace:
+"L4_Pbdhs_batch4_Rop_b_is_a"           = R:op      *  L4_Pbdhs_batch4     *  b_is_a:
+"L4_Pbdhs_batch4_Rop_inplace_b_is_a"   = R:op      *  L4_Pbdhs_batch4     *  inplace:    *  b_is_a:
+"L4_Pbdhs_batch4_Rop_inplace_b_is_c"   = R:op      *  L4_Pbdhs_batch4     *  inplace:    *  b_is_c:
+"L1_L4_Pdhs_batch4_Rop"                = R:op      *  L1_L4_Pbdhs_batch4
+
+//Added for Bug200432410:[test coverage development] investigate and improve cuDNN OP related test
+"L4_Pbdhs_batch4_Rop_propnan_initnan_Pin_Pout"  = R:op      *  L4_Pin_Pout_hsb_batch4*  propnan:    *  initnan:
+"L4_Pbdhs_batch4_Rop_dim3_Pin_Pout"             = R:op      *  L4_Pin_Pout_hsb_batch4*  dim:3
+"L4_Pbdhs_batch4_Rop_mode3_Pin_Pout"            = R:op      *  L4_Pin_Pout_hsb_batch4*  mode:1,2,3
+"L4_Pbdhs_batch4_Rop_b_is_a_Pin_Pout"           = R:op      *  L4_Pin_Pout_hsb_batch4*  b_is_a:
+
+// All testing for routines: blsf,blsb
+"L1_L4_Pdhs_batch4_Rblsb" = R:blsb  *  L1_L4_Pdhs_batch4  *  c:5
+"L1_L4_Pdhs_batch4_Rblsf" = R:blsf  *  L1_L4_Pdhs_batch4
+"L4_bug_200381420_test" = R:blsb * L4_bug_200381420
+
+// All testing for routines: bnf,bnb
+"L1_L3_L4_bnb_algo0"    = R:bnb  *  L1_L3_L4_bnb_algo0_variousDims     *  algo:0    *  mode:0,1 * bnEps:0.01
+"L1_L3_L4_bnb"          = R:bnb  *  L1_L3_L4_batchNorm_variousTests    *  algo:1,2  *  mode:0,1 * bnEps:0.01
+"bug1942570"            = R:bnf  *  L4_req                             *  n:1025    *  c:10      *  h:16  *  w:16  *  algo:0  *  b:  *  P:s * bnEps:0.01
+"L1_L3_L4_bnf_algo2"    = R:bnf  *  L1_L3_L4_batchNorm_variousTests    *  algo:2 * bnEps:0.01
+"L0_L1_L3_L4_bnf_algo1" = R:bnf  *  L0_L1_L3_L4_bnf_algo0_variousDims  *  algo:0 * bnEps:0.01
+"L0_L1_L3_L4_bnf_algo0" = R:bnf  *  L0_L1_L3_L4_bnf_algo1_variousDims  *  algo:1 * bnEps:0.01
+
+"batchNromEx_NHWC_L3_L4_fwd" = R:bnf * dimA:"32,64,256,256" * algo:2 * mode:1 * P:h * formatIn:1 * bnTestEx:"0,0","0,1","1,1" * bnEps:0.000012 * N:30 * L3_req
+"batchNromEx_NHWC_L3_L4_bwd" = R:bnb * dimA:"32,64,256,256" * algo:2 * mode:1 * P:h * formatIn:1 * bnTestEx:"0,0","0,1","1,1" * bnEps:0.000012 * N:30 * L3_req
+
+"L4_bug200467240_1" = R:bnb * algo:1 * L4_req * P:s * dimA:"2,32,432,80" * strideA:"1105920,34560,80,1" * b:
+"L4_bug200467240_2" = R:bnb * algo:1 * L4_req * P:s * dimA:"2,64,248,40" * strideA:"634880,9920,40,1"   * b:
+"L4_bug200467240_3" = R:bnb * algo:1 * L4_req * P:s * dimA:"2,32,248,80" * strideA:"634880,19840,80,1" * b:
+"L4_bug200467240_4" = R:bnb * algo:1 * L4_req * P:s * dimA:"2,64,452,40" * strideA:"1157120,18080,40,1" * b:
+"L4_bug200467240_5" = R:bnb * algo:1 * L4_req * P:s * dimA:"2,32,340,80" * strideA:"870400,27200,80,1" * b:
+
+// All testing for routines: ctc
+"L0_ctc_Ps" = R:ctc  *  L0_ctc  *  Ps
+
+// All testing for routines: divnormf,divnormb
+"L2_Phs_divnorm_variousDims" = R:divnormf,divnormb  *  L2_req  *  divnorm_variousDims  *  Phs
+
+// All testing for routines: findFwdAlgo,findBwdDataAlgo,findBwdFilterAlgo,getFwdAlgo,getBwdDataAlgo,getBwdFilterAlgo
+"L3_conv_variousDims_findBwdData_strideA3072"              = R:findBwdDataAlgo                                                                           *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:0,1  *  T:                        *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_findBwdDataEx_strideA30720"           = R:findBwdDataAlgo                                                                           *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  memlimit:-1               *  strideA:"1,30720,960,30"
+"L3_conv_variousDims_findBwdDataEx_strideA3072"            = R:findBwdDataAlgo                                                                           *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  memlimit:-1               *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_findEx_strideA3072_1"                 = R:findBwdDataAlgo,findBwdFilterAlgo                                                         *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  memlimit:-1               *  strideA:"3072,1024,32,1"
+"L3_conv_variousDims_findEx_strideA30720"                  = R:findBwdFilterAlgo                                                                         *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  memlimit:-1               *  strideA:"1,30720,960,30"
+"L3_conv_variousDims_findBwdFilterEx_strideA3072"          = R:findBwdFilterAlgo                                                                         *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  memlimit:-1               *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_findBwdFilter_strideA3072_tensorCore" = R:findBwdFilterAlgo                                                                         *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:1    *  T:                        *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_getBwdFilter_strideA3072_1"           = R:findBwdFilterAlgo,getBwdDataAlgo,getBwdFilterAlgo                                         *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_findEx_strideA3072_2"                 = R:findFwdAlgo                                                                               *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  memlimit:-1               *  strideA:"3072,1024,32,1"      *  strideOut:"240000,2500,50,1"
+"L3_conv_variousDims_findEx_strideOut240000"               = R:findFwdAlgo                                                                               *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  memlimit:-1               *  strideA:"3072,1,96,3"         *  strideOut:"240000,1,4800,96"
+"L3_conv_variousDims_findFwdAlgo_strideOut240000_1"        = R:findFwdAlgo                                                                               *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:1    *  T:                        *  strideA:"3072,1024,32,1"      *  strideOut:"240000,2500,50,1"
+"L3_conv_variousDims_findFwdAlgo_strideOUt75000"           = R:findFwdAlgo                                                                               *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:1    *  T:                        *  strideA:"1,30720,960,30"      *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_findFwdAlgo_strideOut75000"           = R:findFwdAlgo                                                                               *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  strideA:"1,30720,960,30"  *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_findFwdAlgo_strideOut240000_2"        = R:findFwdAlgo                                                                               *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  strideA:"3072,1024,32,1"  *  strideOut:"240000,2500,50,1"
+"L3_conv_variousDims_findFwdEx_strideOut75000"             = R:findFwdAlgo                                                                               *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  memlimit:-1               *  strideA:"1,30720,960,30"      *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_getBwdData_strideA3072_Pmath1"        = R:getBwdDataAlgo                                                                            *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:1    *  T:                        *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_getBwdFilter_strideA3072_2"           = R:getBwdFilterAlgo                                                                          *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:1    *  T:                        *  strideA:"3072,1,96,3"
+"L3_conv_variousDims_getFind_strideA30720"                 = R:getBwdFilterAlgo,getBwdDataAlgo,findBwdDataAlgo,findBwdFilterAlgo                         *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:0,1  *  T:                        *  strideA:"1,30720,960,30"
+"L3_conv_variousDims_getFwdAlgo_strideOut75000"            = R:getFwdAlgo                                                                                *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  strideA:"1,30720,960,30"  *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_getFwdAlgo_strideOut240000_1"         = R:getFwdAlgo                                                                                *  L3_req  *  conv_variousDims  *  Phs   *  T:         *  strideA:"3072,1024,32,1"  *  strideOut:"240000,2500,50,1"
+"L3_conv_variousDims_getFwdAlgo_strideOut240000_2"         = R:getFwdAlgo                                                                                *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:1    *  T:                        *  strideA:"3072,1024,32,1"      *  strideOut:"240000,2500,50,1"
+"L3_conv_variousDims_getFwdAlgo_strideOut75000_tensorCore" = R:getFwdAlgo                                                                                *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:1    *  T:                        *  strideA:"1,30720,960,30"      *  strideOut:"1,75000,1500,30"
+"L3_conv_variousDims_getFindFwd_strideOut240000"           = R:getFwdAlgo,findFwdAlgo                                                                    *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:0,1  *  T:                        *  strideA:"3072,1,96,3"         *  strideOut:"240000,1,4800,96"
+"L3_conv_variousDims_Pdhs_allGetFind_allowHMMA"            = R:getFwdAlgo,getBwdDataAlgo,getBwdFilterAlgo,findFwdAlgo,findBwdDataAlgo,findBwdFilterAlgo  *  L3_req  *  conv_variousDims  *  Pdhs  *  Pmath:1    *  T:
+"L3_conv_variousDims_strideA3072_allGetFind"               = R:getFwdAlgo,getBwdDataAlgo,getBwdFilterAlgo,findFwdAlgo,findBwdDataAlgo,findBwdFilterAlgo  *  L3_req  *  conv_variousDims  *  Phs   *  Pmath:0,1  *  T:                        *  strideA:"3072,1024,32,1"
+"L3_Pdhs_variousDims_get_find_findEx"                      = L3_Pdhs_variousDims                                                                         *  T:      *  get_find_findEx
+
+// All testing for routines: gridf,gridb
+"L1_L4_Pdhs_batch4_Rgridb" = R:gridb  *  L1_L4_Pdhs_batch4
+"L1_L4_Pdhs_batch4_Rgridf" = R:gridf  *  L1_L4_Pdhs_batch4
+
+// All testing for routines: im2col
+"L1_L4_Pdhs_batch4_Rim2col" = R:im2col  *  L1_L4_Pdhs_batch4
+"L1_L4_Pdhs_batch4_Rim2col_x" = R:im2col  *  x: *  L1_L4_Pdhs_batch4
+
+// All testing for routines: lrnf,lrnb
+"L0_lrnb" = R:lrnb  *  L0_lrnb_variousDims
+"L0_lrnf" = R:lrnf  *  L0_lrnf_variousDims
+
+// Bug 200428771:[test coverage development] investigate and improve cuDNN LRN related test
+"L3_lrnb" = R:lrnb  *  L3_lrnb_variousDims
+"L3_lrnf" = R:lrnf  *  L3_lrnf_variousDims
+
+// All testing for routines: poolb,poolf
+"bug1899533"                                      = R:poolb  *  all_pooling_formats  *  L4_req              *  A:-1              *  B:0                   *  mode:0                     *  b:
+"bug1899533_unif"                                 = R:poolb  *  all_pooling_formats  *  L4_req              *  pad_w:2           *  pad_h:2               *  A:1                        *  B:0                              *  mode:0    *  b:       *  ps:-1  *  p:u  *  pm:-10
+"L4_Pdhs_batch4_Rpoolb_propnan_initnan"           = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:3             *  propnan:              *  initnan:
+"L4_Pdhs_batch4_Rpoolb_dim3_initnan"              = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:3             *  initnan:
+"L4_Pdhs_batch4_Rpoolb_dim3"                      = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:3             *  mode:2,3
+"L4_Pdhs_batch4_Rpoolb_propnan_initnan"           = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:3             *  propnan:              *  initnan:
+"L4_Pdhs_batch4_Rpoolb_negPad"                    = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:2,3           *  pad_w:-2              *  pad_h:-2                   *  mode:0,3                         *  pad_d:-2
+"L4_Pdhs_batch4_Rpoolb_dim3"                      = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:3
+"L4_Pdhs_batch4_Rpoolb_dim3_mode1"                = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:3             *  mode:1
+"L4_Pdhs_batch4_Rpoolb_dim3_unpackedStride"       = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:3             *  dimA:"10,10,5,5,6"    *  strideA:"1502,150,30,6,1"  *  strideOut:"15740,1573,143,13,1"  *  b:
+"L4_Pdhs_batch4_Rpoolb_dim2_unpackedStride_2500"  = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dimA:"10,10,5,5"  *  strideA:"500,40,6,1"  *  strideOut:"2500,200,15,1"  *  b:
+"L1_L4_Pdhs_batch4_Rpoolb_propnan_initnan"        = R:poolb  *  all_pooling_formats  *  L1_L4_Pdhs_batch4   *  propnan:          *  initnan:
+"L1_L4_Pdhs_batch4_Rpoolb_initnan"                = R:poolb  *  all_pooling_formats  *  L1_L4_Pdhs_batch4   *  initnan:
+"L4_Pbdhs_batch4_Rpoolb"                          = R:poolb  *  all_pooling_formats  *  L4_Pdhs_batch4      *  mode:1,2,3
+"L1_L4_Pdhs_batch4_Rpoolb"                        = R:poolb  *  all_pooling_formats  *  L1_L4_Pdhs_batch4
+"bug200345292"                                    = R:poolf  *  all_pooling_formats  *  L4_req              *  n:128             *  c:1                   *  h:1                        *  w:1                              *  u:1       *  v:1      *  A:1    *  B:0  *  b:      *  win_w:1  *  win_h:1
+"L4_Pdhs_batch4_Rpoolf_batch70000"                = R:poolf  *  all_pooling_formats  *  L4_Pdhs_batch4      *  dim:2             *  dimA:"70000,81,7,7"   *  b:                         *  convStrideA:"1,1,1"              *  win_d:7   *  win_h:7
+"L4_Pbdhs_batch4_Rpoolf_negPad"                   = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  pad_w:-2          *  pad_h:-2
+"L4_Pbdhs_batch4_Rpoolf_dim3"                     = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  dim:3
+"L4_Pbdhs_batch4_Rpoolf_unpackedTensor"           = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  dimA:"10,10,5,5"  *  strideA:"255,25,5,1"  *  strideOut:"100,10,3,1"     *  b:
+"L4_Pbdhs_batch4_Rpoolf_dim3_unpackedTensor_1000" = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  dim:3             *  dimA:"10,10,5,5,2"    *  strideA:"1000,51,10,2,1"   *  strideOut:"45,4,2,1,1"           *  b:
+"L4_Pbdhs_batch4_Rpoolf_dim3_negPad"              = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  dim:3             *  pad_w:-2              *  pad_h:-2                   *  pad_d:-2
+"L4_Pbdhs_batch4_Rpoolf_dim3_propnan_initnan"     = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  dim:3             *  propnan:              *  initnan:
+"L4_Pbdhs_batch4_Rpoolf_dim3"                     = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  dim:3             *  mode:1,2
+"L4_Pbdhs_batch4_Rpoolf_dim3_initnan"             = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  dim:3             *  initnan:
+"L1_L4_Pdhs_batch4_Rpoolf_propnan_initnan"        = R:poolf  *  all_pooling_formats  *  L1_L4_Pbdhs_batch4  *  propnan:          *  initnan:
+"L1_L4_Pdhs_batch4_Rpoolf_initnan"                = R:poolf  *  all_pooling_formats  *  L1_L4_Pbdhs_batch4  *  initnan:
+"L1_L4_Pbdhs_batch4_Rpoolf"                       = R:poolf  *  all_pooling_formats  *  L1_L4_Pbdhs_batch4
+"L4_Pbdhs_batch4_Rpoolf"                          = R:poolf  *  all_pooling_formats  *  L4_Pbdhs_batch4     *  mode:1,2
+"large_pooling_window"                            = L4_req   *  all_pooling_formats  *  all_pooling_modes   *  large_window_pool_dims
+"L3_bug_2083491_test_Rpoolf"					  = L3_req   *  R:poolf  *  all_pooling_formats  *  L4_bug_2083491
+"L3_bug_2218236_test_Rpoolb"                      = L3_req   *  R:poolb  *  all_pooling_formats  *  mode:0  *  dimA:"1,1,16,16"  *  u:1  *  v:1  *  win_h:16  *  win_w:16  *  b:
+"L3_bug_2469732_test_Rpoolb"                      = L3_req   *  R:poolb  *  all_pooling_formats  *  mode:0  *  dimA:"1,1,2,16"   *  u:1  *  v:2  *  win_h:2   *  win_w:8   *  b: * p:1
+
+//Pooling vector data type tests
+"L4_vector_pooling_large_W" = L4_req * vector_pooling_modes * vector_pooling_formats * L4_Pb_batch4 * large_window_pool_dims_for_vector_datatype * pooling_nan_formats
+"L4_vector_pooling_x4" = L4_req * vector_pooling_modes * formatIn:2 * formatOut:2 * Pb * pooling_window_sizes * pooling_vector_diff_dimension_for_vect_x4_no_randomization * pooling_nan_formats * b:
+"L4_vector_pooling_x32" = L4_req * vector_pooling_modes * formatIn:2 * formatOut:2 * nc32: * Pb * pooling_window_sizes * pooling_vector_diff_dimension_for_vect_x32_no_randomization * pooling_nan_formats * b:
+
+// All testing for routines: reduce
+"L4_Pdhs_batch4_Rreduce_mode3_56x56image"     = R:reduce  *  L4_Pdhs_batch4      *  n:128         *  c:32                  *  h:56    *  w:56      *  B:0                        *  mode:3    *  strideA:"129000,4000,56,1"  *  strideOut:"3,3,3,3"        *  b:  *  reduceTensorIndicesMode:1  *  dimOut:"1,1,1,1"
+"L4_Pdhs_batch4_Rreduce_dim5_propnan_initnan" = R:reduce  *  L4_Pdhs_batch4      *  dim:5         *  dimA:"8,3,8,8,8,8,8"  *  mode:3  *  initnan:  *  reduceTensorIndicesMode:1  *  propnan:
+"L4_Pb_batch4_Rreduce_mode3_propnan_initnan"  = R:reduce  *  L4_Pb_batch4        *  dim:5         *  dimA:"8,3,8,8,8,8,8"  *  mode:3  *  initnan:  *  reduceTensorIndicesMode:1  *  propnan:
+"L4_Pb_batch4_Rreduce_mode3_56x56image"       = R:reduce  *  L4_Pb_batch4        *  n:128         *  c:32                  *  h:56    *  w:56      *  B:0                        *  mode:3    *  strideA:"129000,4000,56,1"  *  strideOut:"3,3,3,3"        *  b:  *  reduceTensorIndicesMode:1  *  dimOut:"1,1,1,1"
+"L4_Pbdhs_batch4_Rreduce_mode6"               = R:reduce  *  L4_Pbdhs_batch4     *  mode:1,3,4,6
+"L4_Pbdhs_batch4_Rreduce_mode3_56x56image"    = R:reduce  *  L4_Pbdhs_batch4     *  n:128         *  c:32                  *  h:56    *  w:56      *  B:0                        *  mode:3    *  b:                          *  reduceTensorIndicesMode:1
+"L4_Pbdhs_batch4_Rreduce_dim3"                = R:reduce  *  L4_Pbdhs_batch4     *  dim:3
+"L4_Pbdhs_batch4_Rreduce_propnan_initnan"     = R:reduce  *  L4_Pbdhs_batch4     *  propnan:      *  initnan:
+"L4_Pbdhs_batch4_Rreduce"                     = R:reduce  *  L4_Pbdhs_batch4     *  mode:2,5,7
+"L1_L4_Pbdhs_batch4_Rreduce"                  = R:reduce  *  L1_L4_Pbdhs_batch4
+
+"Bug200428889_L4_Pin_Pout_hsb_batch4_Rreduce_mode6"               = R:reduce  *  L4_Pin_Pout_hsb_batch4     *  mode:1,3,4,6
+"Bug200428889_L4_Pin_Pout_hsb_batch4_Rreduce_mode3_56x56image"    = R:reduce  *  L4_Pin_Pout_hsb_batch4     *  n:128         *  c:32                  *  h:56    *  w:56      *  B:0                        *  mode:3    *  b:                          *  reduceTensorIndicesMode:1
+"Bug200428889_L4_Pin_Pout_hsb_batch4_Rreduce_dim3"                = R:reduce  *  L4_Pin_Pout_hsb_batch4     *  dim:3
+"Bug200428889_L4_Pin_Pout_hsb_batch4_Rreduce_propnan_initnan"     = R:reduce  *  L4_Pin_Pout_hsb_batch4     *  propnan:      *  initnan:
+"Bug200428889_L4_Pin_Pout_hsb_batch4_Rreduce"                     = R:reduce  *  L4_Pin_Pout_hsb_batch4     *  mode:2,5,7
+
+
+"Bug200356493"                                = R:reduce  *  n:1000              * c:20           *  P:s                   *  b:
+
+// All testing for routines: RNNb,RNNf
+// addedd for RNN split in different levels in release test
+"L1_SIMPLE_RNN"  = R:RNNf,RNNb * rnnPaddingMode:0 * L1_SIMPLE_RNN
+"L4_RNN_ALL_COMBINATIONS"  = R:RNNf,RNNb * mode:0,1,2,3 * rnnPaddingMode:0,1,2,3 * L4_RNN_ALL_COMBINATIONS
+"L4_RNN_Ps_N30"   = R:RNNb,RNNf  *  L4_RNN  *  Ps  *  N:30
+"L4_RNN_PROJ_FWD" = R:RNNf  *  L4_RNN_PROJ_FWD
+"L4_RNN_PROJ_BWD" = R:RNNb  *  L4_RNN_PROJ_BWD
+"L4_RNN_bug2035253_1" = R:findFwdRNN,findFwdTrainingRNN,findBwdDataRNN,findBwdWeightsRNN * L4_RNN_find_1 * P:s * N:1 * T:1 * b:
+"L4_RNN_bug2035253_2" = R:findFwdRNN,findFwdTrainingRNN,findBwdDataRNN                   * L4_RNN_find_2 * P:s * N:1 * T:1 * b:
+"L4_RNN_bug2035253_3" = R:findBwdWeightsRNN                                              * L4_RNN_find_3 * P:s * N:1 * T:1 * b:
+"L4_RNN_bug2035253_4" =                                                                    L4_RNN_find_4 * P:s * N:1 * T:1 * b:
+
+// All testing for routines: softmaxf,softmaxb
+"L1_Pbdhs_batch4_Rsoftmaxf"   = R:softmaxf  *  Phs * L1_batch4
+"L1_Pdhs_batch4_Rsoftmaxb"    = R:softmaxb  *  Phs * L1_batch4
+"L4_softmaxf_all_combination" = R:softmaxf * mode:0,1,2,3,4,5 * P:h,s,d * n:16 * formatIn:0,1 * dim:2,3 * A:1 *B:0 * N:10 * L4_req
+"L4_softmaxb_all_combination" = R:softmaxb * mode:0,1,2,3,4,5 * P:h,s,d * n:16 * formatIn:0,1 * dim:2,3 * A:1 *B:0 * N:10 * L4_req
+"L4_Pbdhs_batch4_Rsoftmaxf_dim4" = R:softmaxf  *  L4_Pbdhs_batch4     *  dim:4  *  dimA:"5,3,8,8,8,8"
+
+// All testing for routines: transform
+"L1_L4_Pbdhs_batch4_Rtransform"        = R:transform  *  L1_L4_Pbdhs_batch4
+"L1_transform_Pcomps_Pouts_N100"       = R:transform  *  L1_req              *  n:1,10,15,25,50  *  Pin:b,h,s  *  Pcomp:s  *  Pout:s   *  N:100
+"L1_transform_bss_c16_N100_inNCHWx4"   = R:transform  *  L1_req              *  n:1,10,15,25,50  *  c:16       *  Pin:b    *  Pcomp:s  *  Pout:s  *  formatIn:2   *  N:100
+"L1_transform_bbs_c4_N100_inOutNCHWx4" = R:transform  *  L1_req              *  n:1,10,15,25,50  *  c:4        *  Pin:b    *  Pcomp:s  *  Pout:b  *  formatIn:2   *  formatOut:2  *  N:100
+"L1_transform_ssb_outNCHWx4"           = R:transform  *  L1_req              *  n:1,10,15,25,50  *  c:20       *  Pin:s    *  Pcomp:s  *  Pout:b  *  formatOut:2  *  N:100
+"L1_transform_ddd_N100"                = R:transform  *  L1_req              *  n:1,10,15,25,50  *  Pin:d      *  Pcomp:d  *  Pout:d   *  N:100
+"L1_transform_bsb_N100_outNCHWx4"      = R:transform  *  L1_req              *  n:1,10,15,25,50  *  c:12       *  Pin:b    *  Pcomp:s  *  Pout:b  *  formatOut:2  *  N:100
+"L1_transform_bsb_c8_inNCHWx4"         = R:transform  *  L1_req              *  n:1,10,15,25,50  *  c:8        *  Pin:b    *  Pcomp:s  *  Pout:b  *  formatIn:2   *  N:100
+
+"L1_transform_fold"      = R:transform * L1_req * foldA:"3,2"   * dimA:"2,3,224,224" * formatIn:0,1 * formatOut:0,1 * padBeforeA:"0,0,-2,3" * padAfterA:"0,0,3,-2" *  Pin:h,s  *  Pcomp:s  *  Pout:h,s * b: * B:0
+"L1_transform_unfold"    = R:transform * L1_req * unfoldA:"3,2" * dimA:"2,8,53,53" * formatIn:0,1 * formatOut:0,1 * padBeforeA:"0,0,-2,3" * padAfterA:"0,0,3,-2" * Pin:h,s  *  Pcomp:s  *  Pout:h,s * b: * B:0
+"L1_transform_zero_pad"  = R:transform * L1_req * dimA:"2,8,128,128" * formatIn:0,1 * formatOut:0,1 * padBeforeA:"3,1,-21,23" * padAfterA:"1,-2,33,-6" * Pin:h,s  *  Pcomp:s  *  Pout:h,s * b: * B:0
+
+// test for convBiasAct with int8/uint8 and activation identity
+"L3_convActBias_test"           = R:conv,convBiasAct  *  L3_convBiasAct_InOutActMix  *  algo:1  *  c:8  *  k:8  *  h:8  *  w:8  *  n:1  *  p:i  *  Pmath:0,1  *  b:
+
+// test for convBiasAct with all algo1 data-types and activation identity
+"L3_convBiasAct_InOutActMix_IDENTITY_all_test" = R:convBiasAct  *  L3_convBiasAct_InOutActMix_IDENTITY_all  *  algo:0  *  c:8  *  k:8  *  h:8  *  w:8  *  n:1  *  b:
+"L3_convBiasAct_InOutActMix_IDENTITY_all_grouped_test" = R:convBiasAct  *  L3_convBiasAct_InOutActMix_IDENTITY_all_grouped  *  algo:0 *  b:
+"bug2021969_0"                   = R:conv,convBiasAct  * L3_bug_2021969_CUDNN_TENSOR_NHWC         *  dimA:"5,20,720,572"  *  filtA: "20,20,7,7"  *  pad_h:3  *  pad_w: 3  *  algo:1  *  Pin:b  *  Pcomp:b  *  Pout:s,b  *  b:  *  p:i
+"bug2021969_1"                   = R:conv,convBiasAct  * L3_bug_2021969_CUDNN_TENSOR_NCHW_VECT_C  *  dimA:"5,20,720,572"  *  filtA: "30,20,7,7"  *  pad_h:0  *  pad_w: 0  *  algo:1  *  Pin:b  *  Pcomp:b  *  Pout:s    *  b:  *  p:i
+"bug2021969_2"                   = R:conv,convBiasAct  * L3_bug_2021969_CUDNN_TENSOR_NHWC         *  dimA:"5,20,720,572"  *  filtA: "20,20,1,7"  *  pad_h:0  *  pad_w: 3  *  algo:1  *  Pin:b  *  Pcomp:b  *  Pout:s,b  *  b:  *  p:i
+"bug2021969_3"                   = R:conv,convBiasAct  * L3_bug_2021969_CUDNN_TENSOR_NCHW_VECT_C  *  dimA:"5,20,720,572"  *  filtA: "30,20,7,1"  *  pad_h:3  *  pad_w: 0  *  algo:1  *  Pin:b  *  Pcomp:b  *  Pout:s    *  b:  *  p:i
+"bug2021969_4"                   = R:conv,convBiasAct  * L3_bug_2021969_CUDNN_TENSOR_NHWC         *  dimA:"5,20,720,572"  *  filtA: "30,20,1,1"  *  pad_h:0  *  pad_w: 0  *  algo:1  *  Pin:b  *  Pcomp:b  *  Pout:s    *  b:  *  p:i
+"bug2021969_5"                   = R:conv,convBiasAct  * L3_bug_2021969_CUDNN_TENSOR_NCHW_VECT_C  *  dimA:"5,20,720,572"  *  filtA: "20,20,1,1"  *  pad_h:0  *  pad_w: 0  *  algo:1  *  Pin:b  *  Pcomp:b  *  Pout:s,b  *  b:  *  p:i
+"bug200375359"                   = R:conv              * L3_bug_2021969_CUDNN_TENSOR_NCHW_VECT_C * algo:1 * b: * Pin:b * Pcomp:b * Pout:b  * n:1 * c:20 * h:720 * w:572 * pad_w:3 * pad_h:3 * r:7 * s:7 * p:i * k:20
+"Bug2484349"                     = L2_bug_2484349
+
+// test conv numerical threshold
+"L4_bug_200380402_test"          = R:conv              * L4_bug_200380402
+
+// test wgrad numerical threshold
+"L4_bug_200388940_test"          = R:wgrad              * L4_bug_200388940
+
+// test Disallow SASS when filter > source
+"L4_bug_200397238_test"          = R:dgrad              * L4_bug_200397238 * algo:1
+
+// add test for "Bug 2097074: _wgrad_idx_ integration in cuDNN"
+"Performance_Bug_2097074_test"         =  R:wgrad              * Performance_Bug_2097074
+
+// below are tests for bugs discovered by Google
+"GoogleDL_bug1990896_1"          = R:conv   *  L4_req  * n:1  *  c:256  *  h:100   *  w:100   *  k:256   *  r:1     *  s:1   *  algo:5   *  b:
+"GoogleDL_bug1990896_2"          = R:conv   *  L4_req  * n:1  *  c:256  *  h:1     *  w:1     *  k:256   *  r:1     *  s:1   *  algo:5   *  b:
+"GoogleDL_bug1990896_3"          = R:conv   *  L4_req  * n:1  *  c:256  *  h:1     *  w:100   *  k:256   *  r:1     *  s:1   *  algo:5   *  b:
+"GoogleDL_bug1990896_4"          = R:conv   *  L4_req  * n:1  *  c:256  *  h:100   *  w:100   *  k:256   *  r:100   *  s:1   *  algo:5   *  b:
+"GoogleDL_bug1990896_5"          = R:conv   *  L4_req  * n:1  *  c:256  *  h:100   *  w:100
+"GoogleDL_bug1968305_1"          = R:conv   *  L4_req  * dimA:"512,1,300,50"  *  filtA:"64,1,1,50"  *  algo:5   *  pad_w:0  *  b:
+"GoogleDL_bug1968305_2"          = R:conv   *  L4_req  * dimA:"512,1,300,50"  *  filtA:"64,1,1,50"  *  algo:5   *  pad_w:0
+"GoogleDL_bug1962410"            = R:wgrad  *  L4_req  * n:720  *  c:1  *  h:400  *  w:600  *  k:1  *  r:1   *  s:401  *  pad_w:200  *  pref:1 *  T:1  *  b:
+"GoogleDL_bug1962410_1"          = R:wgrad  *  L4_req  * n:720  *  c:1  *  h:400  *  w:600  *  k:1  *  r:1   *  s:401  *  pad_w:200  *  algo:0 *  T:1  *  b:
+"GoogleDL_bug1962410_2"          = R:wgrad  *  L4_req  * n:720  *  c:1  *  h:400  *  w:600  *  k:1  *  r:1   *  s:401  *  pad_w:200  *  algo:3 *  T:1  *  b:
+"GoogleDL_bug1962410_3"          = R:wgrad  *  L4_req  * n:1    *  c:1  *  h:400  *  w:600  *  k:1  *  r:1   *  s:1  *  pad_h:10000   *  pad_w:10000   *  algo:0 *  b:
+"GoogleDL_bug2181786_1"          = R:wgrad  *  L4_req  * algo:2 * P:s * groupCount:3 * dimA:"7,24,51,23"  * filtA:"222,8,1,3" *  padA:"0,1" * A:1 * B:0 *  b:
+"GoogleDL_bug1893243"            = R:conv   *  L3_req  * Pin:s  * Pout:s * Pcomp:s  *  n:1  *  c:32  *  h:300  *  w:300  *  k:662  *  r:3   *  s:3  *  pad_h:1   *  pad_w:1   *  algo:7 *  filtFormat:0 *  formatIn:0 *  formatOut:0 *  b:
+"GoogleDL_bug2254619"            = R:dgrad  *  L4_req  * algo:1 * Pin:h * Pout:h * Pcomp:s * Pmath:1 * x: * dimA:"128,1024,14,14" * strideA:"200704,1,14336,1024" * filtA:"2048,1024,1,1" * filtFormat:0 * padA:"0,0" * convStrideA:"2,2" * dilationA:"1,1" * A:1.000000 * B:0.000000 * strideOut:"100352,49,7,1" * b:
+"GoogleDL_bug2260917"            = R:dgrad  *  L4_req  * formatIn:0 * filtFormat:1 * formatOut:1
+"GoogleDL_bug2260917"            = R:dgrad  *  L4_req  * algo:1 * Pin:h * Pout:h * Pcomp:s * Pmath:1 * x: * dimA:"128,1024,14,14" * strideA:"200704,196,14,1" * filtA:"2048,1024,1,1" * filtFormat:1 * padA:"0,0" * convStrideA:"2,2" * dilationA:"1,1" * A:1.000000 * B:0.000000 * strideOut:"100352,1,14336,2048" * b:
+"GoogleDL_bug2270290"            = R:conv   *  L4_req  * algo:1 * Pin:h * Pout:h * Pcomp:s * dimA:"128,64,56,56" * strideA:"200704,1,3584,64" * filtA:"256,64,1,1"  * filtFormat:1 * formatOut:0 * x: * Pmath:1   * A:1.000000 * B:0.000000 * strideOut:"802816,3136,56,1"  * b:
+
+// tests below are added for feature :Bug 1986116 [RFE] Support for cell clipping in CUDNN LSTM
+"GoogleDL_Bug1986116_cell_clipping_LSTM" = R:RNNf,RNNb  *L0_req  *A:1 *B:0 *rnnLSTMClip:"-50.0,50.0" *P:s *Pmath:0 *mode:2 *rnnSkipInput:1 *rnnInputSize:50 *rnnHiddenSize:50 *rnnMiniBatch:32 *rnnSeqLength:50 *rnnNumLayers:1 *rnnbidirectional:1
+"GoogleDL_Bug1986116_cell_clipping_LSTM_L4_group1" = R:RNNf,RNNb *A:1  *B:0  *b: *L4_req *mode:2 *rnnInputSize:1024 *rnnHiddenSize:256 *rnnSeqLength:25 *rnnNumLayers:1 *rnnPersistent:1,2 *rnnbidirectional:0 *rnnSkipInput:0
+"GoogleDL_Bug1986116_cell_clipping_LSTM_L4_group2" = R:RNNf,RNNb *A:1  *B:0  *b: *L4_req *rnnLSTMClip:"-50.0,50.0" *P:h,s *mode:2 *rnnInputSize:1024 *rnnHiddenSize:256 *rnnSeqLength:25 *rnnNumLayers:1 *rnnPersistent:1,2 *rnnbidirectional:0 *rnnSkipInput:0
+"GoogleDL_Bug1986116_cell_clipping_LSTM_L4_group3" = R:RNNf,RNNb *A:1  *B:0  *b: *L4_req *rnnLSTMClip:"-50.0,50.0" *P:h,s *initnan: *propnan: *mode:2 *rnnInputSize:1024 *rnnHiddenSize:256 *rnnSeqLength:25 *rnnNumLayers:1 *rnnPersistent:1,2 *rnnbidirectional:0 *rnnSkipInput:0
+
+// below are tests for bugs discovered by Google
+"GoogleDL_Bug2354662_BWD_FILTER_Incorrect_1" = R:wgrad *  L3_req * algo:1 * Pin:h * Pout:h * Pcomp:s * Pmath:0 * x: * dimA:"256,3,224,224" * strideA:"150528,1,672,3" * filtA:"64,3,7,7" * filtFormat:1 * padA:"3,3" * convStrideA:"2,2" * dilationA:"1,1" * A:1.000000 * B:0.000000 * strideOut:"802816,1,7168,64" * b:
+"GoogleDL_Bug2354662_BWD_FILTER_Incorrect_2" = R:wgrad *  L3_req * algo:1 * Pin:h * Pout:h * Pcomp:s * Pmath:1 * x: * dimA:"256,3,224,224" * strideA:"150528,1,672,3" * filtA:"64,3,7,7" * filtFormat:1 * padA:"3,3" * convStrideA:"2,2" * dilationA:"1,1" * A:1.000000 * B:0.000000 * strideOut:"802816,1,7168,64" * b:
+
+// Invalid descriptor in strided dgrad
+"ADLR_bug2194811_1"              = R:dgrad  *  L4_req  * n:3 * c:256 * h:180 * w:180 * k:512 * Pin:h * Pout:h * Pcomp:s * Pmath:1 * r:3 * s:3 * u:2 * v:2 * algo:1 * pad_h:1 * pad_w:1 * x: * A:1 * B:0 * b:
+
+// tests below are added for :Bug 200428526:[test coverage development] investigate and improve cuDNN RNN related test
+"GoogleDL_Bug1986116_cell_clipping_LSTM_AlgoDescNew1" = R:RNNf,RNNb  *L4_req  *rnnLSTMClip:"-50.0,50.0" *P:s *Pmath:0 *mode:2 *rnnSkipInput:1 *rnnInputSize:50 *rnnHiddenSize:50 *rnnMiniBatch:32 *rnnSeqLength:50 *rnnNumLayers:1 *rnnbidirectional:1 *rnnAlgoDescNew:1
+"GoogleDL_Bug1986116_cell_clipping_LSTM_AlgoDescNew1_L4_group1" = R:RNNf,RNNb *b: *L4_req *mode:2 *rnnInputSize:1024 *rnnHiddenSize:256 *rnnSeqLength:25 *rnnNumLayers:1 *rnnPersistent:1,2 *rnnbidirectional:0 *rnnSkipInput:0 *rnnAlgoDescNew:1
+"GoogleDL_Bug1986116_cell_clipping_LSTM_AlgoDescNew1_L4_group2" = R:RNNf,RNNb *b: *L4_req *rnnLSTMClip:"-50.0,50.0" *P:h,s *mode:2 *rnnInputSize:1024 *rnnHiddenSize:256 *rnnSeqLength:25 *rnnNumLayers:1 *rnnPersistent:1,2 *rnnbidirectional:0 *rnnSkipInput:0 *rnnAlgoDescNew:1
+"GoogleDL_Bug1986116_cell_clipping_LSTM_AlgoDescNew1_L4_group3" = R:RNNf,RNNb *b: *L4_req *rnnLSTMClip:"-50.0,50.0" *P:h,s *initnan: *propnan: *mode:2 *rnnInputSize:1024 *rnnHiddenSize:256 *rnnSeqLength:25 *rnnNumLayers:1 *rnnPersistent:1,2 *rnnbidirectional:0 *rnnSkipInput:0 *rnnAlgoDescNew:1
+
+"L4_cask_conv_dilation_0"   = R:conv  * Ps * algo:1 * Pmath:0,1 * Pcomp:s      * L4_cask_dilation_various_dims_nonspatial
+"L4_cask_conv_dilation_0x"  = R:conv  * Ps * algo:1 * Pmath:0,1 * Pcomp:s * x: * L4_cask_dilation_various_dims_nonspatial
+"L4_cask_conv_dilation_1"   = R:conv  * Ph * algo:1 * Pmath:1   * Pcomp:s      * L4_cask_dilation_various_dims_nonspatial
+"L4_cask_conv_dilation_1x"  = R:conv  * Ph * algo:1 * Pmath:1   * Pcomp:s * x: * L4_cask_dilation_various_dims_nonspatial
+"L4_cask_dgrad_dilation_0"  = R:dgrad * Ps * algo:1 * Pmath:0,1 * Pcomp:s      * L4_cask_dilation_various_dims_nonspatial_unit_stride
+"L4_cask_dgrad_dilation_0x" = R:dgrad * Ps * algo:1 * Pmath:0,1 * Pcomp:s * x: * L4_cask_dilation_various_dims_nonspatial_unit_stride
+"L4_cask_dgrad_dilation_1"  = R:dgrad * Ph * algo:1 * Pmath:1   * Pcomp:s      * L4_cask_dilation_various_dims_nonspatial_unit_stride
+"L4_cask_dgrad_dilation_1x" = R:dgrad * Ph * algo:1 * Pmath:1   * Pcomp:s * x: * L4_cask_dilation_various_dims_nonspatial_unit_stride
+"L4_cask_wgrad_dilation_0"  = R:wgrad * Ps * algo:1 * Pmath:0,1 * Pcomp:s      * L4_cask_dilation_various_dims_nonspatial_unit_stride * B:0,1
+
+"L4_Bug2340512_test"             = R:dgrad  *  L4_req * Pin:h * Pout:h * Pcomp:s * Pmath:1 * algo:1 * k:1 * c:1 * r:3 * s:3 * n:2 * h:6 * w:6 * b:
+
+// Bug 2192715:cudnnFind() runs kernels in "beta==0" mode, and so returns results that can fail or are slower when run with beta==1.  Examples provided
+"Bug2192715_L4_cudnnFind_beta1.0f" = R:wgrad  * algo:0  * b: * L4_req * k:256  * c:128  * r:3  * s:3  * x:  * n:128  * h:64  * w:64  * dim:2  * filtFormat:0  * formatIn:0  * formatOut:0  * Pin:s  * Pout:s  * Pcomp:s  * v:1  * u:1  * dilation_h:1  * dilation_w:1  * A:1  * B:1
+"Bug2192715_L4_cudnnFind_beta1.0f" = R:wgrad  * algo:0  * b: * L4_req * k:256  * c:65534  * r:2  * s:2  * x:  * n:1  * h:2  * w:1560  * dim:2  * filtFormat:0  * formatIn:0  * formatOut:0  * Pin:s  * Pout:s  * Pcomp:s  * v:1  * u:1  * dilation_h:1  * dilation_w:1  * A:1  * B:1
+
+"cask_winograd_dgrad_bugs" = cask_winograd_dgrad_bugs * R:dgrad * algo:4 * Pin:s * Pout:s * Pcomp:s * A:1.000000 * B:0.000000 * b: * N:10
+
+// NVBug 2101262: test for find{Fwd,Bwd}* and get{Fwd,Bwd}* does not respect -filtFormat=1 option. Note that getBwdDataAlgo is omitted.
+"bug2101262_tests" = R:findBwdDataAlgo,findBwdFilterAlgo,findFwdAlgo,getBwdFilterAlgo,getFwdAlgo * L3_bug_2101262 * P:inh * P:outh * P:comps * P:math1 * b: * formatIn:1 * formatOut:1 * filtFormat:1
+
+"L3_bug2111936_lrn" = bug2111936 * dimA:"100,19,51,36" * lrnA:0.01 * lrnB:0.123 * lrnK:3 * A:1 * B:0 * b:
+
+"RNN_nightly_L3" =   R: RNNf, RNNb  *  rnn_nightly  *  b:
+
+"resnet_update" = resnet_update * A:1.0 * B:0.0 * b: * Pmath:1 * P:h * algo:1
+"resnet_update_fallback" = resnet_update * A:2.0 * B:0.0 * b: * Pmath:1 * P:h * algo:1
+
+"L3_bug2405104_wgrad_1" = R:wgrad * algo:1 * Pin:s * Pout:s * Pcomp:s * Pmath:0 * x: * L3_bug_2405104
+"L3_bug2405104_conv_1" =  R:conv  * algo:1 * Pin:s * Pout:s * Pcomp:s * Pmath:0 * x: * L3_bug_2405104
+"L3_bug2405104_wgrad_2" = R:wgrad * algo:1 * Pin:h * Pout:h * Pcomp:s * Pmath:1 * x: * L3_bug_2405104
+"L3_bug2405104_conv_2" =  R:conv  * algo:1 * Pin:h * Pout:h * Pcomp:s * Pmath:1 * x: * L3_bug_2405104
+
+"L3_A-1_B0_n5_variousDims_convBiasAct_algo4" = R:convBiasAct * L3_A-1_B0_n5_variousDims * conv_corr * Phs * algo:4
+
+"L4_pgan_splitK"          = L4_pgan_splitK
+"L4_pgan_splitK_cross"    = L4_pgan_splitK * x:
+
+"L4_Turing_E2E" = Turing_E2E * algo:1 * Pmath:1 * P:h * Pcomp:s * B:1 * A:1 * b: * k:64 * n:3 * c:128 * dim:2
+
+"Bug2251764_RNN_paddingMode" = R:RNNf * L2_req  *rnnPaddingMode:3 *rnnNumLayers:1 *rnnHiddenSize:10 *rnnInputSize:10 *rnnSeqLength:16 *rnnMiniBatch:33 *b:
+
+"L4_Bug200469600_cudnnConvolutionBiasActivationForward_INT8x32" = R:convBiasAct * L4_req  * Pin:b * Pout:b * Pcomp:b * algo:1 * filtFormat:2 * formatIn:2 * formatOut:2 * p:i * A:1.0 * B:0.0 * dimA:"16,32,64,64" * filtA:"32,32,16,16" * padA:"0,0" * nc:32 * b:
+
+// Test conv and convBiasAct IMMA Filter 1x1 to Filter 16x16
+"L4_Bug200469600_conv_convBiasAct_Image16x16_FilterVARY_INT8x32" = R:conv,convBiasAct * L4_req  * Pin:b * Pout:b * Pcomp:b * algo:1 * filtFormat:2 * formatIn:2 * formatOut:2 * p:i * A:1.0 * B:0.0 * dimA:"16,32,16,16" * filtA:"32,32,1,1", "32,32,2,2", "32,32,3,3", "32,32,4,4", "32,32,5,5", "32,32,6,6", "32,32,7,7", "32,32,8,8", "32,32,9,9", "32,32,10,10", "32,32,11,11", "32,32,12,12", "32,32,13,13", "32,32,14,14", "32,32,15,15", "32,32,16,16" * padA:"0,0" * nc:32 * b:
+
+"L4_Bug200469600_conv_convBiasAct_ImageLarge_Filter7x7_INT8x32" = R:conv,convBiasAct * L4_req  * Pin:b * Pout:b * Pcomp:b * algo:1 * filtFormat:2 * formatIn:2 * formatOut:2 * p:i * A:1.0 * B:0.0 * dimA:"16,32,96,96" * filtA:"32,32,7,7" * padA:"0,0" * nc:32 * b:
+
+"L4_Bug200469600_conv_convBiasAct_ImageLarge_Filter3x3_INT8x32" = R:conv,convBiasAct * L4_req  * Pin:b * Pout:b * Pcomp:b * algo:1 * filtFormat:2 * formatIn:2 * formatOut:2 * p:i * A:1.0 * B:0.0 * dimA:"16,32,96,96" * filtA:"32,32,3,3" * padA:"0,0" * nc:32 * b:

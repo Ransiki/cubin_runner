@@ -1,0 +1,9 @@
+<transpose_all>
+    *
+    tb:
+    ta:
+    ta: * tb:
+
+<perf_regression_tests>
+    P:s * Pin:h * Pout:h * R:gemm * T:10 * algorithm:-1 * b: * mathMode:1 * transpose_all
+

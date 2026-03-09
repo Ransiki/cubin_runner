@@ -1,0 +1,50 @@
+<eris_exclude: !ERIS>
+    *
+    
+<slow_exclude: !SLOW>
+    *
+    
+<text_batches>
+    n:1
+    
+<maskrcnn_backbone_batches>
+    n:1
+    
+<maskrcnn_head_batches>
+    n:1
+    
+<dynamic_batch_size>
+    n: 1, 2
+
+<convolution>
+    dynamic_batch_size  *  R: conv
+    
+<convolution_depsep>
+    convolution
+    
+<activation>
+    dynamic_batch_size  *  R: activationf
+
+<pooling>
+    dynamic_batch_size  *  R: poolf, poolb
+
+<batchNorm: ALLOW_BATCH_NORM>
+    dynamic_batch_size  *  R: bnsf, bnsb
+
+<bias>
+    dynamic_batch_size  *  R: add, bgrad
+    
+<lrn>
+    dynamic_batch_size  *  R: lrnf, lrnb
+
+<softmax>
+    dynamic_batch_size  *  R: softmaxf, softmaxb
+
+<rnn>
+    dynamic_batch_size  *  R: RNNf
+
+<sweep_rnn>
+    dynamic_batch_size  *  R: RNNf  *  rnnPersistent: 0,1
+
+<transform>
+    R: transform  *  B:0  *  A:1  *  Pin:h,s  *  Pout:h,s  *  Pcomp:s  *  N:5

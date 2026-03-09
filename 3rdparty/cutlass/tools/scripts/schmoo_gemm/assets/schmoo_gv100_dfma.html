@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
+    <title>DFMA SCHMOO</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
+
+    <script type="text/javascript" src="./data/schmoo_gv100_dfma.js"></script>
+    <style type="text/css">
+      body {
+        max-width: 750px;
+      }
+      div.chart {
+        width: 1280px;
+        height: 720px;
+      }
+      * {
+        box-sizing : border-box;
+      }
+
+      .column {
+        width: 100%;
+      }
+
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+    </style>
+  </head>
+  <body>
+  <h2>DFMA SCHMOO M, K = 4096, N = {256, 1024, 2048, 4096}</h2>
+    <div class = "row">
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-NT-m.csv">DATA DFMA NT SCHMOO M</a></p>
+          <div id="graphdiv1" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g1 = new Dygraph(document.getElementById("graphdiv1"), data_dfma_NT_m(), {title: "DFMA NT SCHMOO M", xlabel: "M - Size", ylabel : "GFLOPs"}); 
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-TT-m.csv">DATA DFMA TT SCHMOO M</a></p>
+        <div id="graphdiv2" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g2 = new Dygraph(document.getElementById("graphdiv2"), data_dfma_TT_m(), {title: "DFMA TT SCHMOO M", xlabel: "M - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-TN-m.csv">DATA DFMA TN SCHMOO M</a></p>
+        <div id="graphdiv3" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g3 = new Dygraph(document.getElementById("graphdiv3"), data_dfma_TN_m(), {title: "DFMA TN SCHMOO M", xlabel: "M - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-NN-m.csv">DATA DFMA NN SCHMOO M</a></p>
+        <div id="graphdiv4" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv4"), data_dfma_NN_m(), {title: "DFMA NN SCHMOO M", xlabel: "M - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+    </div>
+    
+    <h2>DFMA SCHMOO N, K = 4096, M = {256, 1024, 2048, 4096}</h2>
+    <div class = "row">
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-NT-n.csv">DATA DFMA NT SCHMOO N</a></p>
+        <div id="graphdiv5" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g1 = new Dygraph(document.getElementById("graphdiv5"), data_dfma_NT_n(), {title: "DFMA NT SCHMOO N", xlabel: "N - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-TT-n.csv">DATA DFMA TT SCHMOO N</a></p>
+        <div id="graphdiv6" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g2 = new Dygraph(document.getElementById("graphdiv6"), data_dfma_TT_n(), {title: "DFMA TT SCHMOO N", xlabel: "N - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-TN-n.csv">DATA DFMA TN SCHMOO N</a></p>
+        <div id="graphdiv7" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g3 = new Dygraph(document.getElementById("graphdiv7"), data_dfma_TN_n(), {title: "DFMA TN SCHMOO N", xlabel: "N - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-NN-n.csv">DATA DFMA NN SCHMOO N</a></p>
+        <div id="graphdiv8" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv8"), data_dfma_NN_n(), {title: "DFMA NN SCHMOO N", xlabel: "N - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+    </div>
+
+
+    <h2>DFMA SCHMOO K, M = {256, 1024, 2048, 5120}, N = 4096</h2>
+    <div class = "row">
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-NT-k.csv">DATA DFMA NT SCHMOO K</a></p>
+        <div id="graphdiv9" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g1 = new Dygraph(document.getElementById("graphdiv9"), data_dfma_NT_k(), {title: "DFMA NT SCHMOO K", xlabel: "K - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-TT-k.csv">DATA DFMA TT SCHMOO K</a></p>
+        <div id="graphdiv10" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g2 = new Dygraph(document.getElementById("graphdiv10"), data_dfma_TT_k(), {title: "DFMA TT SCHMOO K", xlabel: "K - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-TN-k.csv">DATA DFMA TN SCHMOO K</a></p>
+        <div id="graphdiv11" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g3 = new Dygraph(document.getElementById("graphdiv11"), data_dfma_TN_k(), {title: "DFMA TN SCHMOO K", xlabel: "K - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+          <p><a href = "./csv/perf-DFMA-NN-k.csv">DATA DFMA NN SCHMOO K</a></p>
+        <div id="graphdiv12" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv12"), data_dfma_NN_k(), {title: "DFMA NN SCHMOO K", xlabel: "K - Size", ylabel : "GFLOPs"});
+          </script>
+        </div>
+      </div>
+
+      <h2>DFMA SCHMOO M, N = 4096, K = 4096 CUTLASS vs cuBLAS</h2>
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-NN-m-sol.csv">DATA DFMA NN SCHMOO M SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv13" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv13"), data_dfma_NN_m_sol(), {title: "DFMA NN SCHMOO M SOL", xlabel: "M - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-NT-m-sol.csv">DATA DFMA NT SCHMOO M SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv14" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv14"), data_dfma_NT_m_sol(), {title: "DFMA NT SCHMOO M SOL", xlabel: "M - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-TT-m-sol.csv">DATA DFMA TT SCHMOO M SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv15" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv15"), data_dfma_TT_m_sol(), {title: "DFMA TT SCHMOO M SOL", xlabel: "M - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-TN-m-sol.csv">DATA DFMA TN SCHMOO M SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv16" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv16"), data_dfma_TN_m_sol(), {title: "DFMA TN SCHMOO M SOL", xlabel: "M - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+
+      <h2>DFMA SCHMOO N, M = 4096, K = 4096 CUTLASS vs cuBLAS</h2>
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-NN-n-sol.csv">DATA DFMA NN SCHMOO N SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv17" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv17"), data_dfma_NN_n_sol(), {title: "DFMA NN SCHMOO N SOL", xlabel: "N - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-NT-n-sol.csv">DATA DFMA NT SCHMOO N SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv18" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv18"), data_dfma_NT_n_sol(), {title: "DFMA NT SCHMOO N SOL", xlabel: "N - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-TT-n-sol.csv">DATA DFMA TT SCHMOO N SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv19" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv19"), data_dfma_TT_n_sol(), {title: "DFMA TT SCHMOO N SOL", xlabel: "N - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-TN-n-sol.csv">DATA DFMA TN SCHMOO N SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv20" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv20"), data_dfma_TN_n_sol(), {title: "DFMA TN SCHMOO M SOL", xlabel: "N - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+
+      <h2>DFMA SCHMOO K, N = 4096, M = 5120 CUTLASS vs cuBLAS</h2>
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-NN-k-sol.csv">DATA DFMA NN SCHMOO K SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv21" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv21"), data_dfma_NN_k_sol(), {title: "DFMA NN SCHMOO K SOL", xlabel: "K - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-NT-k-sol.csv">DATA DFMA NT SCHMOO K SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv22" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv22"), data_dfma_NT_k_sol(), {title: "DFMA NT SCHMOO K SOL", xlabel: "K - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-TT-k-sol.csv">DATA DFMA TT SCHMOO K SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv23" style="width:640px;height:360px">
+          <script type="text/javascript">
+            g4 = new Dygraph(document.getElementById("graphdiv23"), data_dfma_TT_k_sol(), {title: "DFMA TT SCHMOO K SOL", xlabel: "K - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+      <div class = "column">
+        <p><a href = "./csv/perf-DFMA-TN-k-sol.csv">DATA DFMA TN SCHMOO K SOL CUTLASS vs cuBLAS</a></p>
+        <div id="graphdiv24" style="width:640px;height:360px">
+          <script type="text/javascript">
+            gxy = new Dygraph(document.getElementById("graphdiv24"), data_dfma_TN_k_sol(), {title: "DFMA TN SCHMOO K SOL", xlabel: "K - Size", ylabel : "% SOL"});
+          </script>
+        </div>
+      </div>
+
+
+
+    </div>
+  </body>
+</html>

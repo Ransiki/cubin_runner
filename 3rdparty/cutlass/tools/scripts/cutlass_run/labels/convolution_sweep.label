@@ -1,0 +1,330 @@
+<eris_exclude: !ERIS>
+    *
+
+<slow_exclude: !SLOW>
+    *
+
+// Flags used by all layers
+<common_flags>
+    A:1  *  B:0  *  b: * n:8 * csv:
+
+<format_000>
+    formatIn:0 * filtFormat:0 * formatOut:0
+
+<format_111>
+    formatIn:1 * filtFormat:1 * formatOut:1
+
+<format_222>
+    formatIn:2 * filtFormat:2 * formatOut:2
+
+<type_HHH>
+    Pin:h * Pcomp:h * Pout:h
+
+<type_HSH>
+    Pin:h * Pcomp:s * Pout:h
+
+<type_SSS>
+    Pin:s * Pcomp:s * Pout:s
+
+<type_BBI>
+    Pin:b * Pout:b * p:i
+
+// we need accurately control the command and make it easy for adding, removing, modifying or triaging
+// conv + algo0
+<conv_algo0_math0_format000_typehhh>
+    R: conv   * algo: 0                * Pmath:0 * format_000 * type_HHH
+<conv_algo0_math0_format000_typehsh>
+    R: conv   * algo: 0                * Pmath:0 * format_000 * type_HSH
+<conv_algo0_math0_format000_typesss>
+    R: conv   * algo: 0                * Pmath:0 * format_000 * type_SSS
+<conv_algo0_math0_format111_typehhh>
+    R: conv   * algo: 0                * Pmath:0 * format_111 * type_HHH
+<conv_algo0_math0_format111_typehsh>
+    R: conv   * algo: 0                * Pmath:0 * format_111 * type_HSH
+<conv_algo0_math0_format111_typesss>
+    R: conv   * algo: 0                * Pmath:0 * format_111 * type_SSS
+<conv_algo0_math1_format000_typehhh>
+    R: conv   * algo: 0                * Pmath:1 * format_000 * type_HHH
+<conv_algo0_math1_format000_typehsh>
+    R: conv   * algo: 0                * Pmath:1 * format_000 * type_HSH
+<conv_algo0_math1_format000_typesss>
+    R: conv   * algo: 0                * Pmath:1 * format_000 * type_SSS
+<conv_algo0_math1_format111_typehhh>
+    R: conv   * algo: 0                * Pmath:1 * format_111 * type_HHH
+<conv_algo0_math1_format111_typehsh>
+    R: conv   * algo: 0                * Pmath:1 * format_111 * type_HSH
+<conv_algo0_math1_format111_typesss>
+    R: conv   * algo: 0                * Pmath:1 * format_111 * type_SSS
+<conv_algo0_format111_typebbi>
+    R: conv * algo: 0                  *           format_111 * type_BBI
+<conv_algo0_format222_typebbi>
+    R: conv * algo: 0                  *           format_222 * type_BBI
+
+// conv + algo1
+<conv_algo1_math0_format000_typehhh>
+    R: conv   * algo: 1                * Pmath:0 * format_000 * type_HHH
+<conv_algo1_math0_format000_typehsh>
+    R: conv   * algo: 1                * Pmath:0 * format_000 * type_HSH
+<conv_algo1_math0_format000_typesss>
+    R: conv   * algo: 1                * Pmath:0 * format_000 * type_SSS
+<conv_algo1_math0_format111_typehhh>
+    R: conv   * algo: 1                * Pmath:0 * format_111 * type_HHH
+<conv_algo1_math0_format111_typehsh>
+    R: conv   * algo: 1                * Pmath:0 * format_111 * type_HSH
+<conv_algo1_math0_format111_typesss>
+    R: conv   * algo: 1                * Pmath:0 * format_111 * type_SSS
+<conv_algo1_math1_format000_typehhh>
+    R: conv   * algo: 1                * Pmath:1 * format_000 * type_HHH
+<conv_algo1_math1_format000_typehsh>
+    R: conv   * algo: 1                * Pmath:1 * format_000 * type_HSH
+<conv_algo1_math1_format000_typesss>
+    R: conv   * algo: 1                * Pmath:1 * format_000 * type_SSS
+<conv_algo1_math1_format111_typehhh>
+    R: conv   * algo: 1                * Pmath:1 * format_111 * type_HHH
+<conv_algo1_math1_format111_typehsh>
+    R: conv   * algo: 1                * Pmath:1 * format_111 * type_HSH
+<conv_algo1_math1_format111_typesss>
+    R: conv   * algo: 1                * Pmath:1 * format_111 * type_SSS
+<conv_algo1_format111_typebbi>
+    R: conv   * algo: 1                *           format_111 * type_BBI
+
+// conv + algo2
+<conv_algo2_math0_format000_typehhh>
+    R: conv   * algo: 2                * Pmath:0 * format_000 * type_HHH
+<conv_algo2_math0_format000_typehsh>
+    R: conv   * algo: 2                * Pmath:0 * format_000 * type_HSH
+<conv_algo2_math0_format000_typesss>
+    R: conv   * algo: 2                * Pmath:0 * format_000 * type_SSS
+<conv_algo2_math0_format111_typehhh>
+    R: conv   * algo: 2                * Pmath:0 * format_111 * type_HHH
+<conv_algo2_math0_format111_typehsh>
+    R: conv   * algo: 2                * Pmath:0 * format_111 * type_HSH
+<conv_algo2_math0_format111_typesss>
+    R: conv   * algo: 2                * Pmath:0 * format_111 * type_SSS
+<conv_algo2_math1_format000_typehhh>
+    R: conv   * algo: 2                * Pmath:1 * format_000 * type_HHH
+<conv_algo2_math1_format000_typehsh>
+    R: conv   * algo: 2                * Pmath:1 * format_000 * type_HSH
+<conv_algo2_math1_format000_typesss>
+    R: conv   * algo: 2                * Pmath:1 * format_000 * type_SSS
+<conv_algo2_math1_format111_typehhh>
+    R: conv   * algo: 2                * Pmath:1 * format_111 * type_HHH
+<conv_algo2_math1_format111_typehsh>
+    R: conv   * algo: 2                * Pmath:1 * format_111 * type_HSH
+<conv_algo2_math1_format111_typesss>
+    R: conv   * algo: 2                * Pmath:1 * format_111 * type_SSS
+
+// conv + algo3
+<conv_algo3_math0_format000_typehhh>
+    R: conv   * algo: 3                * Pmath:0 * format_000 * type_HHH
+<conv_algo3_math0_format000_typehsh>
+    R: conv   * algo: 3                * Pmath:0 * format_000 * type_HSH
+<conv_algo3_math0_format000_typesss>
+    R: conv   * algo: 3                * Pmath:0 * format_000 * type_SSS
+<conv_algo3_math0_format111_typehhh>
+    R: conv   * algo: 3                * Pmath:0 * format_111 * type_HHH
+<conv_algo3_math0_format111_typehsh>
+    R: conv   * algo: 3                * Pmath:0 * format_111 * type_HSH
+<conv_algo3_math0_format111_typesss>
+    R: conv   * algo: 3                * Pmath:0 * format_111 * type_SSS
+<conv_algo3_math1_format000_typehhh>
+    R: conv   * algo: 3                * Pmath:1 * format_000 * type_HHH
+<conv_algo3_math1_format000_typehsh>
+    R: conv   * algo: 3                * Pmath:1 * format_000 * type_HSH
+<conv_algo3_math1_format000_typesss>
+    R: conv   * algo: 3                * Pmath:1 * format_000 * type_SSS
+<conv_algo3_math1_format111_typehhh>
+    R: conv   * algo: 3                * Pmath:1 * format_111 * type_HHH
+<conv_algo3_math1_format111_typehsh>
+    R: conv   * algo: 3                * Pmath:1 * format_111 * type_HSH
+<conv_algo3_math1_format111_typesss>
+    R: conv   * algo: 3                * Pmath:1 * format_111 * type_SSS
+
+// conv + algo4
+<conv_algo4_math0_format000_typehhh>
+    R: conv   * algo: 4                * Pmath:0 * format_000 * type_HHH
+<conv_algo4_math0_format000_typehsh>
+    R: conv   * algo: 4                * Pmath:0 * format_000 * type_HSH
+<conv_algo4_math0_format000_typesss>
+    R: conv   * algo: 4                * Pmath:0 * format_000 * type_SSS
+<conv_algo4_math0_format111_typehhh>
+    R: conv   * algo: 4                * Pmath:0 * format_111 * type_HHH
+<conv_algo4_math0_format111_typehsh>
+    R: conv   * algo: 4                * Pmath:0 * format_111 * type_HSH
+<conv_algo4_math0_format111_typesss>
+    R: conv   * algo: 4                * Pmath:0 * format_111 * type_SSS
+<conv_algo4_math1_format000_typehhh>
+    R: conv   * algo: 4                * Pmath:1 * format_000 * type_HHH
+<conv_algo4_math1_format000_typehsh>
+    R: conv   * algo: 4                * Pmath:1 * format_000 * type_HSH
+<conv_algo4_math1_format000_typesss>
+    R: conv   * algo: 4                * Pmath:1 * format_000 * type_SSS
+<conv_algo4_math1_format111_typehhh>
+    R: conv   * algo: 4                * Pmath:1 * format_111 * type_HHH
+<conv_algo4_math1_format111_typehsh>
+    R: conv   * algo: 4                * Pmath:1 * format_111 * type_HSH
+<conv_algo4_math1_format111_typesss>
+    R: conv   * algo: 4                * Pmath:1 * format_111 * type_SSS
+
+// conv + algo5
+<conv_algo5_math0_format000_typehhh>
+    R: conv   * algo: 5                * Pmath:0 * format_000 * type_HHH
+<conv_algo5_math0_format000_typehsh>
+    R: conv   * algo: 5                * Pmath:0 * format_000 * type_HSH
+<conv_algo5_math0_format000_typesss>
+    R: conv   * algo: 5                * Pmath:0 * format_000 * type_SSS
+<conv_algo5_math0_format111_typehhh>
+    R: conv   * algo: 5                * Pmath:0 * format_111 * type_HHH
+<conv_algo5_math0_format111_typehsh>
+    R: conv   * algo: 5                * Pmath:0 * format_111 * type_HSH
+<conv_algo5_math0_format111_typesss>
+    R: conv   * algo: 5                * Pmath:0 * format_111 * type_SSS
+<conv_algo5_math1_format000_typehhh>
+    R: conv   * algo: 5                * Pmath:1 * format_000 * type_HHH
+<conv_algo5_math1_format000_typehsh>
+    R: conv   * algo: 5                * Pmath:1 * format_000 * type_HSH
+<conv_algo5_math1_format000_typesss>
+    R: conv   * algo: 5                * Pmath:1 * format_000 * type_SSS
+<conv_algo5_math1_format111_typehhh>
+    R: conv   * algo: 5                * Pmath:1 * format_111 * type_HHH
+<conv_algo5_math1_format111_typehsh>
+    R: conv   * algo: 5                * Pmath:1 * format_111 * type_HSH
+<conv_algo5_math1_format111_typesss>
+    R: conv   * algo: 5                * Pmath:1 * format_111 * type_SSS
+
+// conv + algo6
+<conv_algo6_math0_format000_typehhh>
+    R: conv   * algo: 6                * Pmath:0 * format_000 * type_HHH
+<conv_algo6_math0_format000_typehsh>
+    R: conv   * algo: 6                * Pmath:0 * format_000 * type_HSH
+<conv_algo6_math0_format000_typesss>
+    R: conv   * algo: 6                * Pmath:0 * format_000 * type_SSS
+<conv_algo6_math0_format111_typehhh>
+    R: conv   * algo: 6                * Pmath:0 * format_111 * type_HHH
+<conv_algo6_math0_format111_typehsh>
+    R: conv   * algo: 6                * Pmath:0 * format_111 * type_HSH
+<conv_algo6_math0_format111_typesss>
+    R: conv   * algo: 6                * Pmath:0 * format_111 * type_SSS
+<conv_algo6_math1_format000_typehhh>
+    R: conv   * algo: 6                * Pmath:1 * format_000 * type_HHH
+<conv_algo6_math1_format000_typehsh>
+    R: conv   * algo: 6                * Pmath:1 * format_000 * type_HSH
+<conv_algo6_math1_format000_typesss>
+    R: conv   * algo: 6                * Pmath:1 * format_000 * type_SSS
+<conv_algo6_math1_format111_typehhh>
+    R: conv   * algo: 6                * Pmath:1 * format_111 * type_HHH
+<conv_algo6_math1_format111_typehsh>
+    R: conv   * algo: 6                * Pmath:1 * format_111 * type_HSH
+<conv_algo6_math1_format111_typesss>
+    R: conv   * algo: 6                * Pmath:1 * format_111 * type_SSS
+
+// conv + algo7
+<conv_algo7_math0_format000_typehhh>
+    R: conv   * algo: 7                * Pmath:0 * format_000 * type_HHH
+<conv_algo7_math0_format000_typehsh>
+    R: conv   * algo: 7                * Pmath:0 * format_000 * type_HSH
+<conv_algo7_math0_format000_typesss>
+    R: conv   * algo: 7                * Pmath:0 * format_000 * type_SSS
+<conv_algo7_math0_format111_typehhh>
+    R: conv   * algo: 7                * Pmath:0 * format_111 * type_HHH
+<conv_algo7_math0_format111_typehsh>
+    R: conv   * algo: 7                * Pmath:0 * format_111 * type_HSH
+<conv_algo7_math0_format111_typesss>
+    R: conv   * algo: 7                * Pmath:0 * format_111 * type_SSS
+<conv_algo7_math1_format000_typehhh>
+    R: conv   * algo: 7                * Pmath:1 * format_000 * type_HHH
+<conv_algo7_math1_format000_typehsh>
+    R: conv   * algo: 7                * Pmath:1 * format_000 * type_HSH
+<conv_algo7_math1_format000_typesss>
+    R: conv   * algo: 7                * Pmath:1 * format_000 * type_SSS
+<conv_algo7_math1_format111_typehhh>
+    R: conv   * algo: 7                * Pmath:1 * format_111 * type_HHH
+<conv_algo7_math1_format111_typehsh>
+    R: conv   * algo: 7                * Pmath:1 * format_111 * type_HSH
+<conv_algo7_math1_format111_typesss>
+    R: conv   * algo: 7                * Pmath:1 * format_111 * type_SSS
+
+// dgrad + algo0
+<dgrad_algo0_math0_format000_typesss>
+    R: dgrad  * algo: 0                * Pmath:0 * format_000 * type_SSS
+<dgrad_algo0_math0_format111_typesss>
+    R: dgrad  * algo: 0                * Pmath:0 * format_111 * type_SSS
+
+// dgrad + algo1 + pmath0
+<dgrad_algo1_math0_format000_typesss>
+    R: dgrad  * algo: 1                * Pmath:0 * format_000 * type_SSS
+<dgrad_algo1_math0_format111_typesss>
+    R: dgrad  * algo: 1                * Pmath:0 * format_111 * type_SSS
+
+// dgrad + algo2 + pmath0
+<dgrad_algo2_math0_format000_typesss>
+    R: dgrad  * algo: 2                * Pmath:0 * format_000 * type_SSS
+<dgrad_algo2_math0_format111_typesss>
+    R: dgrad  * algo: 2                * Pmath:0 * format_111 * type_SSS
+
+// dgrad + algo3 + pmath0
+<dgrad_algo3_math0_format000_typesss>
+    R: dgrad  * algo: 3                * Pmath:0 * format_000 * type_SSS
+<dgrad_algo3_math0_format111_typesss>
+    R: dgrad  * algo: 3                * Pmath:0 * format_111 * type_SSS
+
+// dgrad + algo4 + pmath0
+<dgrad_algo4_math0_format000_typesss>
+    R: dgrad  * algo: 4                * Pmath:0 * format_000 * type_SSS
+<dgrad_algo4_math0_format111_typesss>
+    R: dgrad  * algo: 4                * Pmath:0 * format_111 * type_SSS
+
+// dgrad + algo5 + pmath0
+<dgrad_algo5_math0_format000_typesss>
+    R: dgrad  * algo: 5                * Pmath:0 * format_000 * type_SSS
+<dgrad_algo5_math0_format111_typesss>
+    R: dgrad  * algo: 5                * Pmath:0 * format_111 * type_SSS
+
+// dgrad + algo1 + pmath1
+<dgrad_algo1_math1_format000_typesss>
+    R: dgrad  * algo: 1                * Pmath:1 * format_000 * type_SSS
+<dgrad_algo1_math1_format111_typesss>
+    R: dgrad  * algo: 1                * Pmath:1 * format_111 * type_SSS
+
+// wgrad + algo0
+<wgrad_algo0_math0_format000_typesss>
+    R: wgrad  * algo: 0                * Pmath:0 * format_000 * type_SSS
+<wgrad_algo0_math0_format111_typesss>
+    R: wgrad  * algo: 0                * Pmath:0 * format_111 * type_SSS
+
+// wgrad + algo2 + math0
+<wgrad_algo2_math0_format000_typesss>
+    R: wgrad  * algo: 2                * Pmath:0 * format_000 * type_SSS
+<wgrad_algo2_math0_format111_typesss>
+    R: wgrad  * algo: 2                * Pmath:0 * format_111 * type_SSS
+
+// wgrad + algo6 + math0
+<wgrad_algo6_math0_format000_typesss>
+    R: wgrad  * algo: 6                * Pmath:0 * format_000 * type_SSS
+<wgrad_algo6_math0_format111_typesss>
+    R: wgrad  * algo: 6                * Pmath:0 * format_111 * type_SSS
+
+// wgrad + algo1 + math1
+<wgrad_algo6_math1_format000_typesss>
+    R: wgrad  * algo: 1                * Pmath:1 * format_000 * type_SSS
+<wgrad_algo6_math1_format111_typesss>
+    R: wgrad  * algo: 1                * Pmath:1 * format_111 * type_SSS
+
+// wgrad + algo5 + math1
+<wgrad_algo5_math1_format000_typesss>
+    R: wgrad  * algo: 5                * Pmath:1 * format_000 * type_SSS
+<wgrad_algo5_math1_format111_typesss>
+    R: wgrad  * algo: 5                * Pmath:1 * format_111 * type_SSS
+
+<2D_1x1>
+    dimA:"1,64,200,272 * filtA:"64,64,1,1    * padA:"0,0" * u:1 * v:1
+
+<2D_3x3>
+    dimA:"16,32,9,9    * filtA:"32,32,3,3    * padA:"1,1" * u:1 * v:1
+    dimA:"1,80,73,73   * filtA:"192,80,3,3   * pad_h:0 * pad_w:0 * u:1 * v:1
+
+<2D_5x5>
+    dimA:"1,64,27,27   * filtA:"192,64,5,5   * pad_h:2 * pad_w:2 * u:1 * v:1
+
+<2D_11x11>
+    dimA:"1,3,227,227  * filtA:"96,3,11,11   * pad_h:0 * pad_w:0 * u:4 * v:4

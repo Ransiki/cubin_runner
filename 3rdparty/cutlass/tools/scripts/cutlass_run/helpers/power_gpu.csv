@@ -1,0 +1,3 @@
+GPU,SM arch,chip,core clock,memory clock
+Quadro GV100,70,gv100,1350,877
+Quadro RTX 8000,75,tu102,1501,6500

@@ -1,0 +1,27 @@
+<transpose_all>
+    *
+    tb:
+    ta:
+    ta: * tb:
+
+<transpose_none_and_a>
+    *
+    ta:
+
+<transpose_none_and_b>
+    *
+    tb:
+
+<data_types>
+    P:b * Pin:b * Pout:nc32 * Pcomp:nc32
+    P:h * Pin:h * Pout:h * Pcomp:h
+    P:h * Pin:h * Pout:h * Pcomp:s
+    P:s * Pin:h * Pout:h
+    P:s * Pin:s * Pout:s
+    P:d * Pin:d * Pout:d
+ 
+<perf_regression_tests>
+    data_types * R:gemm * T:10 * algorithm:-1 * b: * mathMode:0,1
+    
+<general_tests>
+    R:gemm * T:10 * algorithm:-1 * b: * mathMode:1

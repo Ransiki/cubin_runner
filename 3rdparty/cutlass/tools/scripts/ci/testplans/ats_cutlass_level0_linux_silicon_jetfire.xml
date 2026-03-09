@@ -1,0 +1,20 @@
+<config version="1.0">
+    <group>
+        <identifier>CUTLASS_LINUX_SILICON_JETFIRE</identifier>
+        <flow>cutlass.ExecTests</flow>
+        <test>
+            <identifier>cutlass.ExecTests</identifier>
+            <plugin>simple-target</plugin>
+            <command>
+              <![CDATA[
+                cd {target-mount-root}/build && 
+                bash ./tools/scripts/ci/testplans/ats_cutlass_level0_linux_silicon_jetfire.sh && 
+                echo CUTLASS_LINUX_SILICON_JETFIRE_PASSED
+              ]]>
+            </command>
+            <regex-pass>CUTLASS_LINUX_SILICON_JETFIRE_PASSED</regex-pass>
+            <execute-timeout>720</execute-timeout>
+            <os>docker.*</os>
+        </test>
+    </group>
+</config>

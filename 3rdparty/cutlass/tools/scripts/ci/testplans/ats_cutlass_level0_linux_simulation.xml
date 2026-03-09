@@ -1,0 +1,20 @@
+<config version="1.0">
+    <group>
+        <identifier>CUTLASS_LINUX_SIMULATION</identifier>
+        <flow>cutlass.ExecTests</flow>
+        <test>
+            <identifier>cutlass.ExecTests</identifier>
+            <plugin>simple-target</plugin>
+            <command>
+              <![CDATA[
+              cd {target-mount-root}/build &&
+              bash ./tools/scripts/ci/testplans/ats_cutlass_level0_linux_simulation.sh &&
+              echo CUTLASS_LINUX_SIMULATION_PASSED
+              ]]>
+            </command>
+            <regex-pass>CUTLASS_LINUX_SIMULATION_PASSED</regex-pass>
+            <execute-timeout>2160</execute-timeout>
+            <os>docker.*</os>
+        </test>
+    </group>
+</config>

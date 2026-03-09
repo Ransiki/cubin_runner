@@ -1,0 +1,18 @@
+<!--
+
+This is the general test plan for level0 tests. Only test plans should be
+added to this file. Individual tests should be added to test plans in the
+appropriate directory. For example, audio tests should only be added to
+test plans in the audio directory.
+
+For more information on adding tests to the Automated Test System please see:
+
+http://nv/mobile/sanity
+
+-->
+
+<ats_level1_tests>
+    <cutlass_win>
+        <testPlan>ats_cutlass_level1_windows_silicon.xml</testPlan>
+    </cutlass_win>
+</ats_level1_tests>

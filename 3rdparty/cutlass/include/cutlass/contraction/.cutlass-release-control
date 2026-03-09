@@ -1,0 +1,9 @@
+#
+# This is a release control file invoked by tools/scripts/release.py
+#
+# If any release tag listed here is NOT enabled for the given release type, the
+# entire directory is excluded.
+#
+
+{$nv-cutensor-JIT}
+

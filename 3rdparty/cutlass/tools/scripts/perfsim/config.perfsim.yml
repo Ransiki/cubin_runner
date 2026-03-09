@@ -1,0 +1,262 @@
+# 
+# NOTE: THIS FILE IS DEPRECATED. DO NOT USE IT
+#
+# overall workflow settings
+all:
+  chip: ~
+
+APIC_Capture:
+  # set this to override the cuda capturer that will be used (a qualitifed release from /home/scratch.svc_compute_arch/release/cuda_apic_all)
+  # absolute path to the cuda_apic_capture.pl script
+  cuda_capturer: ~
+
+  # capture options to be passed to cuda_apic_capture.pl
+  # do not specify --pp_args=, this is done through the postprocess/options setting below
+  capture:
+    options:
+      # even though this is the default it is here as a placeholder to create the list
+      - --capture_mode=discrete
+
+  # post process options can be stored in the workload CADI record, those options and these options are union-ed
+  # to produce the runtime options which are then stored as the settings in the APIC CADI record
+  # These options are passed in --pp_args
+  # The format is the same as the capture/options above, [] means empty list
+  postprocess:
+    options: []
+
+# settings for the Trace3D generation step
+Trace3D_Gen:
+  # more options to pass to cudaReplayer
+  cuda_replay_options: '-MergeUVACtx'
+  # environment variables to set for cudaReplayer execution
+  cuda_replay_env:
+    CUDA_FORCE_PTX_JIT: 0
+    CUDA_TSG_CHANNEL_COUNT: 1
+
+  # set this to override the cuda replayer that will be used (default is to tie it to the cuda_capturer used above)
+  # absolute path to the cudaReplayer executable
+  cuda_replayer: ~
+
+  # more options to pass to openclReplayer
+  opencl_replay_options: ''
+  # environment variables to set for openclReplayer execution
+  opencl_replay_env: {}
+
+  # if more time is needed increase the H value (hours), or use a D value (days)
+  lsfQueue: o_cpu_8G_24H
+
+  cuda2ctl_args: {}
+
+  # pass these args to run-ace.pl
+  ACE_args:
+    pmMode: PMMODE_NOCOLLAPSE
+
+  # see https://wiki.nvidia.com/gpuhwdept/index.php/AModel/Knobs for syntax
+  # Remember to quote special yaml characters like [] and {}
+  # Examples:
+  #   TuringCtaShader::instructionsBeforeYield: '{4;;4;;4;;4}'
+  knobs:
+    gp10x:
+      knobsCap:
+        PascalComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        PascalCompute::uninitializedPredicateCheck: 1
+        PascalCompute::uninitializedCCCheck: 1
+        PascalProgram::refshaderNoPrintCountersAndKnobs: 1
+        PascalComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        PascalProgram::refShaderDriverMode: 1
+        PascalComputeClassFE::logMethods: 0
+        PascalShaderState3D::ignoreMisalignedAddrError: 1
+        PascalQmd::pointerSanityCheck: 0
+        PascalQmd::ignoreSanityChecks: 1
+      knobsRep:
+        PascalComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        PascalCompute::uninitializedPredicateCheck: 1
+        PascalCompute::uninitializedCCCheck: 1
+        PascalProgram::refshaderNoPrintCountersAndKnobs: 1
+        PascalComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        PascalProgram::refShaderDriverMode: 1
+        PascalComputeClassFE::logMethods: 0
+        PascalShaderState3D::ignoreMisalignedAddrError: 1
+        PascalQmd::pointerSanityCheck: 0
+        PascalQmd::ignoreSanityChecks: 1
+    gp100:
+      knobsCap:
+        PascalComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        PascalCompute::uninitializedPredicateCheck: 1
+        PascalCompute::uninitializedCCCheck: 1
+        PascalProgram::refshaderNoPrintCountersAndKnobs: 1
+        PascalComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        PascalProgram::refShaderDriverMode: 1
+        PascalComputeClassFE::logMethods: 0
+        PascalShaderState3D::ignoreMisalignedAddrError: 1
+        PascalQmd::pointerSanityCheck: 0
+        PascalQmd::ignoreSanityChecks: 1
+      knobsRep:
+        PascalComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        PascalCompute::uninitializedPredicateCheck: 1
+        PascalCompute::uninitializedCCCheck: 1
+        PascalProgram::refshaderNoPrintCountersAndKnobs: 1
+        PascalComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        PascalProgram::refShaderDriverMode: 1
+        PascalComputeClassFE::logMethods: 0
+        PascalShaderState3D::ignoreMisalignedAddrError: 1
+        PascalQmd::pointerSanityCheck: 0
+        PascalQmd::ignoreSanityChecks: 1
+    gv100:
+      knobsCap:
+        VoltaComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        VoltaCompute::uninitializedPredicateCheck: 1
+        VoltaCompute::uninitializedCCCheck: 1
+        VoltaProgram::refshaderNoPrintCountersAndKnobs: 1
+        VoltaComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        VoltaProgram::refShaderDriverMode: 1
+        VoltaComputeClassFE::logMethods: 0
+        VoltaShaderState3D::ignoreMisalignedAddrError: 1
+        VoltaQmd::pointerSanityCheck: 0
+        VoltaQmd::ignoreSanityChecks: 1
+      knobsRep:
+        VoltaComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        VoltaCompute::uninitializedPredicateCheck: 1
+        VoltaCompute::uninitializedCCCheck: 1
+        VoltaProgram::refshaderNoPrintCountersAndKnobs: 1
+        VoltaComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        VoltaProgram::refShaderDriverMode: 1
+        VoltaComputeClassFE::logMethods: 0
+        VoltaShaderState3D::ignoreMisalignedAddrError: 1
+        VoltaQmd::pointerSanityCheck: 0
+        VoltaQmd::ignoreSanityChecks: 1
+    gv11b:
+      knobsCap:
+        VoltaComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        VoltaCompute::uninitializedPredicateCheck: 1
+        VoltaCompute::uninitializedCCCheck: 1
+        VoltaProgram::refshaderNoPrintCountersAndKnobs: 1
+        VoltaComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        VoltaProgram::refShaderDriverMode: 1
+        VoltaComputeClassFE::logMethods: 0
+        VoltaShaderState3D::ignoreMisalignedAddrError: 1
+        VoltaQmd::pointerSanityCheck: 0
+        VoltaQmd::ignoreSanityChecks: 1
+      knobsRep:
+        VoltaComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        VoltaCompute::uninitializedPredicateCheck: 1
+        VoltaCompute::uninitializedCCCheck: 1
+        VoltaProgram::refshaderNoPrintCountersAndKnobs: 1
+        VoltaComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        VoltaProgram::refShaderDriverMode: 1
+        VoltaComputeClassFE::logMethods: 0
+        VoltaShaderState3D::ignoreMisalignedAddrError: 1
+        VoltaQmd::pointerSanityCheck: 0
+        VoltaQmd::ignoreSanityChecks: 1
+    tu10x:
+      knobsCap:
+        TuringComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        TuringCompute::uninitializedPredicateCheck: 1
+        TuringCompute::uninitializedCCCheck: 1
+        TuringProgram::refshaderNoPrintCountersAndKnobs: 1
+        TuringComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        TuringProgram::refShaderDriverMode: 1
+        TuringComputeClassFE::logMethods: 0
+        TuringShaderState3D::ignoreMisalignedAddrError: 1
+        TuringQmd::pointerSanityCheck: 0
+        TuringQmd::ignoreSanityChecks: 1
+      knobsRep:
+        TuringComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        TuringCompute::uninitializedPredicateCheck: 1
+        TuringCompute::uninitializedCCCheck: 1
+        TuringProgram::refshaderNoPrintCountersAndKnobs: 1
+        TuringComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        TuringProgram::refShaderDriverMode: 1
+        TuringComputeClassFE::logMethods: 0
+        TuringShaderState3D::ignoreMisalignedAddrError: 1
+        TuringQmd::pointerSanityCheck: 0
+        TuringQmd::ignoreSanityChecks: 1
+    ga100:
+      knobsCap:
+        AmpereComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        AmpereCompute::uninitializedPredicateCheck: 1
+        AmpereCompute::uninitializedCCCheck: 1
+        AmpereProgram::refshaderNoPrintCountersAndKnobs: 1
+        AmpereComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        AmpereProgram::refShaderDriverMode: 1
+        AmpereComputeClassFE::logMethods: 0
+        AmpereShaderState3D::ignoreMisalignedAddrError: 1
+        AmpereQmd::pointerSanityCheck: 0
+        AmpereQmd::ignoreSanityChecks: 1
+        Splinter::enable: 1
+        Shader::checkUninitializedRegisters: 1
+        ChipFE::logPushBufferParsing: 1
+        AmpereCtaShader::dumpProgram: 0
+      knobsRep:
+        AmpereComputeWarpState::ignoreMisalignedAddrError: 1
+        Shader::checkUninitializedRegisters: 0
+        ChannelObject::shareSubchannelsAcrossTSGs: 1
+        Shader::checkUninitializedLocalMemory: 0
+        AmpereCompute::uninitializedPredicateCheck: 1
+        AmpereCompute::uninitializedCCCheck: 1
+        AmpereProgram::refshaderNoPrintCountersAndKnobs: 1
+        AmpereComputeWarpState::ignoreApiRetOnEmptyStackError: 1
+        AmpereProgram::refShaderDriverMode: 1
+        AmpereComputeClassFE::logMethods: 0
+        AmpereShaderState3D::ignoreMisalignedAddrError: 1
+        AmpereQmd::pointerSanityCheck: 0
+        AmpereQmd::ignoreSanityChecks: 1
+        Splinter::enable: 1
+        Shader::checkUninitializedRegisters: 1
+        ChipFE::logPushBufferParsing: 1
+        AmpereCtaShader::dumpProgram: 0
+
+PerfSim:
+  enableMorph: false
+  pic: false
+  perfgen:
+    -PERFSIM:knob:
+      - '''NVPerfsim::PerfSim::NoOutputTimeout 1 9000000'''
+      - '''NVPerfsim::SM::MorphDumpInstances {0;;}'''
+    -debug: 0
+    -dont-fail-on-p4-check:
+    -info: ~
+    -mail-to: ~
+    -no-sync-check-fatal:
+    -project:http:server: ~
+    -queue: PERFSIM o_cpu_128G_24H
+    # -queue: ~
+    -rc: $chip/${chip}_flow.perfsim.rc
+    -target: PERFSIM
+    -testgenArgsMore:
+      - -maxMemory
+      - 64000
+

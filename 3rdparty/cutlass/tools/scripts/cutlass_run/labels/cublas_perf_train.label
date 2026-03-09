@@ -1,0 +1,24 @@
+<transpose_all>
+    *
+    tb:
+    ta:
+    ta: * tb:
+
+<transpose_none_and_a>
+    *
+    ta:
+
+<transpose_none_and_b>
+    *
+    tb:
+
+<data_types>
+    P:h * Pin:h * Pout:h
+    P:s * Pin:h * Pout:h
+    P:s * Pin:s * Pout:s
+    
+<perf_regression_tests>
+    data_types * R:gemm * T:10 * algorithm:-1 * b: * mathMode:1
+    
+<general_tests>
+    R:gemm * T:10 * algorithm:-1 * b: * mathMode:1

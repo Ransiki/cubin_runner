@@ -1,0 +1,1294 @@
+<Pdhs>
+    P:d,h,s
+
+<Pbdhs>
+    P:b,d,h,s
+
+<Pb>
+    P:b
+
+<Pbhs>
+    P:b,h,s
+
+<Phs>
+    P:h,s
+
+<Ph>
+    P:h
+
+<Ps>
+    P:s
+
+<Pin_Pout_hsb>
+    Pin:h       *  Pout:s
+    Pin:s       *  Pout:h
+    Pin:b       *  Pout:s
+    Pin:s       *  Pout:b
+
+// Bug 200428771:[test coverage development] investigate and improve cuDNN LRN related test
+<Pd>
+    P:d
+
+// Define labels for requiring specific levels
+<L0_req:L0,L1,L2,L3,L4>
+    *
+
+<L1_req:L1,L2,L3,L4>
+    *
+
+<L2_req:L2,L3,L4>
+    *
+
+<L3_req:L3,L4>
+    *
+
+<L4_req:L4>
+    *
+
+
+// Run both cross-correlation & convolution
+<conv_corr>
+    *
+    x:
+
+// Run all Gets, Finds & findEx's
+<get_find_findEx>
+    R:findFwdAlgo,findBwdDataAlgo,findBwdFilterAlgo
+    R:findFwdAlgo,findBwdDataAlgo,findBwdFilterAlgo * memlimit:-1
+    R:getFwdAlgo,getBwdDataAlgo,getBwdFilterAlgo
+
+<L1_batch4:L1,L2,L3,L4>
+    n:4
+    n:4 * b:
+
+<L4_n4:L4>
+    n:4
+    n:4 * b:
+
+<L4_Pdhs_batch4>
+    Pdhs * L4_n4
+
+<L4_Pb_batch4>
+    Pb * L4_n4
+
+<L4_Pbdhs_batch4>
+    Pbdhs * L4_n4
+
+<L4_Pin_Pout_hsb_batch4>
+    Pin_Pout_hsb * L4_n4
+
+<L1_L4_Pdhs_batch4>
+    Phs * L1_batch4
+    Pdhs * L4_n4
+
+<L1_L4_Pbdhs_batch4>
+    Phs * L1_batch4
+    Pbdhs * L4_n4
+<large_window_pool_dims>
+    // Random tests (no -b); set Alpha/Beta for 3-D due to numeric error on AVERAGE
+    dimA:"1,1,1,1024"    *  win_d:1  *  win_h:1  *  win_w:320 * convStrideA:1,1    *  dim:2
+    dimA:"1,1,1,1,1024"  *  win_d:1  *  win_h:1  *  win_w:320 * convStrideA:1,2,1  *  dim:3  *  A:2  *  B:1
+
+    // Specific tests (-b) to ensure packedness testing
+    dimA:"1,1,1,1024"    *  win_d:1  *  win_h:1  *  win_w:320  *  convStrideA:"2,2"    *  b:  *  dim:2
+    dimA:"1,1,1,1,1024"  *  win_d:1  *  win_h:1  *  win_w:320  *  convStrideA:"2,2,2"  *  b:  *  dim:3  *  A:1  *  B:2
+
+    // Specific tests for max ordering (bug #1938557)
+    dimA:"1,1,16,257"   *  win_d:1  *  win_h:1  *  win_w:257  *  p:1  *  u:1  *  v:1  *  mode:0  *  A:1  *  B:0  *  b:  *  dim:2
+    dimA:"1,1,1,1,257"  *  win_d:1  *  win_h:1  *  win_w:257  *  p:1  *  u:1  *  v:1  *  mode:0  *  A:1  *  B:0  *  b:  *  dim:3
+
+<large_window_pool_dims_for_vector_datatype>
+    // Random tests (no -b); set Alpha/Beta for 3-D due to numeric error on AVERAGE
+    dimA:"1,32,1,1024" *  win_h:1  *  win_w:320 * convStrideA:1,1    *  dim:2
+    dimA:"1,32,1,1024" *  win_h:1  *  win_w:320 * convStrideA:1,2 *  A:2  *  B:1
+
+    // Specific tests (-b) to ensure packedness testing
+    dimA:"1,32,1,1024" *  win_d:1  *  win_h:1  *  win_w:320  *  convStrideA:"2,2"    *  b:  *  dim:2
+    dimA:"1,32,1,1024" * win_h:1  *  win_w:320  *  convStrideA:"2,2"  *  b:  *  dim:2  *  A:1  *  B:2
+
+    // Specific tests for max ordering
+    dimA:"1,32,16,257" *  win_h:1  *  win_w:257  *  p:1  *  u:1  *  v:1 *  A:1  *  B:0  *  b:  *  dim:2
+    dimA:"1,32,1,257" *  win_h:1  *  win_w:257  *  p:1  *  u:1  *  v:1 *  A:1  *  B:0  *  b:  *  dim:2
+
+<all_pooling_formats>
+    *
+    formatIn:1 * formatOut:1
+    formatIn:0 * formatOut:0
+
+<vector_pooling_formats:L4>
+    //for INT8x4
+    formatIn:2 * formatOut:2
+    //for INT8x32
+    formatIn:2 * formatOut:2 * nc32:
+
+<all_pooling_modes>
+    R:poolf  *  mode:0,1,2
+    R:poolb  *  mode:0,1,2,3
+
+<vector_pooling_modes:L4>
+    R:poolf * mode:0,1,2
+
+<pooling_nan_formats:L4>
+    //nonan
+    *
+    //initnan and dont propagate
+    initnan:
+    //initinan and propagate
+    initnan: * propnan:
+
+<pooling_window_sizes:L4>
+    win_w:2,3 * win_h:2,3 * u:2,3 * v:2,3
+
+<pooling_vector_diff_dimension_for_vect_x4_no_randomization:L4>
+    n:5 * c:4,20 * h:20,87 * w:20,87       
+
+<pooling_vector_diff_dimension_for_vect_x32_no_randomization:L4>
+    n:5 * c:32,96 * h:20,87 * w:20,87       
+
+
+<conv_variousDims>
+    n:5
+
+    r:1 * s:3
+    r:3 * s:1
+
+    n:4 * pad_w:3 * pad_h:3
+
+    r:3 * s:5 * x:
+    r:5 * s:3 * x:
+
+    n:5 * pad_w:2 * pad_h:3 * x:
+    n:5 * u:2     * v:2     * x:
+
+    pad_h:1 * pad_w:1 * r:2 * s:3 * B:0
+
+    n:6 * pad_h:3 * u:2 * v:3 * pad_w:2 * D:texoff_dbg=1
+    n:6 * pad_h:3 * u:2 * v:3 * pad_w:2 * off:12
+
+<divnorm_variousDims>
+    dim:3 * dimA:"15,13,4,6,7" * N:100
+    dim:3 * B:0                * dimA:"31,7,5,11,3" * N:20
+    dim:2 * c:15               * h:1                * N:100    * w:1   * n:15
+    dim:2 * c:35               * h:1                * N:100    * w:1   * n:35
+    dim:2 * c:6                * h:6                * N:100    * w:6   * n:6
+    dim:2 * c:1024             * h:1                * N:20     * w:1   * n:512
+    dim:2 * c:8                * h:17               * N:20     * w:13  * n:8
+    dim:2 * c:31               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:32               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:33               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:63               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:65               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:64               * b:                 * h:1      * n:35  * B:0   * w:1
+    dim:2 * c:8                * h:3                * inplace: * n:8   * w:5   * N:10
+    dim:2 * c:25000            * ps:0.5             * h:1      * n:512 * p:r   * w:1  * pm:0
+
+<L0_Pcomph_pi_nRange1to9:L0,L1,L2,L3,L4>
+    Pcomp:h * p:i * n:1,2,8,9
+
+<L0_Pcomph_pi_variousBatch:L0,L1,L2,L3,L4>
+    n:1,64 * Pcomp:h * p:i
+    n:32   * Pcomp:h * p:i   * x:
+    n:100  * Pcomp:h * N:100 * iFilt:1
+
+<L2_variousDims:L2,L3,L4>
+    n:1 * c:16 * k:32 * pad_h:1 * pad_w:1
+    n:2 * c:17 * k:44 * B:0 * x:
+    n:3 * c:3  * k:32 * r:5 * s:5 * x:
+
+<L3_groupedConv_variousDims:L3,L4>
+
+    padA:"0,1" * dim:2 * dimA:"2,32,15,13"  * groupCount:2 * filtA:"64,16,9,9"
+    padA:"2,1" * dim:2 * dimA:"5,9,9,12"   * groupCount:3 * filtA:"12,3,6,3"
+    padA:"2,3" * dim:2 * dimA:"8,15,10,8"  * groupCount:5 * filtA:"10,3,5,6"
+    padA:"2,1" * dim:2 * dimA:"4,16,12,9" * groupCount:8 * filtA:"16,2,8,5"
+
+    padA:"2,1" * dim:2 * dimA:"6,6,7,10"  * groupCount:6 * filtA:"6,1,1,1"   * formatOut:0 * formatIn:0
+    padA:"0,0" * dim:2 * dimA:"7,7,6,15"  * groupCount:7 * filtA:"7,1,3,3"   * formatOut:0 * formatIn:0
+    padA:"2,3" * dim:2 * dimA:"4,16,15,7" * groupCount:4 * filtA:"8,4,3,3"   * formatOut:0 * formatIn:0
+    padA:"0,0" * dim:2 * dimA:"2,9,12,9"  * groupCount:3 * filtA:"3,3,1,1"   * formatOut:0 * formatIn:0
+
+    // Bug #2011118
+    padA:"0,0" * dim:2 * dimA:"1,4,4,5"     * groupCount:2 * filtA:"2,2,2,3"   * formatOut:0 * formatIn:0
+    padA:"0,0" * dim:2 * dimA:"1,2,4,5"     * groupCount:2 * filtA:"4,1,2,3"   * formatOut:0 * formatIn:0
+
+    padA:"2,1,2" * dim:3 * dimA:"2,12,8,6,3"  * groupCount:2 * filtA:"18,6,6,4,3"
+    padA:"2,1,4" * dim:3 * dimA:"5,9,7,8,7"   * groupCount:3 * filtA:"12,3,5,3,6"
+    padA:"2,2,2" * dim:3 * dimA:"8,15,7,8,5"  * groupCount:5 * filtA:"10,3,5,6,5"
+    padA:"2,1,2" * dim:3 * dimA:"2,16,7,6,4" * groupCount:8 * filtA:"16,2,8,5,4"
+
+    padA:"0,2,0" * dim:3 * dimA:"8,5,4,3,2"  * groupCount:5 * filtA:"15,1,2,3,1"
+    padA:"2,1,2" * dim:3 * dimA:"2,4,7,6,4" * groupCount:2 * filtA:"16,2,8,5,4"
+
+<L3_groupedConv_nhwc:L3,L4>
+    padA:"2,1" * dim:2 * dimA:"6,6,7,10"  * groupCount:6 * filtA:"6,1,1,1" * formatOut:1 * filtFormat:1 * formatIn:1
+    padA:"0,0" * dim:2 * dimA:"7,7,6,15"  * groupCount:7 * filtA:"7,1,3,3" * formatOut:1 * filtFormat:1 * formatIn:1
+    padA:"2,3" * dim:2 * dimA:"4,16,15,7" * groupCount:4 * filtA:"8,4,3,3" * formatOut:1 * filtFormat:1 * formatIn:1
+    padA:"0,0" * dim:2 * dimA:"2,9,12,9"  * groupCount:3 * filtA:"3,3,1,1" * formatOut:1 * filtFormat:1 * formatIn:1
+
+    // Bug #2011118
+    padA:"0,0" * dim:2 * dimA:"1,4,4,5"     * groupCount:2 * filtA:"2,2,2,3" * formatOut:1 * filtFormat:1 * formatIn:1
+    padA:"0,0" * dim:2 * dimA:"1,2,4,5"     * groupCount:2 * filtA:"4,1,2,3" * formatOut:1 * filtFormat:1 * formatIn:1
+
+<L3_groupedConv_variousDims_algo1:L3,L4>
+    padA:"2,1" * dim:2 * dimA:"6,6,7,10"  * groupCount:6 * filtA:"6,1,1,1"   * formatIn:1 * filtFormat:1 * formatOut:1 * b:
+    padA:"0,0" * dim:2 * dimA:"7,7,6,15"  * groupCount:7 * filtA:"7,1,3,3"   * formatIn:1 * filtFormat:1 * formatOut:1 * b:
+    padA:"2,1" * dim:2 * dimA:"2,2,6,3"  * groupCount:2 * filtA:"2,1,3,3" * formatIn:1 * filtFormat:1 * formatOut:1 * b:
+    padA:"1,2" * dim:2 * dimA:"2,3,6,6"  * groupCount:3 * filtA:"3,1,1,1" * formatIn:1 * filtFormat:1 * formatOut:1 * b:
+    padA:"1,2" * dim:2 * dimA:"2,10,7,7"  * groupCount:10 * filtA:"10,1,3,3" * formatIn:1 * filtFormat:1 * formatOut:1 * b:
+
+
+<L3_groupedConv_wino_dims:L3,L4>
+    groupCount:7 * dimA:"12,49,20,20,4" * filtA:"7,7,3,3,3" * padA:"2,1,2" * dim:2 * formatIn:0 * formatOut:0
+    groupCount:8 * dimA:"12,32,20,20,4" * filtA:"8,4,3,3,3" * padA:"2,0,1" * dim:2 * formatIn:0 * formatOut:0
+
+<winograd_fused_nonfused>
+    R:conv  * algo:6,7
+    R:dgrad * algo:4,5
+    R:wgrad * algo:5
+
+<L3_groupedConv_fft_explicit_dims:L3,L4>
+    padA:"0,1,0" * dim:2 * dimA:"2,32,30,30,3"  * groupCount:2 * filtA:"64,16,9,9,3"
+    padA:"2,1,4" * dim:2 * dimA:"5,9,17,17,6"   * groupCount:3 * filtA:"12,3,10,3,6"
+    padA:"2,3,2" * dim:2 * dimA:"8,25,16,16,5"  * groupCount:5 * filtA:"15,5,5,6,5"
+    padA:"2,1,2" * dim:2 * dimA:"12,16,20,20,4" * groupCount:8 * filtA:"16,2,8,5,4"
+
+<fft_and_explicit_conv_dgrad>
+    R:conv  * algo:2,4,5
+    R:dgrad * algo:2,3
+
+<L0_L2_L3_conv_algo1_variousDims>
+    Ph * L0_Pcomph_pi_nRange1to9
+    Ph * L0_Pcomph_pi_variousBatch
+    Phs * L2_variousDims
+    Pdhs * L3_groupedConv_variousDims
+    Phs * L3_groupedConv_nhwc
+    Pdhs * L3_req * conv_variousDims
+
+<L1_Pcomph_variousDims:L1,L2,L3,L4>
+    padA:"2,3" * A:1 * c:1  * B:0 * iFilt:1 * h:115 * k:1   * n:5 * s:5  * r:110 * w:20  * Pcomp:h
+    padA:"2,3" * A:1 * c:1  * B:0 * h:50    * k:1   * n:1   * p:i * s:25 * r:25  * w:50  * Pcomp:h
+    padA:"3,5" * A:1 * c:1  * B:0 * h:50    * k:1   * n:100 * p:i * s:20 * r:30  * w:130 * Pcomp:h
+    padA:"5,2" * A:1 * c:1  * B:0 * h:60    * k:1   * n:1   * p:i * s:10 * r:55  * w:38  * Pcomp:h
+    padA:"5,2" * A:1 * c:1  * B:0 * h:64    * k:1   * n:4   * p:i * s:30 * r:20  * w:64  * Pcomp:h
+    padA:"4,2" * A:1 * c:3  * B:0 * h:40    * k:4   * n:2   * p:i * s:20 * r:30  * w:45  * Pcomp:h
+    padA:"2,3" * A:1 * c:5  * B:0 * h:45    * k:3   * n:4   * p:i * s:25 * r:25  * w:40  * Pcomp:h
+    padA:"2,3" * A:1 * c:50 * B:1 * iFilt:1 * h:128 * k:1   * n:2 * s:25 * r:25  * w:128 * Pcomp:h
+    padA:"2,3" * A:2 * c:1  * B:3 * iFilt:1 * h:256 * k:95  * n:1 * s:10 * r:52  * w:256 * Pcomp:h
+
+<L3_Pcomph_variousDims:L3,L4>
+    padA:"2,3" * convStrideA:"2,3" * B:0  * h:128 * p:i     * s:7   * r:6   * A:1 * w:128 * Pcomp:h
+    padA:"1,1" * convStrideA:"3,2" * B:8  * h:48  * p:i     * s:5   * r:4   * A:4 * w:65  * Pcomp:h
+    padA:"2,3" * A:4               * c:1  * B:4   * h:14    * k:1   * n:1   * p:i * s:700 * r:7     * w:1400 * Pcomp:h
+    padA:"2,3" * convStrideA:"4,5" * c:11 * B:0   * h:128   * k:12  * n:10  * p:i * s:7   * r:6     * A:1    * w:128   * Pcomp:h
+    padA:"2,3" * A:1               * c:5  * B:0   * iFilt:1 * h:14  * k:3   * n:4 * p:i   * s:700   * r:7    * w:1400  * Pcomp:h
+    padA:"4,2" * A:2               * c:3  * B:1   * iFilt:1 * h:14  * k:4   * n:2 * p:i   * s:652   * r:5    * w:1400  * Pcomp:h
+    padA:"1,1" * convStrideA:"1,2" * c:5  * B:8   * h:48    * k:150 * n:10  * p:i * s:2   * r:2     * A:4    * w:40    * Pcomp:h * x:
+    padA:"1,1" * convStrideA:"2,4" * c:9  * B:8   * h:48    * k:10  * n:8   * p:i * s:5   * r:4     * A:4    * w:65    * Pcomp:h * x:
+    padA:"1,1" * convStrideA:"1,2" * c:99 * B:8   * h:48    * k:3   * n:100 * p:i * s:2   * r:2     * A:4    * w:44    * Pcomp:h * x:
+
+<L0_L1_L2_L3_dgrad_algo1_variousStrides>
+    u:1,2,3 * v:1
+    u:3 * v:3
+    u:6 * v:1,2,6
+
+<L0_L1_L2_L3_dgrad_algo1_variousDims>
+    Ph * L0_Pcomph_pi_nRange1to9
+    Ph * L0_Pcomph_pi_variousBatch
+    Ph * L1_Pcomph_variousDims
+    Phs * L2_variousDims
+    Ph * L3_Pcomph_variousDims
+    Pdhs * L3_groupedConv_variousDims
+    Phs * L3_groupedConv_nhwc
+    Pdhs * L3_req * conv_variousDims
+
+<L0_large_window_pad_variousDims:L0,L1,L2,L3,L4>
+    padA:"30,30" * A:1 * c:1 * B:0 * h:50 * k:1 * n:1 * p:i * s:25 * r:25 * w:50 * Pcomp:h
+    padA:"10,55" * A:1 * c:1 * B:0 * h:60 * k:1 * n:1 * p:i * s:10 * r:55 * w:38 * Pcomp:h
+    padA:"21,31" * A:1 * c:3 * B:0 * h:40 * k:4 * n:2 * p:i * s:20 * r:30 * w:45 * Pcomp:h
+    padA:"30,30" * A:1 * c:5 * B:0 * h:45 * k:3 * n:4 * p:i * s:25 * r:25 * w:40 * Pcomp:h
+
+<L0_L2_L3_wgrad_algo1_variousDims>
+    Ph * L0_Pcomph_pi_nRange1to9
+    Ph * L0_large_window_pad_variousDims
+    Ph * L0_Pcomph_pi_variousBatch
+    Phs * L2_variousDims
+    Ph * L3_Pcomph_variousDims
+    Pdhs * L3_req * conv_variousDims
+
+<L0_2d_smallDim_unpacked:L0,L1,L2,L3,L4>
+    dim:2 * dimA:"1,5,1,2"       * strideDX:"10,1,10,5"
+    dim:2 * strideDY:"10,1,10,5" * dimA:"1,5,1,2"
+    dim:2 * strideX:"10,1,10,5"  * dimA:"1,5,1,2"
+    dim:2 * dimA:"1,5,1,2"       * strideY:"10,1,10,5"
+    dim:2 * dimA:"3,5,2,7"       * strideDX:"90,17,7,1"
+    dim:2 * strideDY:"90,17,7,1" * dimA:"3,5,2,7"
+    dim:2 * strideX:"90,17,7,1"  * dimA:"3,5,2,7"
+    dim:2 * dimA:"3,5,2,7"       * strideY:"90,17,7,1"
+
+<L0_variousDim_variousStride:L2,L3,L4>
+    dim:2 * dimA:"5,20"          * N:50
+    dim:2 * dimA:"3,5,2,7"       * strideA:"90,14,7,1"
+    dim:2 * dimA:"3,5,2,7"       * strideDX:"90,14,7,1"
+    dim:2 * strideDY:"90,14,7,1" * dimA:"3,5,2,7"
+    dim:2 * strideX:"90,14,7,1"  * dimA:"3,5,2,7"
+    dim:2 * dimA:"3,5,2,7"       * strideY:"90,14,7,1"
+    dim:3 * dimA:"5,3,5,2,7"     * strideA:"510,70,14,7,1"
+    dim:2 * c:1024               * h:1                     * N:50     * w:1  * n:512
+    dim:2 * c:15                 * h:1                     * N:50     * w:1  * n:15
+    dim:2 * c:35                 * h:1                     * N:50     * w:1  * n:35
+    dim:2 * c:6                  * h:6                     * N:50     * w:6  * n:6
+    dim:2 * c:8                  * h:17                    * N:50     * w:17 * n:8
+    dim:2 * c:8                  * h:3                     * inplace: * n:8  * w:5   * N:10
+
+<L0_lrnb_variousDims>
+    Ps * L0_2d_smallDim_unpacked
+    Phs * L0_variousDim_variousStride
+
+// Bug 200428771:[test coverage development] investigate and improve cuDNN LRN related test
+<L3_lrnb_variousDims:L3,L4>
+    Pd * L0_2d_smallDim_unpacked
+    Pd * L0_variousDim_variousStride
+
+<L0_lrnf_variousDims>
+    Ps * L0_2d_smallDim_unpacked
+    Pbhs * L0_variousDim_variousStride
+
+<L3_lrnf_variousDims:L3,L4>
+    Pd * L0_2d_smallDim_unpacked
+    Pd * L0_variousDim_variousStride
+
+<L1_3d_smallDim_unpacked:L1,L2,L3,L4>
+    dim:3 * dimA:"4,3,5,2,7"         * strideDX:"310,90,17,7,1"
+    dim:3 * strideDY:"310,90,17,7,1" * dimA:"4,3,5,2,7"
+    dim:3 * strideX:"310,90,17,7,1"  * dimA:"4,3,5,2,7"
+    dim:3 * dimA:"4,3,5,2,7"         * strideY:"310,90,17,7,1"
+
+<L3_batchNorm_variousTests:L3,L4>
+    dim:3 * dimA:"15,13,4,6,7" * N:100
+    dim:3 * B:0                * dimA:"31,7,5,11,3" * N:20
+    dim:2 * c:15               * h:1                * N:100    * w:1   * n:15
+    dim:2 * c:35               * h:1                * N:100    * w:1   * n:35
+    dim:2 * c:6                * h:6                * N:100    * w:6   * n:6
+    dim:2 * c:1024             * h:1                * N:20     * w:1   * n:512
+    dim:2 * c:8                * h:17               * N:20     * w:13  * n:8
+    dim:2 * c:31               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:32               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:33               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:63               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:65               * b:                 * h:1      * n:35  * w:1
+    dim:2 * c:64               * b:                 * h:1      * n:35  * B:0   * w:1
+    dim:2 * c:8                * h:3                * inplace: * n:8   * w:5   * N:10
+    dim:2 * c:25000            * ps:0.5             * h:1      * n:512 * p:r   * w:1  * pm:0
+
+<L4_2d_Ps_99x99:L4>
+    dim:2 * dimA:"1,1,99,99" * seq:"0,0,1,1" * P:s
+    dim:2 * dimA:"1,99,1,99" * seq:"0,1,0,1" * P:s
+    dim:2 * dimA:"99,1,1,99" * seq:"1,0,0,1" * P:s
+    dim:2 * dimA:"99,1,99,1" * seq:"1,0,1,0" * P:s
+    dim:2 * dimA:"99,99,1,1" * seq:"1,1,0,0" * P:s
+
+<L1_L3_L4_bnb_algo0_variousDims>
+    Ps * L1_3d_smallDim_unpacked
+    Pdhs * L3_batchNorm_variousTests
+    Ps * L4_2d_Ps_99x99
+
+<L3_2d_Ps_seq1x1x0x0:L3,L4>
+    dim:2 * dimA:"4,4096,2,2" * seq:"1,1,0,0" * P:s
+    dim:2 * dimA:"512,8,2,2"  * seq:"1,1,0,0" * P:s
+
+<L1_L3_L4_batchNorm_variousTests>
+    Ps * L1_3d_smallDim_unpacked
+    Pdhs * L3_batchNorm_variousTests
+    Ps * L3_2d_Ps_seq1x1x0x0
+    Ps * L4_2d_Ps_99x99
+
+<L0_3d_smallDim_unpacked:L0,L1,L2,L3,L4>
+    dim:3 * dimA:"4,3,5,2,7"         * strideDX:"310,90,17,7,1"
+    dim:3 * strideDY:"310,90,17,7,1" * dimA:"4,3,5,2,7"
+    dim:3 * strideX:"310,90,17,7,1"  * dimA:"4,3,5,2,7"
+    dim:3 * dimA:"4,3,5,2,7"         * strideY:"310,90,17,7,1"
+
+<L0_L1_L3_L4_bnf_algo0_variousDims>
+    Pb * L0_3d_smallDim_unpacked
+    Ps * L1_3d_smallDim_unpacked
+    Pb * L3_batchNorm_variousTests
+    Pdhs * L3_batchNorm_variousTests
+    Ps * L4_2d_Ps_99x99
+
+<L0_L1_L3_L4_bnf_algo1_variousDims>
+    Pb * L0_3d_smallDim_unpacked
+    Ps * L1_3d_smallDim_unpacked
+    Pb * L3_batchNorm_variousTests
+    Pdhs * L3_batchNorm_variousTests
+    Ps * L3_2d_Ps_seq1x1x0x0
+    Ps * L4_2d_Ps_99x99
+
+<L3_rsNotEqual_variousTests:L3,L4>
+    A:0.5 * s:1  * r:3     * B:0.5
+    A:1   * s:3  * r:1     * B:1
+    A:2   * B:-1 * pad_h:3 * pad_w:3
+    A:1   * x:   * s:5     * r:3     * B:0
+    A:1   * x:   * s:3     * r:5     * B:0
+    A:-1  * B:0  * n:5     * pad_h:3 * x:  * pad_w:2
+    A:1   * B:0  * n:5     * u:2     * v:2 * x:
+    A:1   * B:0  * n:5     * r:5     * u:6 * v:6 * x:
+
+
+<L3_FFT_3d_variousTests:L3,L4>
+    padA:"5,5,5" * dim:3 * dimA:"3,5,20,50,30" * filtA:"3,5,9,9,9"
+    padA:"2,2,2" * dim:3 * c:8                 * dimA:"1,1,20,18,24" * k:8  * filtA:"1,1,6,6,6" * n:8  * B:-2 * A:-1
+    padA:"4,4,4" * dim:3 * c:8                 * dimA:"1,1,4,8,10"   * k:8  * filtA:"1,1,5,5,5" * n:8  * B:-3 * A:2
+    padA:"2,2,2" * dim:3 * c:8                 * dimA:"1,1,20,18,24" * k:32 * filtA:"1,1,3,3,3" * n:32 * B:1  * A:3
+    padA:"3,3,3" * dim:3 * c:8                 * dimA:"1,1,20,18,24" * k:6  * filtA:"1,1,7,7,7" * n:4  * B:2  * A:3
+
+<L3_FFT_2d_variousTests:L3,L4>
+    padA:"0,0"   * dim:2 * c:8   * dimA:"1,1,1,20"    * k:8   * filtA:"1,1,1,1"   * n:8  * B:-1 * A:-1
+    padA:"11,0"  * dim:2 * c:1   * dimA:"1,1,256,256" * k:1   * filtA:"1,1,42,1"  * n:1  * B:0  * A:-1
+    padA:"3,0"   * dim:2 * c:4   * dimA:"1,1,30,1"    * k:8   * filtA:"1,1,5,1"   * n:16 * B:0  * A:-1
+    padA:"2,0"   * dim:2 * c:8   * dimA:"1,1,20,1"    * k:32  * filtA:"1,1,3,1"   * n:32 * B:-1 * A:-3
+    padA:"0,200" * dim:2 * c:1   * dimA:"1,1,1,1357"  * k:1   * filtA:"1,1,1,234" * n:1  * B:0  * A:1
+    padA:"0,3"   * dim:2 * c:128 * dimA:"1,1,17,17"   * k:128 * filtA:"1,1,1,7"   * n:32 * B:0  * A:1
+    padA:"3,0"   * dim:2 * c:128 * dimA:"1,1,17,17"   * k:128 * filtA:"1,1,7,1"   * n:32 * B:0  * A:1
+    padA:"0,2"   * dim:2 * c:16  * dimA:"1,1,1,1000"  * k:32  * filtA:"1,1,1,11"  * n:8  * B:0  * A:1
+    padA:"0,3"   * dim:2 * c:4   * dimA:"1,1,1,30"    * k:8   * filtA:"1,1,1,5"   * n:16 * B:0  * A:1
+    padA:"0,0"   * dim:2 * c:8   * dimA:"1,1,20,1"    * k:8   * filtA:"1,1,1,1"   * n:8  * B:1  * A:1
+    padA:"0,1"   * dim:2 * c:64  * dimA:"1,1,3,4"     * k:64  * filtA:"1,1,1,2"   * n:8  * B:3  * A:2
+    padA:"0,42"  * dim:2 * c:1   * dimA:"1,1,256,256" * k:1   * filtA:"1,1,1,150" * n:1  * B:0  * A:3
+    padA:"0,2"   * dim:2 * c:8   * dimA:"1,1,1,20"    * k:32  * filtA:"1,1,1,3"   * n:32 * B:1  * A:3
+    padA:"0,42"  * dim:2 * c:64  * dimA:"1,1,15,73"   * k:64  * filtA:"1,1,1,57"  * n:32 * B:7  * A:3
+    padA:"2,0"   * dim:2 * c:71  * dimA:"1,1,21,13"   * k:89  * filtA:"1,1,4,1"   * n:32 * B:5  * A:4
+    padA:"0,5"   * dim:2 * c:9   * dimA:"1,1,1,41"    * k:2   * filtA:"1,1,1,8"   * n:3  * B:3  * A:7
+
+<L3_FFT_stride_tests:L3,L4>
+    padA:"0,0"   * dim:2 * c:8   * dimA:"1,1,1,20"    * k:8   * filtA:"1,1,1,1"   * n:8  * B:-1 * A:-1
+    padA:"3,0"   * dim:2 * c:4   * dimA:"1,1,30,1"    * k:8   * filtA:"1,1,5,1"   * n:16 * B:0  * A:-1
+    padA:"2,0"   * dim:2 * c:8   * dimA:"1,1,20,1"    * k:32  * filtA:"1,1,3,1"   * n:32 * B:-1 * A:-3
+    padA:"0,3"   * dim:2 * c:128 * dimA:"1,1,17,17"   * k:128 * filtA:"1,1,1,7"   * n:32 * B:0  * A:1
+    padA:"3,0"   * dim:2 * c:128 * dimA:"1,1,17,17"   * k:128 * filtA:"1,1,7,1"   * n:32 * B:0  * A:1
+    padA:"0,2"   * dim:2 * c:16  * dimA:"1,1,1,1000"  * k:32  * filtA:"1,1,1,11"  * n:8  * B:0  * A:1
+    padA:"0,3"   * dim:2 * c:4   * dimA:"1,1,1,30"    * k:8   * filtA:"1,1,1,5"   * n:16 * B:0  * A:1
+    padA:"0,0"   * dim:2 * c:8   * dimA:"1,1,20,1"    * k:8   * filtA:"1,1,1,1"   * n:8  * B:1  * A:1
+    padA:"0,1"   * dim:2 * c:64  * dimA:"1,1,3,4"     * k:64  * filtA:"1,1,1,2"   * n:8  * B:3  * A:2
+    padA:"0,2"   * dim:2 * c:8   * dimA:"1,1,1,20"    * k:32  * filtA:"1,1,1,3"   * n:32 * B:1  * A:3
+    padA:"2,0"   * dim:2 * c:71  * dimA:"1,1,21,13"   * k:89  * filtA:"1,1,4,1"   * n:32 * B:5  * A:4
+    padA:"0,5"   * dim:2 * c:9   * dimA:"1,1,1,41"    * k:2   * filtA:"1,1,1,8"   * n:3  * B:3  * A:7
+    A:2 * pad_h:1 * h:100   * n:5   * s:5 * r:2 * w:100 * B:5 * pad_w:2
+    A:2 * pad_h:2 * h:300   * n:2   * s:9 * r:3 * w:300 * B:5 * pad_w:4
+    A:2 * pad_h:4 * h:300   * n:2   * s:9 * r:9 * w:300 * B:5 * pad_w:4
+    A:2 * c:3     * pad_h:2 * h:100 * k:7 * n:5 * s:5   * r:5 * w:100   * B:5 * pad_w:2
+
+<L3_FFT_A2_B5_variousTests:L3,L4>
+    A:2 * pad_h:1 * h:100   * n:5   * s:5 * r:2 * w:100 * B:5 * pad_w:2
+    A:2 * pad_h:2 * h:300   * n:2   * s:9 * r:3 * w:300 * B:5 * pad_w:4
+    A:2 * pad_h:4 * h:300   * n:2   * s:9 * r:9 * w:300 * B:5 * pad_w:4
+    A:2 * c:3     * pad_h:2 * h:100 * k:7 * n:5 * s:5   * r:5 * w:100   * B:5 * pad_w:2
+
+<L3_FFT_strides>
+    u:1,2 * v:1,2
+
+<L3_FFT_variousTests>
+    Pdhs * L3_FFT_2d_variousTests
+    Pdhs * L3_FFT_3d_variousTests
+    Phs * L3_FFT_A2_B5_variousTests
+    Phs * L3_FFT_stride_tests * L3_FFT_strides
+
+<L2_L3_conv_variousDims>
+    Phs * L2_variousDims
+    Pdhs * L3_req * conv_variousDims
+
+<L2_L3_conv_variousDims_with_grouped>
+    Phs * L2_variousDims
+    Pdhs * L3_req * conv_variousDims
+    Pdhs * L3_groupedConv_variousDims
+
+<L3_A2_B5_variousDims:L3,L4>
+    A:2 * pad_h:0 * h:128                  * n:5  * s:3 * r:3 * w:128 * B:5  * pad_w:0
+    A:2 * pad_h:0 * h:128                  * n:5  * s:5 * r:5 * w:128 * B:5  * pad_w:0
+    A:2 * pad_h:1 * h:128                  * n:8  * s:3 * r:3 * w:128 * B:5  * pad_w:1
+    A:2 * pad_h:2 * h:128                  * n:8  * s:5 * r:5 * w:128 * B:5  * pad_w:2
+    A:2 * pad_h:1 * h:16                   * n:37 * s:3 * r:3 * w:16  * B:5  * pad_w:1
+    A:2 * pad_h:2 * h:16                   * n:37 * s:5 * r:5 * w:16  * B:5  * pad_w:2
+    A:2 * pad_h:1 * h:224                  * n:5  * s:3 * r:3 * w:224 * B:5  * pad_w:1
+    A:2 * pad_h:2 * h:224                  * n:5  * s:5 * r:5 * w:224 * B:5  * pad_w:2
+    A:2 * pad_h:1 * h:32                   * n:18 * s:3 * r:3 * w:32  * B:5  * pad_w:1
+    A:2 * pad_h:2 * h:32                   * n:18 * s:5 * r:5 * w:32  * B:5  * pad_w:2
+    A:2 * pad_h:1 * h:64                   * n:13 * s:3 * r:3 * w:64  * B:5  * pad_w:1
+    A:2 * pad_h:2 * h:64                   * n:13 * s:5 * r:5 * w:64  * B:5  * pad_w:2
+    A:2 * pad_h:1 * strideA:"1,5120,160,5" * h:32 * n:5 * s:3 * r:3   * w:32 * B:5     * pad_w:1
+    A:2 * pad_h:1 * strideA:"3072,1,96,3"  * h:32 * n:5 * s:3 * r:3   * w:32 * B:5     * pad_w:1
+    A:2 * pad_h:2 * strideA:"1,5120,160,5" * h:32 * n:5 * s:5 * r:5   * w:32 * B:5     * pad_w:2
+    A:2 * pad_h:2 * strideA:"3072,1,96,3"  * h:32 * n:5 * s:5 * r:5   * w:32 * B:5     * pad_w:2
+
+<L2_L3_Phs_variousDims>
+    Phs * L2_variousDims
+    Phs * L3_A2_B5_variousDims
+
+<L3_Pdhs_variousDims>
+    Pdhs * L3_groupedConv_variousDims
+    Pdhs * L3_req * conv_variousDims
+
+<L0_ctc:L0,L1,L2,L3,L4>
+    cN:1   * cL:255 * cA:28   * N:1 * algo:0 * cT:400
+    cN:128 * cL:255 * cA:28   * N:1 * algo:0 * cT:400
+    cN:1   * cL:40  * cA:28   * N:1 * algo:0 * cT:150
+    cN:128 * cL:40  * cA:28   * N:1 * algo:0 * cT:150
+    cN:1   * cL:80  * cA:40   * N:1 * algo:0 * cT:350
+    cN:128 * cL:80  * cA:40   * N:1 * algo:0 * cT:350
+    cN:1   * cL:20  * cA:5000 * N:1 * algo:0 * cT:150
+    cN:128 * cL:20  * cA:5000 * N:1 * algo:0 * cT:150
+    cN:1   * cL:255 * cA:28   * N:1 * algo:1 * cT:400
+    cN:128 * cL:255 * cA:28   * N:1 * algo:1 * cT:400
+    cN:1   * cL:40  * cA:28   * N:1 * algo:1 * cT:150
+    cN:128 * cL:40  * cA:28   * N:1 * algo:1 * cT:150
+    cN:1   * cL:80  * cA:40   * N:1 * algo:1 * cT:350
+    cN:128 * cL:80  * cA:40   * N:1 * algo:1 * cT:350
+    cN:1   * cL:20  * cA:5000 * N:1 * algo:1 * cT:150
+    cN:128 * cL:20  * cA:5000 * N:1 * algo:1 * cT:150
+
+<L3_Pinb_Pcompb_pi:L3,L4>
+    c:12 * Pin:b * Pout:b * n:8 * p:i * Pcomp:b
+    c:20 * Pin:b * Pout:b * n:1 * p:i * Pcomp:b
+    c:32 * Pin:b * Pout:b * n:9 * p:i * Pcomp:b
+    c:44 * Pin:b * Pout:b * n:2 * p:i * Pcomp:b
+    c:12 * Pin:b * Pout:s * n:8 * p:i * Pcomp:b
+    c:20 * Pin:b * Pout:s * n:1 * p:i * Pcomp:b
+    c:32 * Pin:b * Pout:s * n:9 * p:i * Pcomp:b
+    c:44 * Pin:b * Pout:s * n:2 * p:i * Pcomp:b
+
+<L3_conv_dilated_variousDims:L3,L4>
+    dim:3 * c:1 * dimA:"3,1,128,128,128" * k:1 * x: * dilationA:"1,2,3"
+    dim:3 * c:2 * dimA:"2,2,100,128,142" * k:4 * x: * dilationA:"7,5,3"
+
+    padA:"1,2,3" * dim:3 * c:1 * dimA:"5,1,124,123,111" * convStrideA:"1,2,3" * k:50 * filtA:"50,1,2,3,1" * dilationA:"1,1,1"
+    padA:"1,2,3" * dim:3 * c:1 * dimA:"5,1,22,21,20"    * convStrideA:"1,2,3" * k:50 * filtA:"50,1,2,4,2" * dilationA:"1,2,1"
+    padA:"1,2,3" * dim:3 * c:1 * dimA:"5,1,25,25,26"    * convStrideA:"1,2,3" * k:50 * filtA:"50,1,2,3,2" * dilationA:"2,1,1"
+    padA:"1,2,3" * dim:3 * c:1 * dimA:"5,1,124,123,111" * convStrideA:"1,2,3" * k:50 * filtA:"50,1,2,3,1" * dilationA:"4,2,3"
+
+    dim:3 * c:1 * d:20 * h:20 * k:1 * n:1 * w:10 * dilationA:"1,2,3"
+
+    c:128 * h:137 * k:64 * n:3 * s:7 * r:7 * w:124 * dilationA:"4,4"
+
+    padA:"1,2,3" * dim:3 * c:5 * dimA:"3,5,150,125,100" * convStrideA:"1,2,3" * k:50 * filtA:"50,5,3,3,2" * dilationA:"1,1,1"
+    padA:"1,2,3" * dim:3 * c:5 * dimA:"3,5,150,125,100" * convStrideA:"1,2,3" * k:50 * filtA:"50,5,3,3,2" * dilationA:"5,3,2"
+
+    c:1   * h:137 * k:1 * n:1 * s:7 * naiveCPU:1 * w:257 * r:7 * dilationA:"7,3"
+    c:128 * h:137 * k:2 * n:3 * s:7 * r:7        * w:124 * x:  * dilationA:"4,4"
+    c:3   * h:137 * k:2 * n:3 * s:7 * r:7        * w:124 * x:  * dilationA:"4,4"
+    c:1   * h:137 * k:1 * n:1 * s:7 * naiveCPU:1 * w:257 * x:  * r:7             * dilationA:"7,3"
+
+    padA:"2,3" * convStrideA:"1,3" * c:4,8 * h:137 * k:3,8 * n:2 * s:3 * r:1        * w:124 * dilationA:"1,2"
+    padA:"2,3" * convStrideA:"1,3" * c:4,8 * h:137 * k:3,8 * n:2 * s:3 * r:1        * w:124 * dilationA:"1,2"
+    padA:"2,3" * convStrideA:"1,3" * c:128 * h:137 * k:3   * n:2 * s:3 * naiveCPU:1 * w:124 * r:1             * dilationA:"1,2"
+    padA:"2,3" * convStrideA:"2,3" * c:3   * h:137 * k:64  * n:3 * s:5 * naiveCPU:1 * w:124 * r:2             * dilationA:"2,3"
+    padA:"2,3" * convStrideA:"1,3" * c:4,8 * h:137 * k:3,8 * n:2 * s:3 * naiveCPU:1 * w:124 * r:1             * dilationA:"1,1"
+    padA:"2,3" * convStrideA:"1,3" * c:4,8 * h:137 * k:3,8 * n:2 * s:3 * r:1        * w:124 * x:              * dilationA:"1,2"
+    padA:"2,3" * convStrideA:"1,3" * c:4   * h:137 * k:64  * n:2 * s:3 * r:1        * w:124 * x:              * dilationA:"1,2"
+    padA:"2,3" * convStrideA:"2,3" * c:128 * h:137 * k:64  * n:3 * s:5 * naiveCPU:1 * w:124 * x:              * r:2             * dilationA:"1,1"
+    padA:"2,3" * convStrideA:"2,3" * c:3,8 * h:137 * k:64  * n:3 * s:5 * naiveCPU:1 * w:124 * x:              * r:2             * dilationA:"2,3"
+    padA:"2,3" * convStrideA:"1,3" * c:4,8 * h:137 * k:3,8 * n:2 * s:3 * naiveCPU:1 * w:124 * x:              * r:1             * dilationA:"1,2"
+
+<L2_direct_testSweep_types>
+    Pin:h * Pout:h * Pcomp:h * p:i
+    Pin:h * Pout:h * Pcomp:s * p:i
+    Pin:s * Pout:s * Pcomp:s
+
+<L2_direct_testSweep_algos>
+    R:conv * algo:0
+    R:dgrad * algo:0,1
+    R:wgrad * algo:0,1
+
+    R:conv * algo:0 * formatIn:1 * formatOut:1 * filtFormat:1
+    R:dgrad * algo:1 * formatIn:1 * formatOut:1 * filtFormat:1
+    // wgrad test suite has issues with NHWC
+
+<L2_direct_testSweep:L2,L3,L4,DIRECT_SWEEP>
+    n:2 * c:4 * h:8 * w:7 * k:3 * r:3 * s:3 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+    n:3 * c:7 * h:9 * w:6 * k:5 * r:1 * s:3 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+    n:6 * c:10 * h:6 * w:5* k:7 * r:3 * s:1 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+
+    n:1 * c:6 * h:17 * w:15 * k:1 * r:3 * s:3 * dilation_h:2 * dilation_w:2 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+    n:7 * c:3 * h:20 * w:22 * k:5 * r:3 * s:1 * dilation_h:4 * dilation_w:3 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+    n:2 * c:1 * h:18 * w:9 * k:8 * r:1 * s:1 * dilation_h:3 * dilation_w:1 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+
+    n:8 * c:4 * h:8 * w:7 * k:3 * r:3 * s:3 * u:2 * v:2 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+    n:3 * c:7 * h:9 * w:6 * k:5 * r:1 * s:3 * u:2 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+    n:11 * c:10 * h:6 * w:5* k:7 * r:3 * s:1 * v:2 * L2_direct_testSweep_types * L2_direct_testSweep_algos
+
+    // Test from Myelin test: cudnn_Half_Convolution_false_false_I4_F5_2_NCHW_F_Packed
+    dimA:"2,8,23,23" * filtA:"12,2,5,6" * groupCount:4 * padA:"3,3" * convStrideA:"2,1" * dilationA:"1,2" * b: * L2_direct_testSweep_types * L2_direct_testSweep_algos
+
+<L4_cask_dilation_various_dims_nonspatial:L4>
+    c:1 * dimA:"3,1,128,128" * k:1 * dilationA:"2,3"
+    c:1 * dimA:"3,1,128,128" * k:1 * dilationA:"2,3" * padA:"1,2"
+    c:2 * dimA:"2,2,128,142" * k:4 * dilationA:"7,5"
+    c:2 * dimA:"2,2,128,142" * k:4 * dilationA:"7,5" * padA:"1,2"
+    c:8 * dimA:"2,8,128,140" * k:8 * dilationA:"7,5" * padA:"1,2"
+    padA:"2,3" * c:1 * dimA:"5,1,123,111" * convStrideA:"1,2" * k:50 * filtA:"50,1,2,3" * dilationA:"1,1"
+    padA:"1,2" * c:1 * dimA:"5,1,21,20"   * convStrideA:"1,3" * k:50 * filtA:"50,1,2,4" * dilationA:"1,2"
+    padA:"2,3" * c:8 * dimA:"5,8,24,32"   * convStrideA:"2,3" * k:56 * filtA:"56,8,2,4" * dilationA:"2,1"
+    padA:"2,3" * c:8 * dimA:"5,8,24,32"   * convStrideA:"2,3" * k:56 * filtA:"56,8,8,8" * dilationA:"2,1"
+    padA:"2,3" * c:8 * dimA:"5,8,24,32"   * convStrideA:"2,3" * k:56 * filtA:"56,8,12,8" * dilationA:"1,2"
+    c:8 * dimA:"5,8,24,32"   * convStrideA:"2,3" * k:56 * filtA:"56,8,8,12" * dilationA:"2,1"
+    c:8 * dimA:"5,8,24,32"   * convStrideA:"2,3" * k:56 * filtA:"56,8,2,4" * dilationA:"2,1"
+    padA:"1,2" * c:1 * dimA:"5,1,123,111" * convStrideA:"1,3" * k:50 * filtA:"50,1,2,3" * dilationA:"4,2"
+    padA:"1,2" * c:1 * dimA:"5,1,123,111" * convStrideA:"1,3" * k:50 * filtA:"50,1,5,9" * dilationA:"4,2"
+    padA:"1,2" * c:1 * dimA:"5,1,123,111" * convStrideA:"1,3" * k:50 * filtA:"50,1,5,9" * dilationA:"4,2"
+    c:1 * dimA:"5,1,123,111" * convStrideA:"1,3" * k:50 * filtA:"50,1,5,9" * dilationA:"4,2"
+    n:128 * c:128 * h:56 * w:56 *k:256 * r:3 * s:3 * dilationA:"2,2" * b:
+    dim:2 * c:128 * h:137 * k:64 * n:3 * s:7 * r:7 * w:124 * dilationA:"4,4"
+    padA:"3,1" * dim:2 * c:128 * h:137 * k:64 * n:3 * s:7 * r:7 * w:124 * dilationA:"4,4"
+
+<L4_cask_dilation_various_dims_nonspatial_unit_stride:L4>
+    c:1 * dimA:"3,1,128,128" * k:1 * dilationA:"2,3"
+    c:1 * dimA:"3,1,128,128" * k:1 * dilationA:"2,3" * padA:"1,2"
+    c:2 * dimA:"2,2,128,142" * k:4 * dilationA:"7,5"
+    c:2 * dimA:"2,2,128,142" * k:4 * dilationA:"7,5" * padA:"1,2"
+    c:8 * dimA:"2,8,128,140" * k:8 * dilationA:"7,5" * padA:"1,2"
+    padA:"2,3" * c:1 * dimA:"5,1,123,111" * k:50 * filtA:"50,1,2,3" * dilationA:"1,1"
+    padA:"1,2" * c:1 * dimA:"5,1,21,20"   * k:50 * filtA:"50,1,2,4" * dilationA:"1,2"
+    padA:"2,3" * c:8 * dimA:"5,8,24,32"   * k:56 * filtA:"56,8,2,4" * dilationA:"2,1"
+    padA:"2,3" * c:8 * dimA:"5,8,24,32"   * k:56 * filtA:"56,8,4,4" * dilationA:"2,1"
+    padA:"2,3" * c:8 * dimA:"5,8,24,32"   * k:56 * filtA:"56,8,5,6" * dilationA:"1,2"
+    c:8 * dimA:"5,8,24,32" * k:56 * filtA:"56,8,4,4" * dilationA:"2,1"
+    c:8 * dimA:"5,8,24,32" * k:56 * filtA:"56,8,5,6" * dilationA:"2,1"
+    padA:"1,2" * c:1 * dimA:"5,1,123,111" * k:50 * filtA:"50,1,2,3" * dilationA:"4,2"
+    padA:"1,2" * c:1 * dimA:"5,1,123,111" * k:50 * filtA:"50,1,5,9" * dilationA:"4,2"
+    padA:"1,2" * c:1 * dimA:"5,1,123,111" * k:50 * filtA:"50,1,5,9" * dilationA:"4,2"
+    c:1 * dimA:"5,1,123,111" * k:50 * filtA:"50,1,5,9" * dilationA:"4,2"
+    n:128 * c:128 * h:56 * w:56 *k:256 * r:3 * s:3 * dilationA:"2,2" * b:
+    dim:2 * c:128 * h:137 * k:64 * n:3 * s:7 * r:7 * w:124 * dilationA:"4,4"
+    padA:"3,1" * dim:2 * c:128 * h:137 * k:64 * n:3 * s:7 * r:7 * w:124 * dilationA:"4,4"
+
+<L4_RNN:L4>
+    rnnInputSize:256  * rnnNumLayers:3     * rnnMiniBatch:32 * mode:2          * rnnSeqLength:20  * rnnHiddenSize:256
+    rnnInputSize:256  * rnnNumLayers:2     * rnnMiniBatch:32 * Pmath:1         * mode:1           * rnnSeqLength:2    * rnnHiddenSize:256
+    rnnInputSize:256  * rnnNumLayers:3     * rnnSkipInput:0  * rnnMiniBatch:32 * mode:0           * rnnSeqLength:20   * rnnHiddenSize:256
+    rnnInputSize:256  * rnnNumLayers:3     * rnnMiniBatch:32 * mode:1          * rnnSeqLength:20  * rnnHiddenSize:256 * rnnTestVariableMinibatch:1
+    rnnInputSize:256  * rnnbidirectional:1 * rnnNumLayers:3  * rnnMiniBatch:32 * mode:3           * rnnSeqLength:20   * rnnHiddenSize:256
+    rnnInputSize:256  * rnnbidirectional:1 * rnnNumLayers:2  * rnnMiniBatch:32 * Pmath:1          * mode:0            * rnnSeqLength:2             * rnnHiddenSize:256
+    rnnInputSize:256  * rnnNumLayers:2     * rnnMiniBatch:32 * Pmath:1         * mode:2           * rnnSeqLength:2    * rnnHiddenSize:256          * rnnTestVariableMinibatch:1
+    rnnInputSize:256  * rnnNumLayers:2     * rnnSkipInput:0  * rnnMiniBatch:32 * Pmath:1          * mode:3            * rnnSeqLength:2             * rnnHiddenSize:256
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnNumLayers:3  * rnnSkipInput:1  * rnnMiniBatch:16  * rnnPersistent:1   * mode:0                     * rnnSeqLength:5             * rnnHiddenSize:2048
+    rnnInputSize:256  * rnnbidirectional:1 * rnnNumLayers:3  * rnnMiniBatch:16 * rnnTestDropout:1 * rnnPersistent:1   * mode:0                     * rnnSeqLength:5             * rnnHiddenSize:256
+    rnnInputSize:256  * rnnbidirectional:1 * rnnNumLayers:3  * rnnSkipInput:0  * rnnMiniBatch:16  * rnnPersistent:2   * mode:1                     * rnnSeqLength:5             * rnnHiddenSize:2048
+    rnnInputSize:256  * rnnbidirectional:1 * rnnNumLayers:3  * rnnMiniBatch:16 * rnnTestDropout:1 * rnnPersistent:2   * mode:1                     * rnnSeqLength:5             * rnnHiddenSize:256
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnNumLayers:3  * rnnSkipInput:1  * rnnMiniBatch:16  * rnnPersistent:2   * mode:2                     * rnnSeqLength:5             * rnnHiddenSize:1024
+    rnnInputSize:256  * rnnbidirectional:0 * rnnNumLayers:3  * rnnMiniBatch:16 * rnnTestDropout:1 * rnnPersistent:1   * mode:2                     * rnnSeqLength:5             * rnnHiddenSize:256
+    rnnInputSize:256  * rnnbidirectional:0 * rnnNumLayers:3  * rnnSkipInput:0  * rnnMiniBatch:16  * rnnPersistent:1   * mode:3                     * rnnSeqLength:5             * rnnHiddenSize:1024
+    rnnInputSize:256  * rnnbidirectional:0 * rnnNumLayers:3  * rnnMiniBatch:16 * rnnTestDropout:1 * rnnPersistent:0   * mode:3                     * rnnSeqLength:5             * rnnHiddenSize:256
+
+    rnnPersistent:0 * rnnbidirectional:0 * mode:0 * rnnTestDropout:1
+    rnnPersistent:0 * rnnbidirectional:1 * mode:0 * rnnTestDropout:1
+
+    rnnSkipInput:0 * rnnbidirectional:1 * mode:0 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:1 * mode:0 * rnnTestVariableMinibatch:0
+    rnnSkipInput:1 * rnnbidirectional:0 * mode:0 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:1 * mode:0 * rnnTestVariableMinibatch:1
+    rnnSkipInput:0 * rnnbidirectional:0 * mode:1 * rnnTestVariableMinibatch:0
+    rnnSkipInput:0 * rnnbidirectional:1 * mode:1 * rnnTestVariableMinibatch:0
+    rnnSkipInput:0 * rnnbidirectional:0 * mode:1 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:0 * mode:1 * rnnTestVariableMinibatch:0
+
+    rnnPersistent:0 * rnnbidirectional:0 * mode:2 * rnnTestDropout:1
+    rnnPersistent:0 * rnnbidirectional:1 * mode:2 * rnnTestDropout:1
+
+    rnnSkipInput:0 * rnnbidirectional:1 * mode:2 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:1 * mode:2 * rnnTestVariableMinibatch:0
+    rnnSkipInput:1 * rnnbidirectional:0 * mode:2 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:1 * mode:2 * rnnTestVariableMinibatch:1
+    rnnSkipInput:0 * rnnbidirectional:0 * mode:3 * rnnTestVariableMinibatch:0
+    rnnSkipInput:0 * rnnbidirectional:1 * mode:3 * rnnTestVariableMinibatch:0
+    rnnSkipInput:0 * rnnbidirectional:0 * mode:3 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:0 * mode:3 * rnnTestVariableMinibatch:0
+
+    rnnbidirectional:1 * rnnSkipInput:0 * rnnMiniBatch:128 * rnnPersistent:1 * mode:0 * rnnHiddenSize:2048
+    rnnbidirectional:1 * rnnSkipInput:0 * rnnMiniBatch:128 * rnnPersistent:2 * mode:0 * rnnHiddenSize:2048
+    rnnbidirectional:0 * rnnSkipInput:0 * rnnMiniBatch:128 * rnnPersistent:1 * mode:1 * rnnHiddenSize:2048
+    rnnbidirectional:0 * rnnSkipInput:0 * rnnMiniBatch:128 * rnnPersistent:2 * mode:1 * rnnHiddenSize:2048
+    rnnbidirectional:1 * rnnSkipInput:0 * rnnMiniBatch:128 * rnnPersistent:1 * mode:2 * rnnHiddenSize:1024
+    rnnbidirectional:1 * rnnSkipInput:0 * rnnMiniBatch:128 * rnnPersistent:2 * mode:2 * rnnHiddenSize:1024
+    rnnbidirectional:0 * rnnSkipInput:0 * rnnMiniBatch:128 * rnnPersistent:1 * mode:3 * rnnHiddenSize:1024
+    rnnbidirectional:0 * rnnSkipInput:0 * rnnMiniBatch:128 * rnnPersistent:2 * mode:3 * rnnHiddenSize:1024
+
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnSkipInput:1   * rnnMiniBatch:128 * rnnPersistent:1 * mode:0 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnSkipInput:1   * rnnMiniBatch:128 * rnnPersistent:2 * mode:0 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:0 * rnnSkipInput:1   * rnnMiniBatch:128 * rnnPersistent:1 * mode:1 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:0 * rnnTestDropout:1 * rnnMiniBatch:128 * rnnPersistent:1 * mode:1 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnTestDropout:1 * rnnMiniBatch:128 * rnnPersistent:1 * mode:1 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:0 * rnnSkipInput:1   * rnnMiniBatch:128 * rnnPersistent:2 * mode:1 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:0 * rnnTestDropout:1 * rnnMiniBatch:128 * rnnPersistent:2 * mode:1 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnTestDropout:1 * rnnMiniBatch:128 * rnnPersistent:2 * mode:1 * rnnHiddenSize:2048
+    rnnInputSize:1024 * rnnbidirectional:1 * rnnSkipInput:1   * rnnMiniBatch:128 * rnnPersistent:1 * mode:2 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:1 * rnnSkipInput:1   * rnnMiniBatch:128 * rnnPersistent:2 * mode:2 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnSkipInput:1   * rnnMiniBatch:128 * rnnPersistent:1 * mode:3 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnTestDropout:1 * rnnMiniBatch:128 * rnnPersistent:1 * mode:3 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:1 * rnnTestDropout:1 * rnnMiniBatch:128 * rnnPersistent:1 * mode:3 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnSkipInput:1   * rnnMiniBatch:128 * rnnPersistent:2 * mode:3 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnTestDropout:1 * rnnMiniBatch:128 * rnnPersistent:2 * mode:3 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:1 * rnnTestDropout:1 * rnnMiniBatch:128 * rnnPersistent:2 * mode:3 * rnnHiddenSize:1024
+
+    rnnSkipInput:0 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:0 * rnnTestVariableMinibatch:0
+    rnnSkipInput:0 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:0 * rnnTestVariableMinibatch:0
+    rnnSkipInput:0 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:0 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:0 * rnnTestVariableMinibatch:0
+
+    rnnPersistent:0 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:1 * rnnTestDropout:1
+    rnnPersistent:0 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:1 * rnnTestDropout:1
+
+    rnnSkipInput:0 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:1 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:1 * rnnTestVariableMinibatch:0
+    rnnSkipInput:1 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:1 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:1 * rnnTestVariableMinibatch:1
+    rnnSkipInput:0 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:2 * rnnTestVariableMinibatch:0
+    rnnSkipInput:0 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:2 * rnnTestVariableMinibatch:0
+    rnnSkipInput:0 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:2 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:2 * rnnTestVariableMinibatch:0
+
+    rnnPersistent:0 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:3 * rnnTestDropout:1
+    rnnPersistent:0 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:3 * rnnTestDropout:1
+
+    rnnSkipInput:0 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:3 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:3 * rnnTestVariableMinibatch:0
+    rnnSkipInput:1 * rnnbidirectional:0 * rnnMiniBatch:64 * mode:3 * rnnTestVariableMinibatch:1
+    rnnSkipInput:1 * rnnbidirectional:1 * rnnMiniBatch:64 * mode:3 * rnnTestVariableMinibatch:1
+
+    rnnbidirectional:0 * rnnSkipInput:0 * rnnMiniBatch:100 * rnnPersistent:2 * mode:0 * rnnHiddenSize:2048
+
+    rnnInputSize:2048 * rnnbidirectional:0 * rnnSkipInput:1 * rnnMiniBatch:100 * rnnPersistent:2 * mode:0 * rnnHiddenSize:2048
+
+    rnnbidirectional:0 * rnnSkipInput:0 * rnnMiniBatch:100 * rnnPersistent:1  * mode:0          * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnbidirectional:1 * rnnSkipInput:0 * rnnMiniBatch:100 * rnnPersistent:1  * mode:1          * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnbidirectional:1 * rnnSkipInput:0 * rnnMiniBatch:100 * rnnPersistent:2  * mode:1          * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnbidirectional:0 * rnnSkipInput:0 * rnnMiniBatch:100 * rnnPersistent:1  * mode:2          * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnbidirectional:0 * rnnSkipInput:0 * rnnMiniBatch:100 * rnnPersistent:2  * mode:2          * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnbidirectional:1 * rnnSkipInput:0 * rnnMiniBatch:100 * rnnPersistent:1  * mode:3          * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnbidirectional:1 * rnnSkipInput:0 * rnnMiniBatch:100 * rnnPersistent:2  * mode:3          * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnSkipInput:0   * rnnMiniBatch:64  * Pmath:1         * mode:0         * rnnSeqLength:2     * rnnTestVariableMinibatch:0
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnSkipInput:0   * rnnMiniBatch:64  * Pmath:1         * mode:0         * rnnSeqLength:2     * rnnTestVariableMinibatch:0
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnSkipInput:0   * rnnMiniBatch:64  * Pmath:1         * mode:0         * rnnSeqLength:2     * rnnTestVariableMinibatch:1
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnSkipInput:1   * rnnMiniBatch:64  * Pmath:1         * mode:0         * rnnSeqLength:2     * rnnTestVariableMinibatch:0
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnMiniBatch:64  * rnnTestDropout:1 * rnnPersistent:0 * mode:1         * rnnSeqLength:2     * Pmath:1
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnMiniBatch:64  * rnnTestDropout:1 * rnnPersistent:0 * mode:1         * rnnSeqLength:2     * Pmath:1
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnSkipInput:0   * rnnMiniBatch:64  * Pmath:1         * mode:1         * rnnSeqLength:2     * rnnTestVariableMinibatch:1
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnSkipInput:1   * rnnMiniBatch:64  * Pmath:1         * mode:1         * rnnSeqLength:2     * rnnTestVariableMinibatch:0
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnSkipInput:1   * rnnMiniBatch:64  * Pmath:1         * mode:1         * rnnSeqLength:2     * rnnTestVariableMinibatch:1
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnSkipInput:1   * rnnMiniBatch:64  * Pmath:1         * mode:1         * rnnSeqLength:2     * rnnTestVariableMinibatch:1
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnSkipInput:0   * rnnMiniBatch:64  * Pmath:1         * mode:2         * rnnSeqLength:2     * rnnTestVariableMinibatch:0
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnSkipInput:0   * rnnMiniBatch:64  * Pmath:1         * mode:2         * rnnSeqLength:2     * rnnTestVariableMinibatch:0
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnSkipInput:0   * rnnMiniBatch:64  * Pmath:1         * mode:2         * rnnSeqLength:2     * rnnTestVariableMinibatch:1
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnSkipInput:1   * rnnMiniBatch:64  * Pmath:1         * mode:2         * rnnSeqLength:2     * rnnTestVariableMinibatch:0
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnMiniBatch:64  * rnnTestDropout:1 * rnnPersistent:0 * mode:3         * rnnSeqLength:2     * Pmath:1
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnMiniBatch:64  * rnnTestDropout:1 * rnnPersistent:0 * mode:3         * rnnSeqLength:2     * Pmath:1
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnSkipInput:0   * rnnMiniBatch:64  * Pmath:1         * mode:3         * rnnSeqLength:2     * rnnTestVariableMinibatch:1
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnSkipInput:1   * rnnMiniBatch:64  * Pmath:1         * mode:3         * rnnSeqLength:2     * rnnTestVariableMinibatch:0
+    rnnbidirectional:0 * rnnNumLayers:2 * rnnSkipInput:1   * rnnMiniBatch:64  * Pmath:1         * mode:3         * rnnSeqLength:2     * rnnTestVariableMinibatch:1
+    rnnbidirectional:1 * rnnNumLayers:2 * rnnSkipInput:1   * rnnMiniBatch:64  * Pmath:1         * mode:3         * rnnSeqLength:2     * rnnTestVariableMinibatch:1
+
+    rnnInputSize:2048 * rnnbidirectional:0 * rnnSkipInput:1   * rnnMiniBatch:100 * rnnPersistent:1 * mode:0 * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:0 * rnnTestDropout:1 * rnnMiniBatch:48  * rnnPersistent:1 * mode:0 * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnTestDropout:1 * rnnMiniBatch:48  * rnnPersistent:1 * mode:0 * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:0 * rnnTestDropout:1 * rnnMiniBatch:48  * rnnPersistent:2 * mode:0 * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnTestDropout:1 * rnnMiniBatch:48  * rnnPersistent:2 * mode:0 * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnSkipInput:1   * rnnMiniBatch:100 * rnnPersistent:1 * mode:1 * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnInputSize:2048 * rnnbidirectional:1 * rnnSkipInput:1   * rnnMiniBatch:100 * rnnPersistent:2 * mode:1 * rnnSeqLength:5 * rnnHiddenSize:2048
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnSkipInput:1   * rnnMiniBatch:100 * rnnPersistent:1 * mode:2 * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnSkipInput:1   * rnnMiniBatch:100 * rnnPersistent:2 * mode:2 * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnTestDropout:1 * rnnMiniBatch:48  * rnnPersistent:1 * mode:2 * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:1 * rnnTestDropout:1 * rnnMiniBatch:48  * rnnPersistent:1 * mode:2 * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:0 * rnnTestDropout:1 * rnnMiniBatch:48  * rnnPersistent:2 * mode:2 * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:1 * rnnTestDropout:1 * rnnMiniBatch:48  * rnnPersistent:2 * mode:2 * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:1 * rnnSkipInput:1   * rnnMiniBatch:100 * rnnPersistent:1 * mode:3 * rnnSeqLength:5 * rnnHiddenSize:1024
+    rnnInputSize:1024 * rnnbidirectional:1 * rnnSkipInput:1   * rnnMiniBatch:100 * rnnPersistent:2 * mode:3 * rnnSeqLength:5 * rnnHiddenSize:1024
+
+// Bug 200411847 addedd for RNN split in different levels in release test
+<L1_SIMPLE_RNN:L1>
+    mode:0 * rnnNumLayers:1 * rnnInputSize:64 * rnnHiddenSize:64 * rnnbidirectional:0 * rnnMiniBatch:4 * rnnSeqLength:4 * P:s * Pmath:0 * rnnPersistent:0 * rnnTestVariableMinibatch:0 * N:1 * rnnBiasMode:0,1,2,3
+
+<RNN_ALGO0_IN_OUT_COMP_DATATYPE_MIX>
+    Pin:h * Pout:h * Pcomp:h
+    Pin:h * Pout:h * Pcomp:s
+    Pin:s * Pout:s * Pcomp:s
+    Pin:d * Pout:d * Pcomp:d
+
+<RNN_persist_variable_mix>
+    rnnPersistent:0 * RNN_ALGO0_IN_OUT_COMP_DATATYPE_MIX  * rnnTestVariableMinibatch:0,1 * rnnBiasMode:0,1,2,3
+    rnnPersistent:1 * P:s,h * rnnTestVariableMinibatch:0
+    rnnPersistent:2 * P:s,h,d * rnnTestVariableMinibatch:0
+
+<L4_RNN_ALL_COMBINATIONS:L4>
+    rnnNumLayers:3 * rnnInputSize:256 * rnnHiddenSize:256 * rnnbidirectional:0,1 * rnnMiniBatch:8 * rnnSeqLength:4 * Pmath:0,1,2 * RNN_persist_variable_mix * N:8
+
+<L4_RNN_PROJ_FWD:L4>
+    mode:2 * rnnPersistent:0 * Pmath:0,1 * rnnProjSizes:"128,0" * rnnHiddenSize:256 * rnnInputSize:256 * rnnSeqLength:32 * rnnNumLayers:4 * rnnMiniBatch:32 * rnnbidirectional:0,1 * rnnTestVariableMinibatch:0,1 * rnnSkipInput:0,1 * rnnRandNull:0 * P:s,h * N:30
+    mode:2 * rnnPersistent:0 * Pmath:1 * rnnProjSizes:"1024,0" * rnnHiddenSize:8192 * rnnInputSize:1024 * rnnSeqLength:20 * rnnNumLayers:1 * rnnMiniBatch:128 * rnnbidirectional:0,1 * rnnSkipInput:0 * rnnRandNull:0 * P:h * b:
+
+<L4_RNN_PROJ_BWD:L4>
+    mode:2 * rnnPersistent:0 * Pmath:0,1 * rnnProjSizes:"128,0" * rnnHiddenSize:256 * rnnInputSize:256 * rnnSeqLength:32 * rnnNumLayers:4 * rnnMiniBatch:32 * rnnbidirectional:0,1 * rnnTestVariableMinibatch:0,1 * rnnSkipInput:0,1 * rnnRandNull:0 * P:s,h * N:30
+    mode:2 * rnnPersistent:0 * Pmath:1 * rnnProjSizes:"1024,0" * rnnHiddenSize:8192 * rnnInputSize:1024 * rnnSeqLength:20 * rnnNumLayers:1 * rnnMiniBatch:128 * rnnbidirectional:0,1 * rnnSkipInput:0 * rnnRandNull:0 * P:h * b:
+
+//RNN find support-1
+<L4_RNN_find_1:L4>
+    //pattern: .*rnnbidirectional0.*rnnPersistent0.*mode0.* total 56 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:0 * rnnTestDropout:0,1 * mode:0 * Pmath:0,1
+    //pattern: .*rnnbidirectional0.*rnnPersistent0.*mode1.*  total 56 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:0 * rnnTestDropout:0,1 * mode:1 * Pmath:0,1
+    //pattern: .*rnnbidirectional0.*rnnPersistent2.mode[01].*  total 112 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:2 * rnnTestDropout:0,1 * mode:0,1 * Pmath:0,1
+    //pattern: .*rnnbidirectional1.*rnnSkipInput0.*rnnPersistent0.* total 56 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:0 * rnnTestDropout:0,1 * mode:0,1 * Pmath:0,1
+    //pattern: .*rnnbidirectional1.*rnnSkipInput1.*rnnPersistent0.*rnnTestDropout0.*  total 32 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:1 * rnnSkipInput:1 * rnnPersistent:0 * rnnTestDropout:0 * mode:0,1 * Pmath:0,1
+    //pattern: .*rnnbidirectional1.*rnnSkipInput0.*rnnPersistent2.*mode0.* total 56 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:2 * rnnTestDropout:0,1 * mode:0,1 * Pmath:0,1
+    //pattern: .*rnnbidirectional1.*rnnSkipInput1.*rnnPersistent2.*rnnTestDropout0.*mode0.* total 32 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:1 * rnnSkipInput:1 * rnnPersistent:2 * rnnTestDropout:0 * mode:0,1 * Pmath:0,1
+
+//RNN find support-2
+<L4_RNN_find_2:L4>
+    //pattern: .*rnnbidirectional0.*rnnPersistent0.*rnnTestDropout0.*mode2.* total 32 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:0 * rnnTestDropout:0 * mode:2 * Pmath:0,1
+    //pattern: .*rnnbidirectional0.*rnnSkipInput1.*rnnPersistent2.*rnnTestDropout0.*mode2.* total 24 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:2 * rnnTestDropout:0 * mode:2 * Pmath:0,1
+    //pattern: .*rnnbidirectional1.*rnnSkipInput0.*rnnPersistent0.*rnnTestDropout0.*mode2.* total 12 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:0 * rnnTestDropout:0 * mode:2 * Pmath:0,1
+    //pattern: .*rnnbidirectional1.*rnnSkipInput1.*rnnPersistent1.* total 12 cases
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:1 * rnnSkipInput:1 * rnnPersistent:0 * rnnTestDropout:0 * mode:2 * Pmath:0,1
+
+//RNN find support-3
+<L4_RNN_find_3:L4>
+    rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0,1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:0 * rnnTestDropout:0,1 * mode:0 * Pmath:0,1
+
+//RNN find support-4
+<L4_RNN_find_4:L4>
+    //pattern: .*rnnbidirectional0.*rnnSkipInput0.*rnnPersistent1.*mode0 total 8 cases
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:1 * rnnTestDropout:1 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:1 * rnnTestDropout:1 * mode:0 * Pmath:0
+    //pattern: .*rnnbidirectional0.*rnnSkipInput1.*rnnPersistent1.*mode0.* total 4 cases
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:0 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:0 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:0 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:0 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    //.*rnnbidirectional0.*rnnSkipInput0.*rnnPersistent1.*mode1.* total 8 cases
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:1 * rnnTestDropout:0 * mode:1 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:1 * rnnTestDropout:1 * mode:1 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:1 * rnnTestDropout:0 * mode:1 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:0 * rnnSkipInput:0,1 * rnnPersistent:1 * rnnTestDropout:1 * mode:1 * Pmath:0
+    //pattern: .*rnnbidirectional1.*rnnSkipInput0.*rnnPersistent1.* total 8 cases
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:0 * mode:1 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:1 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:1 * mode:1 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:0 * mode:1 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:1 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:1 * rnnSkipInput:0 * rnnPersistent:1 * rnnTestDropout:1 * mode:1 * Pmath:0
+    //pattern: .*rnnbidirectional1.*rnnSkipInput1.*rnnPersistent1.* total 4 cases
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:1 * rnnSkipInput:1 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:0 * rnnbidirectional:1 * rnnSkipInput:1 * rnnPersistent:1 * rnnTestDropout:0 * mode:1 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:1 * rnnSkipInput:1 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+    R:findBwdWeightsRNN * rnnInputSize:1024 * rnnNumLayers:2 * rnnMiniBatch:48 * rnnSeqLength:2 * rnnHiddenSize:1024 * rnnTestVariableMinibatch:1 * rnnbidirectional:1 * rnnSkipInput:1 * rnnPersistent:1 * rnnTestDropout:0 * mode:0 * Pmath:0
+
+<L2_wgrad_fft1_tiling:L2,L3,L4>
+    // Failing test bug 2072856
+    A:1 * B:0 * dim:2 * dimA:"1,1,2,257"   * filtA:"1,1,2,11"  * n:1   * c:1   * k:1  * b:
+    A:1 * B:0 * dim:2 * dimA:"1,1,2,257"   * filtA:"1,1,2,11"  * n:20  * c:6   * k:10 * b:
+    A:4 * B:1 * dim:2 * dimA:"1,1,2,33"    * filtA:"1,1,2,11"  * n:728 * c:96  * k:1  * b:
+    // Small image
+    A:3 * B:2 * dim:2 * dimA:"1,1,1,14"    * filtA:"1,1,1,3"   * n:256 * c:32  * k:16
+    A:3 * B:2 * dim:2 * dimA:"1,1,14,1"    * filtA:"1,1,3,1"   * n:256 * c:32  * k:16
+    // Large image, two sub-tiles
+    A:1 * B:1 * dim:2 * dimA:"1,1,1,260"   * filtA:"1,1,1,50"  * n:16  * c:3   * k:10
+    A:1 * B:1 * dim:2 * dimA:"1,1,260,1"   * filtA:"1,1,50,1"  * n:16  * c:3   * k:10
+    // Large image, eight sub-tiles
+    A:1 * B:2 * dim:2 * dimA:"1,1,1,300"   * filtA:"1,1,1,51"  * n:3   * c:2   * k:8
+    A:1 * B:2 * dim:2 * dimA:"1,1,300,1"   * filtA:"1,1,51,1"  * n:3   * c:2   * k:8
+    // 1D filter max 256
+    A:1 * B:2 * dim:2 * dimA:"1,1,1,262"   * filtA:"1,1,1,7"   * n:128 * c:2   * k:8
+    A:1 * B:2 * dim:2 * dimA:"1,1,262,1"   * filtA:"1,1,7,1"   * n:128 * c:2   * k:8
+    // 2D x 1D -> 1D
+    A:1 * B:2 * dim:2 * dimA:"1,1,256,80"  * filtA:"1,1,256,1" * n:2   * c:3   * k:4
+    A:1 * B:2 * dim:2 * dimA:"1,1,256,1"   * filtA:"1,1,256,1" * n:2   * c:3   * k:4
+    // Include padding
+    A:1 * B:2 * dim:2 * dimA:"1,1,1,300"   * filtA:"1,1,1,100" * n:10  * c:30  * k:20 * padA:"0,21"
+    A:1 * B:2 * dim:2 * dimA:"1,1,300,1"   * filtA:"1,1,100,1" * n:10  * c:30  * k:20 * padA:"10,0"
+    // Likely fft1 32-points
+    dimA:"8,14,20,1500" * filtA:"18,14,20,1450"
+    dimA:"8,14,1500,10" * filtA:"18,14,1450,10"
+    // Likely fft1 256-points
+    dimA:"8,14,20,1200" * filtA:"18,14,20,800"
+    dimA:"8,14,1200,16" * filtA:"18,14,800,16"
+
+<L3_Pinb_Pcompb_pi_largeK:L3,L4>
+    Pin:b * Pout:b * dimA:"1,20" * filtA:"20,4"  * groupCount:5 * p:i * Pcomp:b
+    Pin:b * Pout:s * dimA:"2,16" * filtA:"8,8"   * groupCount:2 * p:i * Pcomp:b
+    Pin:b * Pout:s * dimA:"1,24" * filtA:"36,8"  * groupCount:3 * p:i * Pcomp:b
+    Pin:b * Pout:s * dimA:"8,32" * filtA:"48,8"  * groupCount:4 * p:i * Pcomp:b
+    Pin:b * Pout:s * dimA:"9,64" * filtA:"16,16" * groupCount:4 * p:i * Pcomp:b
+
+<L3_conv_Pinb_Pcompb_pi>
+    Pb * L3_Pinb_Pcompb_pi_largeK
+    Pb * L3_Pinb_Pcompb_pi
+
+<L3_A2_B5_n5_variousDims:L3,L4>
+    A:2 * pad_h:6 * h:123 * n:5 * s:11 * r:7 * w:123 * B:5 * pad_w:10
+    A:2 * pad_h:2 * h:128 * n:5 * s:3  * r:3 * w:128 * B:5 * pad_w:2
+    A:2 * pad_h:6 * h:14  * n:5 * s:3  * r:7 * w:13  * B:5 * pad_w:2
+    A:2 * pad_h:2 * h:16  * n:5 * s:3  * r:3 * w:16  * B:5 * pad_w:2
+    A:2 * pad_h:2 * h:223 * n:5 * s:7  * r:3 * w:121 * B:5 * pad_w:6
+    A:2 * pad_h:2 * h:224 * n:5 * s:3  * r:3 * w:224 * B:5 * pad_w:2
+    A:2 * pad_h:2 * h:32  * n:5 * s:3  * r:3 * w:32  * B:5 * pad_w:2
+    A:2 * pad_h:4 * h:35  * n:5 * s:3  * r:5 * w:35  * B:5 * pad_w:2
+    A:2 * pad_h:2 * h:61  * n:5 * s:5  * r:3 * w:61  * B:5 * pad_w:4
+    A:2 * pad_h:2 * h:64  * n:5 * s:3  * r:3 * w:64  * B:5 * pad_w:2
+
+<L1_L3_Ph_Pcomph>
+    Ph * L1_Pcomph_variousDims
+    Ph * L3_Pcomph_variousDims
+
+<L1_L3_variousDims_variousTypes>
+    Ph * L1_Pcomph_variousDims
+    Ph * L3_Pcomph_variousDims
+    Pdhs * L3_conv_dilated_variousDims
+
+<L3_convBiasAct_InOutActMix:L3,L4>
+    Pin:b,u * formatIn:1 * Pout:s * formatOut:1 * Pcomp:b * filtFormat:1 * activFloor:
+    Pin:b,u * formatIn:1 * Pout:b * formatOut:1 * Pcomp:b * filtFormat:1 * activFloor:
+    Pin:b,u * formatIn:2 * Pout:s * formatOut:1 * Pcomp:b * filtFormat:2 * activFloor:
+    Pin:b,u * formatIn:2 * Pout:b * formatOut:2 * Pcomp:b * filtFormat:2 * activFloor:
+    Pin:b,u * formatIn:1 * Pout:s * formatOut:1 * Pcomp:b * filtFormat:1
+    Pin:b,u * formatIn:1 * Pout:b * formatOut:1 * Pcomp:b * filtFormat:1
+    Pin:b,u * formatIn:2 * Pout:s * formatOut:1 * Pcomp:b * filtFormat:2
+    Pin:b,u * formatIn:2 * Pout:b * formatOut:2 * Pcomp:b * filtFormat:2
+
+<L3_convBiasAct_InOutActMix_IDENTITY_all:L3,L4>
+    // INT8_EXT_CONFIG & UINT8_EXT_CONFIG
+    Pin:b,u * formatIn:1 * Pout:s * formatOut:1 * Pcomp:b * filtFormat:1 * activFloor: * p:i
+    Pin:u * formatIn:1 * Pout:s * formatOut:1 * Pcomp:b * filtFormat:1 * p:i
+    // INT8_CONFIG & UINT8_CONFIG
+    Pin:b,u * formatIn:1 * Pout:b * formatOut:1 * Pcomp:b * filtFormat:1 * activFloor: * p:i
+    Pin:u * formatIn:1 * Pout:b * formatOut:1 * Pcomp:b * filtFormat:1 * p:i
+    // INT8x4_CONFIG & UINT8x4_CONFIG
+    Pin:b,u * formatIn:2 * Pout:b * formatOut:2 * Pcomp:b * filtFormat:2 * activFloor: * p:i
+    Pin:b,u * formatIn:2 * Pout:b * formatOut:2 * Pcomp:b * filtFormat:2 * activFloor: * p:i
+    Pin:u * formatIn:2 * Pout:b * formatOut:2 * Pcomp:b * filtFormat:2 * p:i
+    // INT8x4_EXT_CONFIG & UINT8x4_EXT_CONFIG
+    Pin:b,u * formatIn:2 * Pout:s * formatOut:1 * Pcomp:b * filtFormat:2 * activFloor: * p:i
+    Pin:u * formatIn:2 * Pout:s * formatOut:1 * Pcomp:b * filtFormat:2 * p:i
+    // FLOAT_CONFIG
+    Pin:s * formatIn:0 * Pout:s * formatOut:0 * Pcomp:s * filtFormat:0 * activFloor:
+    Pin:s * formatIn:1 * Pout:s * formatOut:1 * Pcomp:s * filtFormat:1 * activFloor:
+    // DOUBLE_CONFIG
+    Pin:d * formatIn:0 * Pout:d * formatOut:0 * Pcomp:d * filtFormat:0 * activFloor:
+    Pin:d * formatIn:1 * Pout:d * formatOut:1 * Pcomp:d * filtFormat:1 * activFloor:
+    // TRUE_HALF_CONFIG
+    Pin:h * formatIn:0 * Pout:h * formatOut:0 * Pcomp:h * filtFormat:0 * activFloor:
+    Pin:h * formatIn:1 * Pout:h * formatOut:1 * Pcomp:h * filtFormat:1 * activFloor:
+    // PSEUDO_HALF_CONFIG
+    Pin:h * formatIn:0 * Pout:h * formatOut:0 * Pcomp:s * filtFormat:0 * activFloor:
+    Pin:h * formatIn:1 * Pout:h * formatOut:1 * Pcomp:s * filtFormat:1 * activFloor:
+
+<L3_convBiasAct_InOutActMix_IDENTITY_all_grouped:L3,L4>
+    P:s,d * dimA:"10,4,8,8" * filtA:"8,2,3,3" * groupCount:2 * pad_h:1 * pad_w:1
+    P:s,d * dimA:"64,4,8,8" * filtA:"8,2,3,3" * groupCount:2 * pad_h:1 * pad_w:1 * activFloor:
+    P:s,d * dimA:"10,64,8,8" * filtA:"64,2,3,3" * groupCount:32 * pad_h:1 * pad_w:1
+    P:s,d * dimA:"10,64,8,8" * filtA:"64,2,3,3" * groupCount:32 * pad_h:1 * pad_w:1 * activFloor:
+
+<L4_bug_2034186:L4>
+    R: dgrad * P:s,d,h * dimA:"1,1,3591,3591" * filtA:"1,1,3,3" * b: * groupCount:1 * pad_h:1 * pad_w:1 * ws:1 * dilation_h:2 * dilation_w:2
+    R: dgrad * P:s,d,h * dimA:"1,2,10000,5000" * filtA:"2,1,3,3" * b: * groupCount:2 * pad_h:1 * pad_w:1 * ws:1 * dilation_h:2 * dilation_w:2
+    R: dgrad * P:s,d,h * dimA:"1,4,5000,5000" * filtA:"4,1,3,3" * b: * groupCount:4 * pad_h:1 * pad_w:1 * ws:1 * dilation_h:2 * dilation_w:2
+    R: dgrad * P:s,d,h * dimA:"4,3,3591,3591" * filtA:"9,1,3,3" * b: * groupCount:3 * pad_h:1 * pad_w:1 * ws:1 * dilation_h:2 * dilation_w:2
+    R: dgrad * P:s,d,h * dimA:"1,10,3591,3591" * filtA:"20,1,3,3" * b: * groupCount:10 * pad_h:1 * pad_w:1 * ws:1 * dilation_h:2 * dilation_w:2
+
+<L3_bug_2021969_CUDNN_TENSOR_NHWC:L3,L4>
+    filtFormat:1               *  formatIn:1             *  formatOut:1
+<L3_bug_2021969_CUDNN_TENSOR_NCHW_VECT_C:L3,L4>
+    filtFormat:2               *  formatIn:2             *  formatOut:2
+
+<L4_bug_200381420:L4>
+    P:s,d,h * c:1,2,4,8,16,32 * b:
+    P:d * c:64,128,256,512,1024 * b: * V:
+    P:h * c:64,128,256,512 * b: * V:
+    P:d * c:60,299,1023 * b:
+
+<L4_bug_200380402:L4>
+    P:s,h * c:1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608,13336576,15384576,16777216 * b: * n:1 * h:1 * w:1 * algo:1 * k:1 * r:1 * s:1 * u:1 * v:1 * pad_w:1 * pad_h:1 * formatIn:0 * formatOut:0 * filtFormat:0
+
+<L4_bug_200388940:L4>
+    A:1 * B:0 * b: * dimA:"1,32,270,480" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,460" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,440" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,420" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,400" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,380" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,360" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,340" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,320" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,300" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,280" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,260" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,240" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,220" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,200" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,180" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,160" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,140" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,120" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+    A:1 * B:0 * b: * dimA:"1,32,270,100" * filtA:"32,1,1,1" * groupCount:32 * u:1 * v:1 * n:32 * csv: * d:0
+
+<L4_bug_200397238:L4>
+    dimA:"18,8,8,17" * filtA:"966,8,5,5" * padA:"0,0" * convStrideA:"1,1" * A:0.000166,1.000000 * B:0.000000 * b:
+
+<L4_bug_2083491:L4>
+    P:s,h,d * b: * dimA:"256,64,112,112" * dimOut:"256,64,55,55" * formatIn:1 * formatOut:1
+    P:s,h,d * b: * dimA:"10,32,5,5" * dimOut:"10,32,2,2" * formatIn:1 * formatOut:1
+    P:s,h,d * b: * dimA:"10,7,3,3" * dimOut:"10,7,1,1" * formatIn:1 * formatOut:1
+
+
+<L4_variousDims:L4>
+    // Packed, both layouts should have same runtime
+    dimA:"4,32,16,8"  *  formatIn:0,1
+    // Spatially packed NCHW
+    dimA:"4,32,16,8"  *  strideA:"8192,128,8,1"
+    dimA:"4,32,16,8"  *  strideA:"8192,256,8,1"
+    // Other (unpacked NHWC, spatially unpacked NHWC)
+    dimA:"4,32,16,8"  *  strideA:"8192,256,16,1"
+    dimA:"4,32,16,8"  *  strideA:"8192,256,16,2"
+    dimA:"4,32,16,8"  *  strideA:"8192,1,256,32"
+    dimA:"4,32,16,8"  *  strideA:"8192,1,512,32"
+    dimA:"4,32,16,8"  *  strideA:"8192,1,512,64"
+    dimA:"4,32,16,8"  *  strideA:"8192,2,512,64"
+
+<L4_noSpatial:L4>
+    // mode 4, no spatial dims
+    dimA:"128,512,1,1"  *  formatIn:0,1
+    dimA:"128,512,1,1"  *  strideA:"1024,1,1,1"
+    dimA:"128,512,1,1"  *  strideA:"1024,2,1,1"
+    dimA:"128,512,1,1"  *  strideA:"1024,2,2,1"
+    dimA:"128,512,1,1"  *  strideA:"1024,2,2,2"
+    dimA:"128,512,1,1"  *  strideA:"1024,1,512,512"
+    dimA:"128,512,1,1"  *  strideA:"1024,1,1024,512"
+    dimA:"128,512,1,1"  *  strideA:"1024,1,1024,1024"
+    dimA:"128,512,1,1"  *  strideA:"1024,2,1024,1024"
+
+
+<Performance_Bug_2097074:L3>
+    R:wgrad  *  b:   *  P:h   *  Pin:h   *  Pout:h   *  Pcomp:s   *  algo:1   *  n:8   *  c:32   *  h:512   *  w:512   *  k:64   *  r:4   *  s:4   *  pad_h:1   *  pad_w:1   *  u:2   *  v:2  *  formatIn:1   *  formatOut:1   *  filtFormat:1   *  Pmath:1   *  x:   *  N:4  * p:i
+    R:wgrad  *  b:   *  P:h   *  Pin:h   *  Pout:h   *  Pcomp:s   *  algo:1   *  n:8   *  c:128   *  h:128   *  w:128   *  k:256   *  r:4   *  s:4   *  pad_h:1   *  pad_w:1   *  u:2   *  v:2  *  formatIn:1   *  formatOut:1   *  filtFormat:1   *  Pmath:1   *  x:   *  N:4
+    R:wgrad  *  b:   *  P:h   *  Pin:h   *  Pout:h   *  Pcomp:s   *  algo:1   *  n:8   *  c:256   *  h:64   *  w:64   *  k:256   *  r:3   *  s:3   *  pad_h:1   *  pad_w:1   *  u:1   *  v:1  *  formatIn:1   *  formatOut:1   *  filtFormat:1   *  Pmath:1   *  x:   *  N:4
+
+<cask_winograd_dgrad_bugs:L4>
+    Pmath:0                     * dimA:"1,2,5,7"   * strideA:"140,35,7,1"      * filtA:"2,2,3,3" * filtFormat:0 * padA:"2,2" * convStrideA:"1,1" * dilationA:"1,1" * strideOut:"252,63,9,1"
+    Pmath:0 * x:                * dimA:"1,2,5,7"   * strideA:"140,35,7,1"      * filtA:"2,2,3,3" * filtFormat:0 * padA:"2,2" * convStrideA:"1,1" * dilationA:"1,1" * strideOut:"252,63,9,1"
+    Pmath:0 *      groupCount:2 * dimA:"1,4,5,7"   * strideA:"140,35,7,1"      * filtA:"4,2,3,3" * filtFormat:0 * padA:"2,2" * convStrideA:"1,1" * dilationA:"1,1" * strideOut:"252,63,9,1"
+    Pmath:0 * x: * groupCount:2 * dimA:"1,4,5,7"   * strideA:"140,35,7,1"      * filtA:"4,2,3,3" * filtFormat:0 * padA:"2,2" * convStrideA:"1,1" * dilationA:"1,1" * strideOut:"252,63,9,1"
+    Pmath:1      * dimA:"4,9,35,35" * strideA:"11025,1225,35,1" * filtA:"9,9,3,3" * filtFormat:0 * padA:"1,1" * convStrideA:"1,1" * dilationA:"1,1" * strideOut:"11025,1225,35,1"
+    Pmath:1 * x: * dimA:"4,9,35,35" * strideA:"11025,1225,35,1" * filtA:"9,9,3,3" * filtFormat:0 * padA:"1,1" * convStrideA:"1,1" * dilationA:"1,1" * strideOut:"11025,1225,35,1"
+
+<L3_bug_2101262:L3,L4>
+    formatIn:1 * formatOut:1 * filtFormat:1
+
+<bug2111936:L3,L4,Normalization>
+    R:lrnb,lrnf * lrnN:4
+
+<resnet_update:L4>
+    R:dgrad * h:32  * w:48  * c:8 * n:1  * k:8  * s:1 * r:1 * pad_w:0 * pad_h:0 * x: * u:2 * v:2 * formatOut:1 * formatIn:1 * seedGeom:48 * filtFormat:1
+    R:dgrad * h:32  * w:48  * c:8 * n:1  * k:8  * s:3 * r:3 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * formatOut:1 * formatIn:1 * seedGeom:48 * filtFormat:1
+    R:wgrad * h:120 * w:80  * c:3 * n:5  * k:16 * s:3 * r:3 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * seedGeom:84
+    R:wgrad * h:104 * w:8   * c:3 * n:8  * k:32 * s:4 * r:4 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * seedGeom:89
+    R:wgrad * h:376 * w:16  * c:3 * n:3  * k:48 * s:5 * r:5 * pad_w:2 * pad_h:2 * x: * u:2 * v:2 * seedGeom:94
+    R:wgrad * h:24  * w:56  * c:3 * n:8  * k:64 * s:7 * r:7 * pad_w:3 * pad_h:3 * x: * u:2 * v:2 * seedGeom:99
+    R:wgrad * h:8   * w:384 * c:3 * n:24 * k:64 * s:3 * r:3 * pad_w:1 * pad_h:1 * x: * u:1 * v:1 * seedGeom:96
+    R:wgrad * h:32  * w:128 * c:3 * n:8  * k:16 * s:5 * r:5 * pad_w:2 * pad_h:2 * x: * u:1 * v:1 * seedGeom:86
+    R:wgrad * h:72  * w:136 * c:3 * n:8  * k:32 * s:7 * r:7 * pad_w:3 * pad_h:3 * x: * u:1 * v:1 * seedGeom:91
+    R:wgrad * h:96  * w:56  * c:3 * n:8  * k:64 * s:3 * r:3 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * seedGeom:96 * formatOut:0 * filtFormat:0 * formatIn:1 * strideA:"21504,1,224,4"
+    R:wgrad * h:136 * w:96  * c:3 * n:8  * k:48 * s:4 * r:4 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * seedGeom:93 * formatOut:0 * filtFormat:0 * formatIn:1 * strideA:"52224,1,384,4"
+    R:wgrad * h:80  * w:16  * c:3 * n:8  * k:32 * s:5 * r:5 * pad_w:2 * pad_h:2 * x: * u:2 * v:2 * seedGeom:90 * formatOut:0 * filtFormat:0 * formatIn:1 * strideA:"5120,1,64,4"
+    R:wgrad * h:80  * w:56  * c:3 * n:16 * k:48 * s:3 * r:3 * pad_w:1 * pad_h:1 * x: * u:1 * v:1 * seedGeom:92 * formatOut:0 * filtFormat:0 * formatIn:1 * strideA:"17920,1,224,4"
+    R:wgrad * h:224 * w:224 * c:4 * n:24 * k:64 * s:7 * r:7 * pad_w:3 * pad_h:3 * x: * u:2 * v:2 * seedGeom:96 * formatOut:1 * filtFormat:1 * formatIn:1
+    R:conv  * h:120 * w:80  * c:3 * n:5  * k:16 * s:3 * r:3 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * seedGeom:84
+    R:conv  * h:104 * w:8   * c:3 * n:8  * k:32 * s:4 * r:4 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * seedGeom:89
+    R:conv  * h:360 * w:16  * c:3 * n:9  * k:16 * s:5 * r:5 * pad_w:2 * pad_h:2 * x: * u:2 * v:2 * seedGeom:86
+    R:conv  * h:104 * w:56  * c:3 * n:8  * k:16 * s:7 * r:7 * pad_w:3 * pad_h:3 * x: * u:2 * v:2 * seedGeom:87
+    R:conv  * h:120 * w:80  * c:4 * n:5  * k:16 * s:3 * r:3 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * seedGeom:84 * formatOut:1 * filtFormat:1 * formatIn:1
+    R:conv  * h:104 * w:8   * c:4 * n:8  * k:32 * s:4 * r:4 * pad_w:1 * pad_h:1 * x: * u:2 * v:2 * seedGeom:89 * formatOut:1 * filtFormat:1 * formatIn:1
+    R:conv  * h:376 * w:16  * c:4 * n:3  * k:48 * s:5 * r:5 * pad_w:2 * pad_h:2 * x: * u:2 * v:2 * seedGeom:94 * formatOut:1 * filtFormat:1 * formatIn:1
+    R:conv  * h:104 * w:56  * c:4 * n:8  * k:16 * s:7 * r:7 * pad_w:3 * pad_h:3 * x: * u:2 * v:2 * seedGeom:87 * formatOut:1 * filtFormat:1 * formatIn:1
+
+<L3_bug_2405104:L3,L4>
+    dimA:"2,2,6,6" * strideA:"72,36,6,1" * filtA:"1,2,1,1" * filtFormat:0 * padA:"0,0" * convStrideA:"1,1" * dilationA:"1,1" * A:1.000000 * B:0.000000 * strideOut:"36,36,6,1" * b:
+
+<rnn_nightly:L4>
+    mode: 0  *  rnnSkipInput: 1  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 1
+    mode: 0  *  rnnSkipInput: 0  *  rnnbidirectional: 1 * rnnTestVariableMinibatch: 1
+    mode: 0  *  rnnSkipInput: 1  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 0
+    mode: 0  *  rnnSkipInput: 1  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 1
+    mode: 1  *  rnnSkipInput: 0  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 0
+    mode: 1  *  rnnSkipInput: 0  *  rnnbidirectional: 1 * rnnTestVariableMinibatch: 0
+    mode: 1  *  rnnSkipInput: 1  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 0
+    mode: 1  *  rnnSkipInput: 0  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 1
+    mode: 2  *  rnnSkipInput: 1  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 1
+    mode: 2  *  rnnSkipInput: 0  *  rnnbidirectional: 1 * rnnTestVariableMinibatch: 1
+    mode: 2  *  rnnSkipInput: 1  *  rnnbidirectional: 1 * rnnTestVariableMinibatch: 0
+    mode: 2  *  rnnSkipInput: 1  *  rnnbidirectional: 1 * rnnTestVariableMinibatch: 1
+    mode: 3  *  rnnSkipInput: 0  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 0
+    mode: 3  *  rnnSkipInput: 1  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 0
+    mode: 3  *  rnnSkipInput: 0  *  rnnbidirectional: 1 * rnnTestVariableMinibatch: 0
+    mode: 3  *  rnnSkipInput: 0  *  rnnbidirectional: 0 * rnnTestVariableMinibatch: 1
+    mode: 0  *  rnnTestDropout: 1  *  rnnbidirectional: 1 * rnnPersistent: 0
+    mode: 0  *  rnnTestDropout: 1  *  rnnbidirectional: 0 * rnnPersistent: 0
+    mode: 2  *  rnnTestDropout: 1  *  rnnbidirectional: 1 * rnnPersistent: 0
+    mode: 2  *  rnnTestDropout: 1  *  rnnbidirectional: 0 * rnnPersistent: 0
+    mode: 1  *  rnnTestDropout: 1  *  rnnbidirectional: 1 * rnnPersistent: 1  *  rnnInputSize: 2048  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128
+    mode: 1  *  rnnTestDropout: 1  *  rnnbidirectional: 0 * rnnPersistent: 2  *  rnnInputSize: 2048  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128
+    mode: 1  *  rnnTestDropout: 1  *  rnnbidirectional: 1 * rnnPersistent: 1  *  rnnInputSize: 2048  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128
+    mode: 1  *  rnnTestDropout: 1  *  rnnbidirectional: 0 * rnnPersistent: 2  *  rnnInputSize: 2048  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128
+    mode: 3  *  rnnTestDropout: 1  *  rnnbidirectional: 1 * rnnPersistent: 1  *  rnnInputSize: 1024  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 128
+    mode: 3  *  rnnTestDropout: 1  *  rnnbidirectional: 0 * rnnPersistent: 2  *  rnnInputSize: 1024  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 128
+    mode: 3  *  rnnTestDropout: 1  *  rnnbidirectional: 1 * rnnPersistent: 1  *  rnnInputSize: 1024  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 128
+    mode: 3  *  rnnTestDropout: 1  *  rnnbidirectional: 0 * rnnPersistent: 2  *  rnnInputSize: 1024  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 128
+    mode: 0  *  rnnSkipInput: 0  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 0  *  rnnSkipInput: 1  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 0  *  rnnSkipInput: 0  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 0  *  rnnSkipInput: 1  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 1  *  rnnSkipInput: 0  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 1  *  rnnSkipInput: 1  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 1  *  rnnSkipInput: 0  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 1  *  rnnSkipInput: 1  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 2  *  rnnSkipInput: 0  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 2  *  rnnSkipInput: 1  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 2  *  rnnSkipInput: 0  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 2  *  rnnSkipInput: 1  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 3  *  rnnSkipInput: 0  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 3  *  rnnSkipInput: 1  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 3  *  rnnSkipInput: 0  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+    mode: 3  *  rnnSkipInput: 1  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 128  *  rnnInputSize: 2048
+
+
+    mode: 0  *  rnnSkipInput: 0  *  rnnTestVariableMinibatch: 0  *  rnnbidirectional: 0 * rnnMiniBatch: 64
+    mode: 0  *  rnnSkipInput: 1  *  rnnTestVariableMinibatch: 0  *  rnnbidirectional: 0 * rnnMiniBatch: 64
+    mode: 0  *  rnnSkipInput: 0  *  rnnTestVariableMinibatch: 0  *  rnnbidirectional: 1 * rnnMiniBatch: 64
+    mode: 0  *  rnnSkipInput: 0  *  rnnTestVariableMinibatch: 1  *  rnnbidirectional: 0 * rnnMiniBatch: 64
+    mode: 1  *  rnnSkipInput: 1  *  rnnTestVariableMinibatch: 1  *  rnnbidirectional: 0 * rnnMiniBatch: 64
+    mode: 1  *  rnnSkipInput: 0  *  rnnTestVariableMinibatch: 1  *  rnnbidirectional: 1 * rnnMiniBatch: 64
+    mode: 1  *  rnnSkipInput: 1  *  rnnTestVariableMinibatch: 0  *  rnnbidirectional: 1 * rnnMiniBatch: 64
+    mode: 1  *  rnnSkipInput: 1  *  rnnTestVariableMinibatch: 1  *  rnnbidirectional: 1 * rnnMiniBatch: 64
+    mode: 2  *  rnnSkipInput: 0  *  rnnTestVariableMinibatch: 0  *  rnnbidirectional: 0 * rnnMiniBatch: 64
+    mode: 2  *  rnnSkipInput: 1  *  rnnTestVariableMinibatch: 0  *  rnnbidirectional: 0 * rnnMiniBatch: 64
+    mode: 2  *  rnnSkipInput: 0  *  rnnTestVariableMinibatch: 0  *  rnnbidirectional: 0 * rnnMiniBatch: 64
+    mode: 2  *  rnnSkipInput: 0  *  rnnTestVariableMinibatch: 1  *  rnnbidirectional: 1 * rnnMiniBatch: 64
+    mode: 3  *  rnnSkipInput: 1  *  rnnTestVariableMinibatch: 1  *  rnnbidirectional: 0 * rnnMiniBatch: 64
+    mode: 3  *  rnnSkipInput: 0  *  rnnTestVariableMinibatch: 1  *  rnnbidirectional: 1 * rnnMiniBatch: 64
+    mode: 3  *  rnnSkipInput: 1  *  rnnTestVariableMinibatch: 0  *  rnnbidirectional: 1 * rnnMiniBatch: 64
+    mode: 3  *  rnnSkipInput: 1  *  rnnTestVariableMinibatch: 1  *  rnnbidirectional: 1 * rnnMiniBatch: 64
+    mode: 0  *  rnnTestVariableMinibatch: 0  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnSkipInput: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 0  *  rnnTestVariableMinibatch: 0  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnSkipInput: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 0  *  rnnTestVariableMinibatch: 0  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnSkipInput: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 0  *  rnnTestVariableMinibatch: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnSkipInput: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 1  *  rnnTestVariableMinibatch: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnSkipInput: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 1  *  rnnTestVariableMinibatch: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnSkipInput: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 1  *  rnnTestVariableMinibatch: 0  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnSkipInput: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 1  *  rnnTestVariableMinibatch: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnSkipInput: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 2  *  rnnTestVariableMinibatch: 0  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnSkipInput: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 2  *  rnnTestVariableMinibatch: 0  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnSkipInput: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 2  *  rnnTestVariableMinibatch: 0  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnSkipInput: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 2  *  rnnTestVariableMinibatch: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnSkipInput: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 3  *  rnnTestVariableMinibatch: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnSkipInput: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 3  *  rnnTestVariableMinibatch: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnSkipInput: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 3  *  rnnTestVariableMinibatch: 0  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnSkipInput: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 3  *  rnnTestVariableMinibatch: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnSkipInput: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 1  *  rnnTestDropout: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 1  *  rnnTestDropout: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 3  *  rnnTestDropout: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 1  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 3  *  rnnTestDropout: 1  *  rnnSeqLength: 2  *  rnnNumLayers: 2  *  rnnbidirectional: 0  *  rnnMiniBatch: 64  *  Pmath: 1
+    mode: 0  *  rnnHiddenSize: 2560  *  rnnInputSize: 2560  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnMiniBatch: 256  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 1  *  rnnHiddenSize: 2560  *  rnnInputSize: 2560  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnMiniBatch: 256  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 2  *  rnnHiddenSize: 1536  *  rnnInputSize: 1536  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnMiniBatch: 256  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 3  *  rnnHiddenSize: 1536  *  rnnInputSize: 1536  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnMiniBatch: 256  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 0  *  rnnHiddenSize: 2560  *  rnnInputSize: 2560  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnMiniBatch: 256  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 1  *  rnnHiddenSize: 2560  *  rnnInputSize: 2560  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnMiniBatch: 256  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 2  *  rnnHiddenSize: 1536  *  rnnInputSize: 1536  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnMiniBatch: 256  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 3  *  rnnHiddenSize: 1536  *  rnnInputSize: 1536  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnMiniBatch: 256  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 0  *  rnnTestDropout: 1  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnInputSize: 2048  *  rnnMiniBatch: 48  *  rnnSeqLength: 5
+    mode: 0  *  rnnTestDropout: 1  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnInputSize: 2048  *  rnnMiniBatch: 48  *  rnnSeqLength: 5
+    mode: 0  *  rnnTestDropout: 1  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnInputSize: 2048  *  rnnMiniBatch: 48  *  rnnSeqLength: 5
+    mode: 0  *  rnnTestDropout: 1  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnInputSize: 2048  *  rnnMiniBatch: 48  *  rnnSeqLength: 5
+    mode: 1  *  rnnTestDropout: 1  *  rnnbidirectional: 1  *  rnnPersistent: 0  *  rnnMiniBatch: 64
+    mode: 1  *  rnnTestDropout: 1  *  rnnbidirectional: 0  *  rnnPersistent: 0  *  rnnMiniBatch: 64
+    mode: 2  *  rnnTestDropout: 1  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 1024  *  rnnInputSize: 1024  *  rnnMiniBatch: 48  *  rnnSeqLength: 5
+    mode: 2  *  rnnTestDropout: 1  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 1024  *  rnnInputSize: 1024  *  rnnMiniBatch: 48  *  rnnSeqLength: 5
+    mode: 2  *  rnnTestDropout: 1  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 1024  *  rnnInputSize: 1024  *  rnnMiniBatch: 48  *  rnnSeqLength: 5
+    mode: 2  *  rnnTestDropout: 1  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 1024  *  rnnInputSize: 1024  *  rnnMiniBatch: 48  *  rnnSeqLength: 5
+    mode: 3  *  rnnTestDropout: 1  *  rnnbidirectional: 1  *  rnnPersistent: 0  *  rnnMiniBatch: 64
+    mode: 3  *  rnnTestDropout: 1  *  rnnbidirectional: 0  *  rnnPersistent: 0  *  rnnMiniBatch: 64
+    mode: 0  *  rnnSkipInput: 0  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 2048
+    mode: 0  *  rnnSkipInput: 1  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 2048
+    mode: 1  *  rnnSkipInput: 0  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 2048
+    mode: 1  *  rnnSkipInput: 1  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 2048
+    mode: 2  *  rnnSkipInput: 0  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 1024
+    mode: 2  *  rnnSkipInput: 1  *  rnnbidirectional: 0  *  rnnPersistent: 1  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 1024
+    mode: 3  *  rnnSkipInput: 0  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 1024
+    mode: 3  *  rnnSkipInput: 1  *  rnnbidirectional: 1  *  rnnPersistent: 1  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 1024
+    mode: 0  *  rnnSkipInput: 0  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 100  *  rnnInputSize: 2048
+    mode: 0  *  rnnSkipInput: 1  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 100  *  rnnInputSize: 2048
+    mode: 1  *  rnnSkipInput: 0  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 2048
+    mode: 1  *  rnnSkipInput: 1  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 2048  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 2048
+    mode: 2  *  rnnSkipInput: 0  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 1024
+    mode: 2  *  rnnSkipInput: 1  *  rnnbidirectional: 0  *  rnnPersistent: 2  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 1024
+    mode: 3  *  rnnSkipInput: 0  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 1024
+    mode: 3  *  rnnSkipInput: 1  *  rnnbidirectional: 1  *  rnnPersistent: 2  *  rnnHiddenSize: 1024  *  rnnMiniBatch: 100  *  rnnSeqLength: 5  *  rnnInputSize: 1024
+
+
+    mode: 0  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnMiniBatch: 16  *  rnnPersistent: 1  *  rnnSeqLength: 5  *  rnnTestDropout: 1
+    mode: 2  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnMiniBatch: 16  *  rnnPersistent: 1  *  rnnSeqLength: 5  *  rnnTestDropout: 1
+    mode: 3  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnMiniBatch: 16  *  rnnPersistent: 0  *  rnnSeqLength: 5  *  rnnTestDropout: 1
+    mode: 0  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnMiniBatch: 64  *  rnnPersistent: 1  *  rnnSeqLength: 5  *  rnnSkipInput: 1  *  Pmath: 1
+    mode: 2  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnMiniBatch: 64  *  rnnPersistent: 1  *  rnnSeqLength: 5  *  rnnSkipInput: 1  *  Pmath: 1
+    mode: 3  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnMiniBatch: 64  *  rnnPersistent: 1  *  rnnSeqLength: 5  *  rnnSkipInput: 1  *  Pmath: 1
+    mode: 0  *  rnnInputSize: 2048  *  rnnHiddenSize: 2048  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnMiniBatch: 16  *  rnnPersistent: 1  *  rnnSeqLength: 5  *  rnnSkipInput: 1
+    mode: 3  *  rnnInputSize: 256   *  rnnHiddenSize: 256   *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnMiniBatch: 16  *  rnnPersistent: 1  *  rnnSeqLength: 5  *  rnnSkipInput: 0
+    mode: 0  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnMiniBatch: 32  *  Pmath: 0  *  rnnSeqLength: 20
+    mode: 1  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnTestVariableMinibatch: 1  *  rnnMiniBatch: 32  *  Pmath: 0  *  rnnSeqLength: 20
+    mode: 2  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnMiniBatch: 32  *  Pmath: 0  *  rnnSeqLength: 20
+    mode: 3  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnMiniBatch: 32  *  Pmath: 0  *  rnnSeqLength: 20
+    mode: 3  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnMiniBatch: 32  *  Pmath: 1  *  rnnSeqLength: 20  *  rnnSkipInput: 0
+    mode: 2  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnTestVariableMinibatch: 1  *  rnnMiniBatch: 32  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 1  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 0  *  rnnMiniBatch: 32  *  Pmath: 1  *  rnnSeqLength: 20
+    mode: 0  *  rnnInputSize: 256  *  rnnHiddenSize: 256  *  rnnNumLayers: 3  *  rnnbidirectional: 1  *  rnnMiniBatch: 32  *  Pmath: 1  *  rnnSeqLength: 20
+
+
+
+
+<L3_A-1_B0_n5_variousDims:L3>
+    A:-1 * pad_h:6 * h:123 * n:5 * s:11 * r:7 * w:123 * B:0 * pad_w:10 * b:
+    A:-1 * pad_h:2 * h:128 * n:5 * s:3  * r:3 * w:128 * B:0 * pad_w:2 * b:
+    A:-1 * pad_h:2 * h:223 * n:5 * s:7  * r:3 * w:121 * B:0 * pad_w:6 * b:
+    A:-1 * pad_h:2 * h:224 * n:5 * s:3  * r:3 * w:224 * B:0 * pad_w:2 * b:
+
+<pgan_splitK>
+   n:8 * P:h * algo:1 * Pcomp:s * Pmath:1 * filtFormat:1 * formatIn:1 * formatOut:1 * A:1.0 * B:1.0 * pad_h:1 * pad_w:1 * b:
+
+<L4_pgan_splitK:L4>
+   R:conv  * pgan_splitK * dimA:"1,256,64,64" * filtA:"512,256,4,4" * u:2 * v:2
+   R:conv  * pgan_splitK * dimA:"1,512,32,32" * filtA:"512,512,3,3" * u:1 * v:1
+   R:conv  * pgan_splitK * dimA:"1,512,32,32" * filtA:"512,512,4,4" * u:2 * v:2
+   R:conv  * pgan_splitK * dimA:"1,512,16,16" * filtA:"512,512,3,3" * u:1 * v:1
+   R:conv  * pgan_splitK * dimA:"1,512,16,16" * filtA:"512,512,4,4" * u:2 * v:2
+   R:conv  * pgan_splitK * dimA:"1,512,8,8"   * filtA:"512,512,3,3" * u:1 * v:1
+   R:conv  * pgan_splitK * dimA:"1,512,8,8"   * filtA:"512,512,4,4" * u:2 * v:2
+   R:dgrad * pgan_splitK * dimA:"1,512,32,32" * filtA:"512,512,3,3" * u:1 * v:1
+   R:dgrad * pgan_splitK * dimA:"1,512,16,16" * filtA:"512,512,3,3" * u:1 * v:1
+   R:dgrad * pgan_splitK * dimA:"1,512,8,8"   * filtA:"512,512,3,3" * u:1 * v:1
+
+<Turing_E2E:L4>
+   R:conv  * padA:"0,0" * h:1024 * s:1 * r:1 * w:9
+   R:dgrad * padA:"2,2" * h:137  * s:3 * r:3 * w:124 * filtFormat:1 * formatIn:1 * formatOut:1
+   R:dgrad * padA:"0,0" * h:137  * s:3 * r:3 * w:124 * filtFormat:1 * formatIn:1 * formatOut:1
+   R:dgrad * padA:"0,0" * h:137  * s:5 * r:5 * w:124 * filtFormat:1 * formatIn:1 * formatOut:1
+   R:dgrad * padA:"0,0" * h:137  * s:7 * r:7 * w:124 * filtFormat:1 * formatIn:1 * formatOut:1
+
+// Grouped dgrad with strided output.
+<L2_bug_2484349:L2,L3,L4>
+   R:dgrad * dimA:"2,8,23,23" * strideA:"5400,600,25,1" * filtA:"12,4,5,6" * groupCount:2 * pad_h:1 * u:2 * P:h,s * algo:1 * x: * Pmath:1 * N:5 * b:

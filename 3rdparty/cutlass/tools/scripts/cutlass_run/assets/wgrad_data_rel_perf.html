@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.css" />
+    <title>CUTLASS WGRAD Relative Performance vs cuDNN</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/2.1.0/dygraph.min.js"></script>
+
+    <script type="text/javascript" src="./data/wgrad_data_rel_perf.js"></script>
+    <style type="text/css">
+      body {
+        max-width: 750px;
+      }
+      div.chart {
+        width: 1280px;
+        height: 720px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>CUTLASS WGRAD Relative Performance vs cuDNN</h2>
+    <div id="graphdiv" style="width:1280px;height:720px"></div>
+    <script type="text/javascript">
+      g = new Dygraph(document.getElementById("graphdiv"), data_rel_perf_wgrad(),
+        {
+          title: "Relative performance between Wgrad convolution kernels between CUTLASS and cuDNN",
+          xlabel: "Problem Id",
+          ylabel: "GFLOPs"
+        }
+      );
+    </script>
+  </body>
+</html>

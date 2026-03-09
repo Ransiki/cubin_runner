@@ -1,0 +1,94 @@
+<eris_exclude: !ERIS>
+    *
+
+<slow_exclude: !SLOW>
+    *
+
+<text_batches>
+    n:1
+
+<dynamic_batch_size_slow: SLOW>
+    n: 2
+
+<dynamic_batch_size_mid: MID>
+    n: 8
+
+<dynamic_batch_size_fast: FAST>
+    n: 32
+
+<dynamic_batch_size>
+    dynamic_batch_size_slow
+    dynamic_batch_size_mid
+    dynamic_batch_size_fast
+
+<dynamic_batch_size_rnn_fast: FAST>
+    dynamic_batch_size  *  rnnMiniBatch: 16,32,64,128
+
+<dynamic_batch_size_rnn_slow_mid: SLOW, MID>
+    dynamic_batch_size
+
+<fast_label_rnn>
+    rnnMiniBatch: 16,32,64,128
+
+<sweep_label_rnn>
+    rnnPersistent: 0,1
+
+<dynamic_batch_size_rnn>
+    dynamic_batch_size_rnn_fast
+    dynamic_batch_size_rnn_slow_mid
+
+<dynamic_batch_size_sweep_rnn_fast: FAST>
+    dynamic_batch_size_rnn  *  rnnPersistent: 0,1
+
+<dynamic_batch_size_sweep_rnn_slow_mid: SLOW, MID>
+    dynamic_batch_size_rnn
+
+<maskrcnn_backbone_batches>
+    n:1
+
+<maskrcnn_head_batches>
+    n:1
+
+<dynamic_batch_size_sweep_rnn>
+    dynamic_batch_size_sweep_rnn_fast
+    dynamic_batch_size_sweep_rnn_slow_mid
+
+// Flags used by all layers
+<common_flags>
+    A:1  *  B:0  *  b:
+
+<convolution>
+    R: conv, dgrad, wgrad, bgrad * common_flags
+
+<convolution_depsep>
+    convolution
+
+<activation>
+    R: activationf, activationb  * activCoef:0 *  dynamic_batch_size * common_flags
+
+<pooling>
+    R: poolf, poolb  *  dynamic_batch_size  *  common_flags
+
+<batchNorm: ALLOW_BATCH_NORM>
+    R: bnf, bnb  *  dynamic_batch_size  *  common_flags
+
+<bias>
+    R: add, bgrad  *  dynamic_batch_size  *  common_flags
+
+<lrn>
+    R: lrnf, lrnb  *  dynamic_batch_size  *  common_flags
+
+<softmax>
+    R: softmaxf, softmaxb  *  dynamic_batch_size  *  common_flags
+
+<rnn>
+    R: RNNf, RNNb  *  dynamic_batch_size_rnn  *  b:
+
+<sweep_rnn>
+    R: RNNf, RNNb  *  dynamic_batch_size_sweep_rnn  *  b:
+
+<transform>
+    R: transform  *  Pin:h,s  *  Pout:h,s  *  Pcomp:s  *  N:5 * common_flags
+
+<convolution_splitK>
+    R:conv * dynamic_batch_size * P:h * algo:1 * Pcomp:s * Pmath:1 * filtFormat:1 * formatIn:1 * formatOut:1 * A:1.0 * B:1.0 * pad_h:1 * pad_w:1 * b:

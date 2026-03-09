@@ -1,0 +1,4 @@
+Layer Name,Common Flags,math:s1688gemm_nt_256x128x32_f32,math:s1688gemm_nt_128x128x32_f32,math:s1688gemm_nt_64x64x32_f32,math:s884gemm_nt_256x128x32_f32,math:s884gemm_nt_128x128x32_f32,math:s884gemm_nt_64x64x32_f32,math:s884gemm_nt_64x128x32_f32
+TestLayer_0,--device=1 --function=Gemm --problem-size::m=10240 --problem-size::n=1024 --problem-size::k=1024 --A=f16:col --B=f16:row --C=f32,38028.4,40187.6,50684.5,26806.5,28984.4,27332.1,20936.6
+TestLayer_1,--device=1 --function=Gemm --problem-size::m=128 --problem-size::n=128 --problem-size::k=128 --A=f16:col --B=f16:row --C=f32,299.319,471.075,470.822,173,299.71,327.549,324.83
+TestLayer_3,--device=1 --function=Gemm --problem-size::m=128 --problem-size::n=512 --problem-size::k=512 --A=f16:col --B=f16:row --C=f32,1589.15,2819.32,2820.23,845.285,1592.82,1641.43,1647.2
