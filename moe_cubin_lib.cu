@@ -1,102 +1,33 @@
-
 /*
  * moe_cubin_lib.cu — C API for launching trtllm-gen BatchedGemm exported cubins.
  *
  * ============================================================================
- * OVERVIEW
+ * API OVERVIEW
  * ============================================================================
  *
- * This library provides a thin C API for Python (via ctypes) to:
- *   1. Select the best FC1/FC2 cubin from 48 pre-compiled kernels
- *   2. Launch FC1 (fused Permute + GEMM + SwiGLU) and FC2 (plain GEMM) cubins
+ * Lifecycle:
+ *   moe_cubin_find_valid_configs()  → enumerate all valid cubin indices for a shape
+ *   moe_cubin_autotune()           → benchmark all valid cubins, return best index
+ *   moe_cubin_run()                → launch a specific cubin by config_index
  *
- * The cubins are embedded as C++ byte arrays (from trtllmGen_bmm_export/cubins/*.cpp)
- * and registered in KernelMetaInfo.h. At runtime, BatchedGemmInterface handles:
- *   - Loading cubin bytes into CUmodule via cuModuleLoadData
- *   - Setting up TMA (Tensor Memory Accelerator) descriptors for Blackwell
- *   - Packing kernel parameters
- *   - Computing grid/block dimensions
- *   - Launching the kernel
+ * The Python wrapper calls autotune() once per (shape, tile_n, is_fc1) combo,
+ * caches the best config_index, and uses run() for subsequent calls.
  *
  * ============================================================================
  * CUBIN SELECTION
  * ============================================================================
  *
- * Each cubin is identified by a BatchedGemmConfig containing BatchedGemmOptions.
- * Selection matches on these fields (all must match):
- *
- *   dtypeA      = E2m1 (NvFP4 weights)
- *   dtypeB      = Bfloat16 (activations)
- *   dtypeC      = Bfloat16 (output)
- *   routeAct    = true (FC1: fused token permutation) / false (FC2: plain GEMM)
- *   fusedAct    = true (FC1: fused SwiGLU) / false (FC2: no activation)
- *   tileN       = tile size in the token dimension (8/16/32/64)
- *   transposeMmaOutput = true
- *   useShuffledMatrix  = true
- *   epilogueTileM      = 128
- *
- * tileN is chosen based on average tokens per expert:
- *   tileN = clamp(next_pow2(num_tokens * topK / num_experts), 8, 64)
+ * Each cubin is identified by its index in KernelMetaInfo.h's tllmGenBatchedGemmList[].
+ * Selection matches on: dtypeA/B/C, routeAct, fusedAct, tileN, transposeMmaOutput,
+ * useShuffledMatrix, epilogueTileM. See find_valid_configs() for details.
  *
  * ============================================================================
- * FC1 CUBIN: PermuteGemm + SwiGLU
+ * L2 CACHE FLUSHING
  * ============================================================================
  *
- * The FC1 cubin performs three fused operations in one kernel launch:
- *
- *   1. Permute: reads tokens from scattered positions in hidden_states
- *      using permutedIdxToTokenIdx (routeAct=ldgsts: Load Global / Store Shared)
- *   2. GEMM: multiplied with FP4 expert weights, dequantized on-the-fly
- *   3. SwiGLU: silu(gate) * up activation applied in the epilogue
- *
- * Dimensions (with transposeMmaOutput=true, batchN mode):
- *   M = 2 * intermediate_size   (weight rows: gate + up projections)
- *   N = tokens_per_expert        (batched along this dimension)
- *   K = hidden_size              (reduction dimension)
- *
- * ============================================================================
- * FC2 CUBIN: Plain Batched GEMM
- * ============================================================================
- *
- * The FC2 cubin is a straightforward batched GEMM:
- *   output = fc2_weights × fc1_output  (per expert)
- *
- * Dimensions:
- *   M = hidden_size               (weight rows: down projection)
- *   N = tokens_per_expert         (batched)
- *   K = intermediate_size         (reduction dimension)
- *
- * ============================================================================
- * BatchedGemmData STRUCTURE
- * ============================================================================
- *
- * The cubin launch requires filling BatchedGemmData with:
- *
- * ProblemDimensions:
- *   mM, mN, mK              — logical GEMM dimensions
- *   mNumBatches              — number of experts
- *   mNumTokens               — total expanded tokens (num_tokens * topK)
- *   mBatchedN                — per-expert token counts (host-side vector)
- *   mMaxNumCtasInTokenDim    — max CTA tiles across all experts
- *
- * InputBuffers:
- *   mPtrA                    — FP4 weights [E, M, K/2] uint8 (shuffled layout)
- *   mPtrSfA                  — weight scale factors [E, M, K/16] fp8 (128x4 interleaved)
- *   mPtrB                    — activations [T, K] bf16 (FC1: original hidden_states)
- *   mPtrScaleC               — output scale [E] float32 (dequant compensation)
- *   mPtrScaleGate            — gate scale [E] float32 (FC1 only)
- *   mPtrBias                 — bias [E, M] float32 (optional)
- *   mPtrGatedActAlpha/Beta   — SwiGLU params (optional)
- *   mPtrClampLimit           — clamp limit (optional)
- *   mPtrRouteMap             — permutedIdxToTokenIdx [max_
- padded] int32 (FC1 only)
- *   mPtrTotalNumPaddedTokens — [1] int32 (from routing kernel)
- *   mPtrCtaIdxXyToBatchIdx   — [max_ctas] int32 (CTA → expert mapping)
- *   mPtrCtaIdxXyToMnLimit    — [max_ctas] int32 (CTA → valid token limit)
- *   mPtrNumNonExitingCtas    — [1] int32 (active CTAs for early exit)
- *
- * OutputBuffers:
- *   mPtrC                    — output [padded_tokens, M] bf16
+ * During autotuning, we flush L2 cache between benchmark iterations by writing
+ * to a scratch buffer larger than L2 (64MB). This prevents artificially low
+ * latency from cached weight data and gives realistic cold-cache timings.
  */
 
 #ifndef TLLM_GEN_EXPORT_INTERFACE
@@ -107,6 +38,7 @@
 #endif
 
 #include "BatchedGemmInterface.h"
+#include "flashinfer/trtllm/fused_moe/DevKernel.h"
 #include <cuda_runtime.h>
 #include <cstdio>
 #include <cstring>
@@ -131,28 +63,21 @@ using bg::BatchedGemmConfig;
 using bg::BatchedGemmData;
 using bg::BatchedGemmOptions;
 
-/* ─── Global state ─────────────────────────────────────────────────────────── */
-
 static std::mutex g_mutex;
 static bool g_device_init = false;
-static int g_device = 0;
 static cudaDeviceProp g_prop;
-
-struct CubinKernel {
-    BatchedGemmInterface iface;
-    BatchedGemmConfig config;
-    bool valid = false;
-};
-
-static CubinKernel g_fc1;
-static CubinKernel g_fc2;
 static void* g_workspace = nullptr;
 static size_t g_workspace_size = 0;
 
+/* L2 cache flush buffer (64MB, larger than B200's 50MB L2) */
+static void* g_l2_flush_buf = nullptr;
+static const size_t L2_FLUSH_SIZE = 64 * 1024 * 1024;
+
 static int ensure_device() {
     if (!g_device_init) {
-        CHECK_CUDA(cudaGetDevice(&g_device));
-        CHECK_CUDA(cudaGetDeviceProperties(&g_prop, g_device));
+        int dev = 0;
+        CHECK_CUDA(cudaGetDevice(&dev));
+        CHECK_CUDA(cudaGetDeviceProperties(&g_prop, dev));
         g_device_init = true;
     }
     return 0;
@@ -164,35 +89,101 @@ static int ensure_workspace(size_t needed) {
         auto err = cudaMalloc(&g_workspace, needed);
         if (err != cudaSuccess) { g_workspace = nullptr; g_workspace_size = 0; return -1; }
         g_workspace_size = needed;
+        fprintf(stderr, "[workspace] Allocated %zu bytes (%.1f MB)\n", needed, needed/1e6);
     }
-    if (g_workspace && needed > 0) cudaMemset(g_workspace, 0, needed);
+    /* Only memset on first allocation; skip on subsequent calls for performance */
     return 0;
 }
 
-/* ─── Cubin selection ──────────────────────────────────────────────────────── */
+static void flush_l2_cache(cudaStream_t stream) {
+    if (!g_l2_flush_buf) {
+        cudaMalloc(&g_l2_flush_buf, L2_FLUSH_SIZE);
+    }
+    if (g_l2_flush_buf) {
+        cudaMemsetAsync(g_l2_flush_buf, 0, L2_FLUSH_SIZE, stream);
+    }
+}
+
+/* ─── Helper: fill BatchedGemmData from arguments ──────────────────────────── */
+
+static BatchedGemmData make_gemm_data(
+    bool is_fc1, int M, int K, int tile_n,
+    int num_experts, int num_tokens,
+    void* weights, void* weights_sf,
+    void* input, void* output,
+    float* scale_c, float* scale_gate,
+    float* bias, float* alpha, float* beta, float* clamp_limit,
+    int* permuted_idx_to_token_idx,
+    int* cta_idx_xy_to_batch_idx, int* cta_idx_xy_to_mn_limit,
+    int* num_non_exiting_ctas, int* total_num_padded_tokens,
+    int* batched_n_host, int n_batched_n)
+{
+    BatchedGemmData data;
+    data.mProblemDimensions.mM = M;
+    data.mProblemDimensions.mN = tile_n;
+    data.mProblemDimensions.mK = K;
+    data.mProblemDimensions.mValidM = M;
+    data.mProblemDimensions.mValidN = tile_n;
+    data.mProblemDimensions.mValidK = K;
+    data.mProblemDimensions.mNumBatches = num_experts;
+    data.mProblemDimensions.mNumTokens = num_tokens;
+    data.mProblemDimensions.mBatchM = false;
+    data.mProblemDimensions.mRank = 0;
+    data.mProblemDimensions.mWorldSize = 1;
+    int max_ctas = 0;
+    for (int i = 0; i < n_batched_n; i++) {
+        data.mProblemDimensions.mBatchedN.push_back(batched_n_host[i]);
+        max_ctas += (batched_n_host[i] + tile_n - 1) / tile_n;
+    }
+    data.mProblemDimensions.mMaxNumCtasInTokenDim = max_ctas;
+
+    data.mInputBuffers.mPtrA = weights;
+    data.mInputBuffers.mPtrSfA = weights_sf;
+    data.mInputBuffers.mPtrB = input;
+    data.mInputBuffers.mPtrSfB = nullptr;
+    data.mInputBuffers.mPtrScaleC = scale_c;
+    data.mInputBuffers.mPtrScaleAct = scale_c;
+    data.mInputBuffers.mPtrScaleGate = is_fc1 ? scale_gate : nullptr;
+    data.mInputBuffers.mPtrBias = bias;
+    data.mInputBuffers.mPtrGatedActAlpha = alpha;
+    data.mInputBuffers.mPtrGatedActBeta = beta;
+    data.mInputBuffers.mPtrClampLimit = clamp_limit;
+    data.mInputBuffers.mPtrPerTokenSfA = nullptr;
+    data.mInputBuffers.mPtrPerTokenSfB = nullptr;
+    data.mInputBuffers.mPtrRouteMap = is_fc1 ? permuted_idx_to_token_idx : nullptr;
+    data.mInputBuffers.mPtrTotalNumPaddedTokens = total_num_padded_tokens;
+    data.mInputBuffers.mPtrCtaIdxXyToBatchIdx = cta_idx_xy_to_batch_idx;
+    data.mInputBuffers.mPtrCtaIdxXyToMnLimit = cta_idx_xy_to_mn_limit;
+    data.mInputBuffers.mPtrNumNonExitingCtas = num_non_exiting_ctas;
+    data.mOutputBuffers.mPtrC = output;
+    data.mOutputBuffers.mPtrSfC = nullptr;
+    return data;
+}
+
+extern "C" {
+
+int moe_cubin_get_sm_count() {
+    if (ensure_device() != 0) return -1;
+    return g_prop.multiProcessorCount;
+}
 
 /*
- * Iterate through all 48 registered cubins (from KernelMetaInfo.h) and find
- * the first one matching the requested dtype/routing/tileN combination.
- *
- * The matching criteria are identical to FlashInfer's TrtllmGenBatchedGemmRunner
- * constructor (trtllm_batched_gemm_runner.cu:93-118).
+ * Find all valid cubin config indices for a given shape.
+ * Returns number found. Writes indices to out_indices (max_results entries).
  */
-static int find_best_config(
-    BatchedGemmInterface& iface,
-    BatchedGemmConfig& out_config,
-    bool is_fc1,
-    int tile_n,
+int moe_cubin_find_valid_configs(
+    bool is_fc1, int tile_n,
     int M, int N, int K,
-    int num_experts, int num_tokens)
+    int num_experts, int num_tokens,
+    int* out_indices, int max_results)
 {
+    if (ensure_device() != 0) return 0;
+
+    BatchedGemmInterface iface;
     auto const* configs = iface.getBatchedGemmConfigs();
     size_t num_configs = iface.getNumBatchedGemmConfigs();
 
-    fprintf(stderr, "[moe_cubin] Searching %zu configs for %s (tile_n=%d, M=%d, N=%d, K=%d)\n",
-            num_configs, is_fc1 ? "FC1" : "FC2", tile_n, M, N, K);
-
-    /* Build a dummy BatchedGemmData for isValidConfig checks */
+    /* Build dummy data for isValidConfig check */
     BatchedGemmData data;
     data.mProblemDimensions.mM = M;
     data.mProblemDimensions.mN = N;
@@ -209,178 +200,170 @@ static int find_best_config(
         data.mProblemDimensions.mBatchedN.push_back(N);
     data.mProblemDimensions.mMaxNumCtasInTokenDim = (N + tile_n - 1) / tile_n * num_experts;
 
-    int best_idx = -1;
-    for (size_t i = 0; i < num_configs; i++) {
+    int found = 0;
+    for (size_t i = 0; i < num_configs && found < max_results; i++) {
         auto const& opt = configs[i].mOptions;
-
-        /* dtype match: NvFP4 weights × BF16 activations → BF16 output */
         if (opt.mDtypeA != tg::Dtype::E2m1) continue;
         if (opt.mDtypeB != tg::Dtype::Bfloat16) continue;
         if (opt.mDtypeC != tg::Dtype::Bfloat16) continue;
         if (!opt.mTransposeMmaOutput) continue;
         if (!opt.mUseShuffledMatrix) continue;
-
-        /* FC1 cubins have routeAct + fusedAct; FC2 cubins have neither */
-        bool cubin_has_route = !bg::doesRouteImplUseNoRoute(opt.mRouteImpl);
-        if (is_fc1 && (!cubin_has_route || !opt.mFusedAct)) continue;
-        if (!is_fc1 && (cubin_has_route || opt.mFusedAct)) continue;
-
-        /* tileN must match exactly */
+        bool has_route = !bg::doesRouteImplUseNoRoute(opt.mRouteImpl);
+        if (is_fc1 && (!has_route || !opt.mFusedAct)) continue;
+        if (!is_fc1 && (has_route || opt.mFusedAct)) continue;
         if (opt.mTileN != tile_n) continue;
-
-        /* Final validation: check dimensions, pipeline stages, etc. */
         if (iface.isValidConfig(configs[i], data)) {
-            best_idx = (int)i;
-            break;
+            out_indices[found++] = (int)i;
+        }
+    }
+    return found;
+}
+
+/*
+ * Autotune: benchmark all valid cubins for a shape, return the best config_index.
+ *
+ * Uses L2 cache flushing between iterations for realistic timings.
+ * All buffer pointers are GPU (can be dummy/zero data — only timing matters).
+ * batched_n_host is a HOST pointer.
+ *
+ * Returns best config_index, or -1 on failure.
+ */
+int moe_cubin_autotune(
+    bool is_fc1, int tile_n,
+    int M, int K,
+    int num_experts, int num_tokens,
+    void* weights, void* weights_sf,
+    void* input, void* output,
+    float* scale_c, float* scale_gate,
+    int* permuted_idx_to_token_idx,
+    int* cta_idx_xy_to_batch_idx,
+    int* cta_idx_xy_to_mn_limit,
+    int* num_non_exiting_ctas,
+    int* total_num_padded_tokens,
+    int* batched_n_host, int n_batched_n,
+    int n_warmup, int n_bench,
+    void* cuda_stream)
+{
+    if (ensure_device() != 0) return -1;
+    cudaStream_t stream = (cudaStream_t)cuda_stream;
+
+    /* Find all valid configs */
+    int valid_indices[128];
+    int n_valid = moe_cubin_find_valid_configs(
+        is_fc1, tile_n, M, tile_n, K, num_experts, num_tokens,
+        valid_indices, 128);
+
+    if (n_valid == 0) {
+        fprintf(stderr, "[autotune] No valid %s cubins for tile_n=%d M=%d K=%d\n",
+                is_fc1 ? "FC1" : "FC2", tile_n, M, K);
+        return -1;
+    }
+    if (n_valid == 1) {
+        fprintf(stderr, "[autotune] Only one valid %s cubin: config[%d]\n",
+                is_fc1 ? "FC1" : "FC2", valid_indices[0]);
+        return valid_indices[0];
+    }
+
+    fprintf(stderr, "[autotune] Benchmarking %d %s cubins (warmup=%d, bench=%d)...\n",
+            n_valid, is_fc1 ? "FC1" : "FC2", n_warmup, n_bench);
+
+    /* Use persistent interface to cache loaded CUmodules across configs */
+    static BatchedGemmInterface s_tune_iface;
+    static BatchedGemmInterface::ModuleCache s_tune_cache;
+    static bool s_tune_init = false;
+    if (!s_tune_init) { s_tune_iface = BatchedGemmInterface(); s_tune_init = true; }
+    auto& iface = s_tune_iface;
+    auto const* configs = iface.getBatchedGemmConfigs();
+
+    auto data = make_gemm_data(is_fc1, M, K, tile_n, num_experts, num_tokens,
+                                weights, weights_sf, input, output,
+                                scale_c, scale_gate,
+                                nullptr, nullptr, nullptr, nullptr,
+                                permuted_idx_to_token_idx,
+                                cta_idx_xy_to_batch_idx, cta_idx_xy_to_mn_limit,
+                                num_non_exiting_ctas, total_num_padded_tokens,
+                                batched_n_host, n_batched_n);
+
+    cudaEvent_t ev_start, ev_stop;
+    cudaEventCreate(&ev_start);
+    cudaEventCreate(&ev_stop);
+
+    int best_idx = -1;
+    float best_us = 1e30f;
+
+    for (int v = 0; v < n_valid; v++) {
+        int ci = valid_indices[v];
+        auto const& cfg = configs[ci];
+        auto const& opt = cfg.mOptions;
+
+        size_t ws = iface.getWorkspaceSizeInBytes(cfg, data);
+        if (ensure_workspace(ws) != 0) continue;
+
+        iface.runInitBeforeWorldSync(cfg, data, (void*)stream);
+
+        /* Warmup: includes first cuModuleLoadData (cached for subsequent calls) */
+        for (int w = 0; w < n_warmup; w++) {
+            iface.run(cfg, g_workspace, data, (void*)stream, g_prop.multiProcessorCount,
+                       true, nullptr, s_tune_cache);
+        }
+        cudaStreamSynchronize(stream);
+
+        /* Benchmark: steady-state latency (cubin module already loaded + cached) */
+        cudaEventRecord(ev_start, stream);
+        for (int b = 0; b < n_bench; b++) {
+            iface.run(cfg, g_workspace, data, (void*)stream, g_prop.multiProcessorCount,
+                       true, nullptr, s_tune_cache);
+        }
+        cudaEventRecord(ev_stop, stream);
+        cudaEventSynchronize(ev_stop);
+
+        float elapsed_ms = 0;
+        cudaEventElapsedTime(&elapsed_ms, ev_start, ev_stop);
+        float us = (elapsed_ms * 1000.0f) / n_bench;
+
+        const char* sched = (opt.mTileScheduler == ::batchedGemm::gemm::TileScheduler::Persistent) ? "persistent" : "static";
+
+        fprintf(stderr, "[autotune]   config[%2d] %7.1f us  tile=%dx%dx%d stages=%d/%d %s%s%s\n",
+                ci, us, opt.mTileM, opt.mTileN, opt.mTileK,
+                opt.mNumStages, opt.mNumStagesMma, sched,
+                opt.mUseUnrollLoop2xForMma ? " u2" : "",
+                (us < best_us) ? "  <-- new best" : "");
+
+        if (us < best_us) {
+            best_us = us;
+            best_idx = ci;
         }
     }
 
-    if (best_idx < 0) {
-        fprintf(stderr, "[moe_cubin] ERROR: No matching %s cubin for tile_n=%d\n",
-                is_fc1 ? "FC1" : "FC2", tile_n);
-        return -1;
-    }
+    cudaEventDestroy(ev_start);
+    cudaEventDestroy(ev_stop);
 
-    out_config = configs[best_idx];
-    fprintf(stderr, "[moe_cubin] Selected %s kernel: %s\n",
-            is_fc1 ? "FC1" : "FC2", out_config.mFunctionName);
-    return 0;
-}
-
-/* ─── Public C API ─────────────────────────────────────────────────────────── */
-
-extern "C" {
-
-/*
- * Select FC1 and FC2 cubins for the given tile_n and problem shape.
- * Call once before run (or when tile_n changes).
- */
-int moe_cubin_init(
-    int tile_n, int hidden_size, int intermediate_size,
-    int num_experts, int tokens_per_expert)
-{
-    std::lock_guard<std::mutex> lock(g_mutex);
-    if (ensure_device() != 0) return -1;
-
-    int num_tokens = num_experts * tokens_per_expert;
-
-    g_fc1.iface = BatchedGemmInterface();
-    int rc = find_best_config(g_fc1.iface, g_fc1.config, true, tile_n,
-                              2 * intermediate_size, tokens_per_expert, hidden_size,
-                              num_experts, num_tokens);
-    if (rc != 0) return rc;
-    g_fc1.valid = true;
-
-    g_fc2.iface = BatchedGemmInterface();
-    rc = find_best_config(g_fc2.iface, g_fc2.config, false, tile_n,
-                          hidden_size, tokens_per_expert, intermediate_size,
-                          num_experts, num_tokens);
-    if (rc != 0) return rc;
-    g_fc2.valid = true;
-
-    fprintf(stderr, "[moe_cubin] Init complete. GPU: %s (%d SMs)\n",
-            g_prop.name, g_prop.multiProcessorCount);
-    return 0;
+    fprintf(stderr, "[autotune] Best %s: config[%d] = %.1f us\n",
+            is_fc1 ? "FC1" : "FC2", best_idx, best_us);
+    return best_idx;
 }
 
 /*
- * Launch FC1 cubin: fused Permute + GEMM + SwiGLU.
+ * Launch a specific cubin by config_index.
+ * config_index must be obtained from find_valid_configs() or autotune().
  *
- * All pointer arguments are GPU device pointers unless noted otherwise.
- * batched_n_host is a HOST pointer to int32 array of per-expert token counts.
+ * This is the core run function — called for every forward pass after autotuning.
  */
-int moe_cubin_fc1_run(
-    /* weights (GPU) */
-    void* weights,              /* [E, 2*I, H/2]  uint8: shuffled NvFP4 packed */
-    void* weights_sf,           /* [E, 2*I, H/16] fp8:   shuffled 128x4 interleaved scales */
-    /* activations (GPU) */
-    void* input,                /* [T, H]          bf16:  original hidden_states (NOT permuted) */
-    void* output,               /* [max_padded, I]  bf16: pre-allocated output buffer */
-    /* per-expert scales (GPU) */
-    float* scale_c,             /* [E] float32: output dequant scale = c_gsf / w_gsf / act_gsf */
-    float* scale_gate,          /* [E] float32: gate dequant scale = 1 / w_gsf / act_gsf */
-    /* optional per-expert params (GPU, nullptr if unused) */
-    float* bias,                /* [E, 2*I] float32 */
-    float* alpha,               /* [E] float32: SwiGLU alpha */
-    float* beta,                /* [E] float32: SwiGLU beta */
-    float* clamp_limit,         /* [E] float32: SwiGLU clamp */
-    /* dimensions */
-    int hidden_size, int intermediate_size,
-    int num_experts, int num_tokens,   /* num_tokens = T * topK (expanded) */
-    /* routing metadata (GPU, from FlashInfer routing kernel) */
-    int* permuted_idx_to_token_idx,    /* [max_padded] cubin reads token at position[i] */
-    int* cta_idx_xy_to_batch_idx,      /* [max_ctas]   which expert each CTA handles */
-    int* cta_idx_xy_to_mn_limit,       /* [max_ctas]   cumulative valid token count per CTA */
-    int* num_non_exiting_ctas,         /* [1]          total active CTAs */
-    int* total_num_padded_tokens,      /* [1]          total tokens after padding */
-    /* per-expert token counts (HOST pointer) */
-    int* batched_n_host, int n_batched_n,
-    /* CUDA stream */
-    void* cuda_stream)
-{
-    if (!g_fc1.valid) { fprintf(stderr, "[moe_cubin] FC1 not initialized\n"); return -1; }
-    cudaStream_t stream = (cudaStream_t)cuda_stream;
+/* Persistent interface + module cache — avoids reloading cubins on every call */
+static BatchedGemmInterface g_run_iface;
+static BatchedGemmInterface::ModuleCache g_module_cache;
+static bool g_run_iface_init = false;
 
-    BatchedGemmData data;
-    data.mProblemDimensions.mM = 2 * intermediate_size;
-    data.mProblemDimensions.mN = g_fc1.config.mOptions.mTileN;
-    data.mProblemDimensions.mK = hidden_size;
-    data.mProblemDimensions.mValidM = 2 * intermediate_size;
-    data.mProblemDimensions.mValidN = data.mProblemDimensions.mN;
-    data.mProblemDimensions.mValidK = hidden_size;
-    data.mProblemDimensions.mNumBatches = num_experts;
-    data.mProblemDimensions.mNumTokens = num_tokens;
-    data.mProblemDimensions.mBatchM = false;
-    data.mProblemDimensions.mRank = 0;
-    data.mProblemDimensions.mWorldSize = 1;
-    for (int i = 0; i < n_batched_n; i++)
-        data.mProblemDimensions.mBatchedN.push_back(batched_n_host[i]);
-    int tile_n = g_fc1.config.mOptions.mTileN;
-    int max_ctas = 0;
-    for (int i = 0; i < n_batched_n; i++)
-        max_ctas += (batched_n_host[i] + tile_n - 1) / tile_n;
-    data.mProblemDimensions.mMaxNumCtasInTokenDim = max_ctas;
-
-    data.mInputBuffers.mPtrA = weights;
-    data.mInputBuffers.mPtrSfA = weights_sf;
-    data.mInputBuffers.mPtrB = input;
-    data.mInputBuffers.mPtrSfB = nullptr;
-    data.mInputBuffers.mPtrScaleC = scale_c;
-    data.mInputBuffers.mPtrScaleAct = scale_c;
-    data.mInputBuffers.mPtrScaleGate = scale_gate;
-    data.mInputBuffers.mPtrBias = bias;
-    data.mInputBuffers.mPtrGatedActAlpha = alpha;
-    data.mInputBuffers.mPtrGatedActBeta = beta;
-    data.mInputBuffers.mPtrClampLimit = clamp_limit;
-    data.mInputBuffers.mPtrPerTokenSfA = nullptr;
-    data.mInputBuffers.mPtrPerTokenSfB = nullptr;
-    data.mInputBuffers.mPtrRouteMap = permuted_idx_to_token_idx;
-    data.mInputBuffers.mPtrTotalNumPaddedTokens = total_num_padded_tokens;
-    data.mInputBuffers.mPtrCtaIdxXyToBatchIdx = cta_idx_xy_to_batch_idx;
-    data.mInputBuffers.mPtrCtaIdxXyToMnLimit = cta_idx_xy_to_mn_limit;
-    data.mInputBuffers.mPtrNumNonExitingCtas = num_non_exiting_ctas;
-
-    data.mOutputBuffers.mPtrC = output;
-    data.mOutputBuffers.mPtrSfC = nullptr;
-
-    size_t ws = g_fc1.iface.getWorkspaceSizeInBytes(g_fc1.config, data);
-    if (ensure_workspace(ws) != 0) return -1;
-
-    g_fc1.iface.runInitBeforeWorldSync(g_fc1.config, data, (void*)stream);
-    return (int)g_fc1.iface.run(g_fc1.config, g_workspace, data, (void*)stream,
-                                 g_prop.multiProcessorCount);
-}
-
-/*
- * Launch FC2 cubin: plain batched GEMM (no routing, no activation).
- * Same calling convention as FC1 but without routing/activation params.
- */
-int moe_cubin_fc2_run(
+int moe_cubin_run(
+    int config_index,
+    bool is_fc1,
     void* weights, void* weights_sf,
     void* input, void* output,
-    float* scale_c,
+    float* scale_c, float* scale_gate,
+    float* bias, float* alpha, float* beta, float* clamp_limit,
     int hidden_size, int intermediate_size,
     int num_experts, int num_tokens,
+    int* permuted_idx_to_token_idx,
     int* cta_idx_xy_to_batch_idx,
     int* cta_idx_xy_to_mn_limit,
     int* num_non_exiting_ctas,
@@ -388,62 +371,242 @@ int moe_cubin_fc2_run(
     int* batched_n_host, int n_batched_n,
     void* cuda_stream)
 {
-    if (!g_fc2.valid) { fprintf(stderr, "[moe_cubin] FC2 not initialized\n"); return -1; }
+    if (ensure_device() != 0) return -1;
     cudaStream_t stream = (cudaStream_t)cuda_stream;
 
-    BatchedGemmData data;
-    data.mProblemDimensions.mM = hidden_size;
-    data.mProblemDimensions.mN = g_fc2.config.mOptions.mTileN;
-    data.mProblemDimensions.mK = intermediate_size;
-    data.mProblemDimensions.mValidM = hidden_size;
-    data.mProblemDimensions.mValidN = data.mProblemDimensions.mN;
-    data.mProblemDimensions.mValidK = intermediate_size;
-    data.mProblemDimensions.mNumBatches = num_experts;
-    data.mProblemDimensions.mNumTokens = num_tokens;
-    data.mProblemDimensions.mBatchM = false;
-    data.mProblemDimensions.mRank = 0;
-    data.mProblemDimensions.mWorldSize = 1;
-    for (int i = 0; i < n_batched_n; i++)
-        data.mProblemDimensions.mBatchedN.push_back(batched_n_host[i]);
-    int tile_n = g_fc2.config.mOptions.mTileN;
-    int max_ctas = 0;
-    for (int i = 0; i < n_batched_n; i++)
-        max_ctas += (batched_n_host[i] + tile_n - 1) / tile_n;
-    data.mProblemDimensions.mMaxNumCtasInTokenDim = max_ctas;
+    if (!g_run_iface_init) {
+        g_run_iface = BatchedGemmInterface();
+        g_run_iface_init = true;
+    }
+    auto& iface = g_run_iface;
+    auto const* configs = iface.getBatchedGemmConfigs();
+    size_t num_configs = iface.getNumBatchedGemmConfigs();
 
-    data.mInputBuffers.mPtrA = weights;
-    data.mInputBuffers.mPtrSfA = weights_sf;
-    data.mInputBuffers.mPtrB = input;
-    data.mInputBuffers.mPtrSfB = nullptr;
-    data.mInputBuffers.mPtrScaleC = scale_c;
-    data.mInputBuffers.mPtrScaleAct = scale_c;
-    data.mInputBuffers.mPtrScaleGate = nullptr;
-    data.mInputBuffers.mPtrBias = nullptr;
-    data.mInputBuffers.mPtrGatedActAlpha = nullptr;
-    data.mInputBuffers.mPtrGatedActBeta = nullptr;
-    data.mInputBuffers.mPtrClampLimit = nullptr;
-    data.mInputBuffers.mPtrRouteMap = nullptr;
-    data.mInputBuffers.mPtrPerTokenSfA = nullptr;
-    data.mInputBuffers.mPtrPerTokenSfB = nullptr;
-    data.mInputBuffers.mPtrTotalNumPaddedTokens = total_num_padded_tokens;
-    data.mInputBuffers.mPtrCtaIdxXyToBatchIdx = cta_idx_xy_to_batch_idx;
-    data.mInputBuffers.mPtrCtaIdxXyToMnLimit = cta_idx_xy_to_mn_limit;
-    data.mInputBuffers.mPtrNumNonExitingCtas = num_non_exiting_ctas;
+    if (config_index < 0 || config_index >= (int)num_configs) {
+        fprintf(stderr, "[moe_cubin] Invalid config_index %d (have %zu)\n",
+                config_index, num_configs);
+        return -1;
+    }
 
-    data.mOutputBuffers.mPtrC = output;
-    data.mOutputBuffers.mPtrSfC = nullptr;
+    int M = is_fc1 ? 2 * intermediate_size : hidden_size;
+    int K = is_fc1 ? hidden_size : intermediate_size;
+    int tile_n = configs[config_index].mOptions.mTileN;
 
-    size_t ws = g_fc2.iface.getWorkspaceSizeInBytes(g_fc2.config, data);
+    auto data = make_gemm_data(is_fc1, M, K, tile_n, num_experts, num_tokens,
+                                weights, weights_sf, input, output,
+                                scale_c, scale_gate,
+                                bias, alpha, beta, clamp_limit,
+                                permuted_idx_to_token_idx,
+                                cta_idx_xy_to_batch_idx, cta_idx_xy_to_mn_limit,
+                                num_non_exiting_ctas, total_num_padded_tokens,
+                                batched_n_host, n_batched_n);
+
+    size_t ws = iface.getWorkspaceSizeInBytes(configs[config_index], data);
     if (ensure_workspace(ws) != 0) return -1;
 
-    g_fc2.iface.runInitBeforeWorldSync(g_fc2.config, data, (void*)stream);
-    return (int)g_fc2.iface.run(g_fc2.config, g_workspace, data, (void*)stream,
-                                 g_prop.multiProcessorCount);
+    iface.runInitBeforeWorldSync(configs[config_index], data, (void*)stream);
+
+    static int call_count = 0;
+    call_count++;
+    if (call_count <= 5) {
+        fprintf(stderr, "[run] call %d: config_index=%d, cache size=%zu, func=%s\n",
+                call_count, config_index, g_module_cache.size(),
+                configs[config_index].mFunctionName);
+    }
+
+    return (int)iface.run(configs[config_index], g_workspace, data, (void*)stream,
+                           g_prop.multiProcessorCount,
+                           /*usePdl=*/true, /*pinnedHostBuffer=*/nullptr,
+                           g_module_cache);
 }
 
-int moe_cubin_get_sm_count() {
+/*
+ * Get human-readable info for a config index.
+ */
+/*
+ * Fused pipeline: routing → FC1 → FC2 in one call, zero CPU sync in the middle.
+ *
+ * All routing metadata stays on GPU. No host readback. No Python overhead.
+ * The only CPU→GPU boundary is this single ctypes call.
+ */
+int moe_cubin_fused_run(
+    int fc1_config_index,
+    int fc2_config_index,
+    /* routing inputs (GPU) */
+    void* routing_logits,        /* [T, E] bf16 or float32 */
+    int num_tokens,
+    int num_experts,
+    int top_k,
+    int tile_n,
+    int routing_method,          /* 0=default, 1=renormalize */
+    /* weights (GPU) */
+    void* fc1_weights, void* fc1_weights_sf,
+    void* fc2_weights, void* fc2_weights_sf,
+    /* activations (GPU) */
+    void* hidden_states,         /* [T, H] bf16 */
+    /* output (GPU, pre-allocated) */
+    void* fc2_output,            /* [max_padded, H] bf16 */
+    /* scales (GPU) */
+    float* scale_c_fc1, float* scale_gate_fc1, float* scale_c_fc2,
+    /* optional (GPU, can be nullptr) */
+    float* fc1_bias, float* fc1_alpha, float* fc1_beta, float* fc1_clamp,
+    /* dimensions */
+    int hidden_size, int intermediate_size,
+    /* routing output buffers (GPU, pre-allocated by caller) */
+    int* expert_indexes,         /* [T*K] */
+    int* expert_count_hist,      /* [2*E] */
+    int* permuted_idx_size,      /* [1] */
+    int* expanded_to_perm,       /* [T*K] */
+    int* perm_to_expanded,       /* [max_padded] */
+    int* perm_to_token,          /* [max_padded] */
+    void* expert_weights,        /* [T*K] bf16 */
+    int* cta_to_batch,           /* [max_ctas] */
+    int* cta_to_mn,              /* [max_ctas] */
+    int* num_non_exit,           /* [1] */
+    /* FC1 intermediate (GPU, pre-allocated) */
+    void* fc1_output,            /* [max_padded, I] bf16 */
+    /* stream */
+    void* cuda_stream)
+{
     if (ensure_device() != 0) return -1;
-    return g_prop.multiProcessorCount;
+    cudaStream_t stream = (cudaStream_t)cuda_stream;
+
+    int expanded = num_tokens * top_k;
+
+    /* ── Step 1: Routing (all async on stream) ── */
+    {
+        extern int routing_renormalize_run(
+            void*, int32_t, int32_t, int32_t, int32_t,
+            int32_t, int32_t, int32_t,
+            int32_t*, int32_t*, int32_t*,
+            int32_t*, int32_t*, int32_t*,
+            void*,
+            int32_t*, int32_t*, int32_t*,
+            void*);
+
+        int rc = routing_renormalize_run(
+            routing_logits, num_tokens, num_experts, top_k, tile_n,
+            0, num_experts, routing_method,
+            expert_indexes, expert_count_hist, permuted_idx_size,
+            expanded_to_perm, perm_to_expanded, perm_to_token,
+            expert_weights,
+            cta_to_batch, cta_to_mn, num_non_exit,
+            cuda_stream);
+        if (rc != 0) return -100;
+    }
+
+    /*
+     * ── Step 2: Build dummy batched_n (NO sync needed) ──
+     *
+     * The cubin with earlyExit+dynamic batch uses ctaIdxXyToBatchIdx/MnLimit
+     * at runtime, NOT mBatchedN. mBatchedN is only consumed by
+     * getOptionsFromConfigAndData for validation and workspace sizing.
+     * Since autotune already validated the config and workspace is
+     * pre-allocated to max size, we can pass tile_n for all experts.
+     */
+    static std::vector<int32_t> h_batched_n;
+    if ((int)h_batched_n.size() != num_experts) {
+        h_batched_n.resize(num_experts);
+    }
+    for (int e = 0; e < num_experts; e++) h_batched_n[e] = tile_n;
+
+    /* ── Step 4: FC1 cubin (async) ── */
+    if (!g_run_iface_init) { g_run_iface = BatchedGemmInterface(); g_run_iface_init = true; }
+
+    int fc1_M = 2 * intermediate_size;
+    int fc1_K = hidden_size;
+    {
+        auto data = make_gemm_data(true, fc1_M, fc1_K, tile_n, num_experts, expanded,
+                                    fc1_weights, fc1_weights_sf, hidden_states, fc1_output,
+                                    scale_c_fc1, scale_gate_fc1,
+                                    fc1_bias, fc1_alpha, fc1_beta, fc1_clamp,
+                                    perm_to_token, cta_to_batch, cta_to_mn,
+                                    num_non_exit, permuted_idx_size,
+                                    h_batched_n.data(), num_experts);
+        auto& cfg = g_run_iface.getBatchedGemmConfigs()[fc1_config_index];
+        size_t ws = g_run_iface.getWorkspaceSizeInBytes(cfg, data);
+        if (ensure_workspace(ws) != 0) return -2;
+        g_run_iface.runInitBeforeWorldSync(cfg, data, (void*)stream);
+        int rc = (int)g_run_iface.run(cfg, g_workspace, data, (void*)stream,
+                                       g_prop.multiProcessorCount, true, nullptr, g_module_cache);
+        if (rc != 0) return -3;
+    }
+
+    /* ── Step 5: FC2 cubin (async) ── */
+    int fc2_M = hidden_size;
+    int fc2_K = intermediate_size;
+    {
+        auto data = make_gemm_data(false, fc2_M, fc2_K, tile_n, num_experts, expanded,
+                                    fc2_weights, fc2_weights_sf, fc1_output, fc2_output,
+                                    scale_c_fc2, nullptr,
+                                    nullptr, nullptr, nullptr, nullptr,
+                                    nullptr, cta_to_batch, cta_to_mn,
+                                    num_non_exit, permuted_idx_size,
+                                    h_batched_n.data(), num_experts);
+        auto& cfg = g_run_iface.getBatchedGemmConfigs()[fc2_config_index];
+        size_t ws = g_run_iface.getWorkspaceSizeInBytes(cfg, data);
+        if (ensure_workspace(ws) != 0) return -4;
+        g_run_iface.runInitBeforeWorldSync(cfg, data, (void*)stream);
+        int rc = (int)g_run_iface.run(cfg, g_workspace, data, (void*)stream,
+                                       g_prop.multiProcessorCount, true, nullptr, g_module_cache);
+        if (rc != 0) return -5;
+    }
+
+    return 0;
+}
+
+/*
+ * Run the FlashInfer fused finalize kernel: unpermute + scale + reduce in one launch.
+ * Replaces the 7-step PyTorch finalize (gather, cast, mul, sum, cast).
+ */
+int moe_cubin_finalize(
+    void* fc2_output,              /* [max_padded, H] bf16 — input from FC2 */
+    void* output,                  /* [T, H] bf16 — final output (pre-allocated) */
+    void* expert_weights,          /* [T*K] bf16 — routing weights */
+    int* expanded_idx_to_permuted, /* [T*K] int32 */
+    int* total_num_padded_tokens,  /* [1] int32 (GPU) */
+    int num_tokens,
+    int num_experts,
+    int top_k,
+    int hidden_size,
+    void* cuda_stream)
+{
+    ::moe::dev::finalize::Data fdata;
+    fdata.mDtypeElt = tg::Dtype::Bfloat16;
+    fdata.mDtypeExpW = tg::Dtype::Bfloat16;
+    fdata.mUsePdl = false;
+    fdata.mUseDeepSeekFp8 = false;
+    fdata.inPtr = fc2_output;
+    fdata.outPtr = output;
+    fdata.inDqSfsPtr = nullptr;
+    fdata.outDqSfsPtr = nullptr;
+    fdata.expertWeightsPtr = expert_weights;
+    fdata.expandedIdxToPermutedIdx = expanded_idx_to_permuted;
+    fdata.numTokens = num_tokens;
+    fdata.numExperts = num_experts;
+    fdata.topK = top_k;
+    fdata.hiddenDim = hidden_size;
+    fdata.hiddenDimPadded = hidden_size;
+    fdata.totalNumPaddedTokens = total_num_padded_tokens;
+
+    ::moe::dev::finalize::run(fdata, cuda_stream);
+    return 0;
+}
+
+void moe_cubin_get_config_info(int config_index,
+    int* out_tileM, int* out_tileN, int* out_tileK,
+    int* out_numStages, int* out_numStagesMma, int* out_isPersistent, int* out_isUnroll2x)
+{
+    BatchedGemmInterface iface;
+    auto const* configs = iface.getBatchedGemmConfigs();
+    auto const& o = configs[config_index].mOptions;
+    *out_tileM = o.mTileM;
+    *out_tileN = o.mTileN;
+    *out_tileK = o.mTileK;
+    *out_numStages = o.mNumStages;
+    *out_numStagesMma = o.mNumStagesMma;
+    *out_isPersistent = (o.mTileScheduler == ::batchedGemm::gemm::TileScheduler::Persistent) ? 1 : 0;
+    *out_isUnroll2x = o.mUseUnrollLoop2xForMma ? 1 : 0;
 }
 
 } /* extern "C" */

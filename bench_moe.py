@@ -26,6 +26,7 @@ import argparse
 _parser = argparse.ArgumentParser()
 _parser.add_argument("--model", default="dsv3", choices=["kimi_k2", "dsv3"])
 _parser.add_argument("--tokens", type=int, default=128)
+_parser.add_argument("--tp", type=int, default=1)
 _args, _ = _parser.parse_known_args()
 
 CONFIGS = {
@@ -45,7 +46,7 @@ CONFIGS = {
 
 _cfg = CONFIGS[_args.model]
 HIDDEN_SIZE = _cfg["hidden_size"]
-INTERMEDIATE_SIZE = _cfg["intermediate_size"]
+INTERMEDIATE_SIZE = _cfg["intermediate_size"] // _args.tp
 NUM_EXPERTS = _cfg["num_experts"]
 TOP_K = _cfg["top_k"]
 NUM_TOKENS = _args.tokens
@@ -57,7 +58,7 @@ NUM_WARMUP = 3
 def main():
     device = "cuda"
     print("=" * 60)
-    print(f"  {_args.model} MOE Profile — NvFP4 × BF16 Cubin")
+    print(f"  {_args.model} TP{_args.tp} MOE Profile — NvFP4 × BF16 Cubin")
     print("=" * 60)
     print(f"  hidden_size      = {HIDDEN_SIZE}")
     print(f"  intermediate_size= {INTERMEDIATE_SIZE}")

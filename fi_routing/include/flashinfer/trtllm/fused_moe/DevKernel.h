@@ -21,8 +21,8 @@
 #include <iostream>
 #include <string>
 
-#include "flashinfer/trtllm/batched_gemm/trtllmGen_bmm_export/trtllm/gen/DtypeDecl.h"
-#include "flashinfer/trtllm/batched_gemm/trtllmGen_bmm_export/trtllm/gen/SfLayoutDecl.h"
+#include "trtllm/gen/DtypeDecl.h"
+#include "trtllm/gen/SfLayoutDecl.h"
 // #include <cuda_runtime_api.h>
 #include <cutlass/cutlass.h>
 #include <cutlass/numeric_size.h>

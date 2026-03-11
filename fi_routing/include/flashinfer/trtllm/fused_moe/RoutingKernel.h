@@ -20,7 +20,7 @@
 #include <cuda_runtime_api.h>
 
 #include "IntFastDiv.h"
-#include "flashinfer/trtllm/batched_gemm/trtllmGen_bmm_export/trtllm/gen/DtypeDecl.h"
+#include "trtllm/gen/DtypeDecl.h"
 #include "flashinfer/trtllm/common/cudaUtils.h"
 
 namespace moe::dev {

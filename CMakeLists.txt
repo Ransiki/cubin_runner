@@ -27,6 +27,7 @@ add_library(moe_cubin_lib SHARED
     fi_routing/routing_wrapper.cu
     fi_routing/trtllm_fused_moe_routing_renormalize.cu
     fi_routing/trtllm_fused_moe_routing_deepseek.cu
+    fi_routing/trtllm_fused_moe_dev_kernel.cu
     ${CUBIN_SOURCES}
 )
 
@@ -45,6 +46,10 @@ target_include_directories(moe_cubin_lib PRIVATE
 
 target_include_directories(moe_cubin_lib SYSTEM PRIVATE
     ${CUTLASS_DIR}
+)
+
+target_compile_options(moe_cubin_lib PRIVATE
+    $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr>
 )
 
 target_link_libraries(moe_cubin_lib PRIVATE

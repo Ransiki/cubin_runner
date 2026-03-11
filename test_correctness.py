@@ -25,7 +25,7 @@ def run_test(T, H, I, E, K, seed=42):
         print("  Phase 1: Quantizing with TRT-LLM...")
         r1 = subprocess.run(
             [sys.executable, PHASE1_SCRIPT, cfg_path],
-            capture_output=True, text=True, timeout=120)
+            capture_output=True, text=True, timeout=300)
         if r1.returncode != 0:
             print(f"  Phase 1 FAILED:\n{r1.stderr[-500:]}")
             return False
@@ -59,11 +59,21 @@ if __name__ == "__main__":
     print("=" * 70)
 
     configs = [
-        (8,  256, 256, 4, 2),
-        (16, 512, 512, 4, 2),
-        (8, 1024, 1024, 4, 2),
-        # Minimal: 1 expert, 1 token — no routing complexity
-        (8, 1024, 1024, 4, 1),
+        # (T, H, I, E, K)
+        # --- Basic shapes ---
+        (8,   256,  256,  4,  2),
+        (16,  512,  512,  4,  2),
+        (8,  1024, 1024,  4,  2),
+        (8,  1024, 1024,  4,  1),    # K=1: single expert per token
+        # --- DSv3 TP=8 shapes (customer config) ---
+        (1,  7168,  256, 256, 8),    # BS=1 decode
+        (16, 7168,  256, 256, 8),    # BS=16 decode
+        (128,7168,  256, 256, 8),    # BS=128 decode
+        # --- Kimi K2 TP=8 shape (smaller to fit timeout) ---
+        (16, 7168,  256, 384, 8),    # K2 TP=8
+        # --- Edge cases ---
+        (4,   256,  256,  8,  2),    # very few tokens
+        (32,  512,  256, 128, 4),    # many experts, moderate K
     ]
 
     results = []
