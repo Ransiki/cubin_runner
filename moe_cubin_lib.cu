@@ -203,7 +203,11 @@ int moe_cubin_find_valid_configs(
     int found = 0;
     for (size_t i = 0; i < num_configs && found < max_results; i++) {
         auto const& opt = configs[i].mOptions;
+#if DTYPE_MODE == 1
+        if (opt.mDtypeA != tg::Dtype::MxE2m1) continue;
+#else
         if (opt.mDtypeA != tg::Dtype::E2m1) continue;
+#endif
         if (opt.mDtypeB != tg::Dtype::Bfloat16) continue;
         if (opt.mDtypeC != tg::Dtype::Bfloat16) continue;
         if (!opt.mTransposeMmaOutput) continue;

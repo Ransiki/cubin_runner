@@ -5,3 +5,9 @@ __pycache__/
 *.sqlite
 *.egg-info/
 *.so
+nsysrep/
+
+# Profiling helper scripts (not part of core API)
+profile_all.py
+profile_single.py
+sweep_cubins.py

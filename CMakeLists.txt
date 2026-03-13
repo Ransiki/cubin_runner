@@ -1,9 +1,11 @@
-# trtllmgen_runner — NvFP4 × BF16 MOE using trtllm-gen exported cubins
+# trtllmgen_runner — FP4 × BF16 MOE using trtllm-gen exported cubins
 #
 # Build:
 #   mkdir -p build && cd build && cmake .. && make -j$(nproc)
 #
-# Fully self-contained: all dependencies (cubins, cutlass headers) are bundled.
+# Builds two libraries:
+#   libmoe_cubin_lib.so      — NvFP4 (E2m1) cubins
+#   libmoe_mxfp4_cubin_lib.so — MxFP4 (MxE2m1) cubins with patchF2fp
 
 cmake_minimum_required(VERSION 3.18)
 project(trtllmgen_runner LANGUAGES CXX CUDA)
@@ -13,51 +15,49 @@ set(CMAKE_CUDA_STANDARD 17)
 
 find_package(CUDAToolkit REQUIRED)
 
-# Cubin export directory (self-contained, shipped with this project)
-set(BMM_EXPORT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_export")
-
-# cutlass headers (bundled in 3rdparty/)
 set(CUTLASS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/cutlass/include")
 
-# Collect cubin .cpp files
-file(GLOB CUBIN_SOURCES "${BMM_EXPORT_DIR}/cubins/*.cpp")
-
-add_library(moe_cubin_lib SHARED
-    moe_cubin_lib.cu
+set(ROUTING_SOURCES
     fi_routing/routing_wrapper.cu
     fi_routing/trtllm_fused_moe_routing_renormalize.cu
     fi_routing/trtllm_fused_moe_routing_deepseek.cu
     fi_routing/trtllm_fused_moe_dev_kernel.cu
-    ${CUBIN_SOURCES}
 )
 
-target_compile_definitions(moe_cubin_lib PRIVATE
-    TLLM_GEN_EXPORT_INTERFACE
-    TLLM_ENABLE_CUDA
-)
+function(add_moe_cubin_target TARGET_NAME EXPORT_DIR DTYPE_MODE_VAL)
+    file(GLOB _CUBIN_SRCS "${EXPORT_DIR}/cubins/*.cpp")
+    add_library(${TARGET_NAME} SHARED
+        moe_cubin_lib.cu
+        ${ROUTING_SOURCES}
+        ${_CUBIN_SRCS}
+    )
+    target_compile_definitions(${TARGET_NAME} PRIVATE
+        TLLM_GEN_EXPORT_INTERFACE
+        TLLM_ENABLE_CUDA
+        DTYPE_MODE=${DTYPE_MODE_VAL}
+    )
+    target_include_directories(${TARGET_NAME} PRIVATE
+        ${EXPORT_DIR}
+        ${EXPORT_DIR}/trtllm/gen
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_stubs
+        ${CMAKE_CURRENT_SOURCE_DIR}/fi_routing
+        ${CMAKE_CURRENT_SOURCE_DIR}/fi_routing/include
+    )
+    target_include_directories(${TARGET_NAME} SYSTEM PRIVATE ${CUTLASS_DIR})
+    target_compile_options(${TARGET_NAME} PRIVATE
+        $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr>
+    )
+    target_link_libraries(${TARGET_NAME} PRIVATE CUDA::cudart CUDA::cuda_driver)
+    set_target_properties(${TARGET_NAME} PROPERTIES
+        CUDA_ARCHITECTURES "100"
+        POSITION_INDEPENDENT_CODE ON
+    )
+endfunction()
 
-target_include_directories(moe_cubin_lib PRIVATE
-    ${BMM_EXPORT_DIR}
-    ${BMM_EXPORT_DIR}/trtllm/gen
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_stubs
-    ${CMAKE_CURRENT_SOURCE_DIR}/fi_routing
-    ${CMAKE_CURRENT_SOURCE_DIR}/fi_routing/include
-)
+# NvFP4 (E2m1 × BF16)
+add_moe_cubin_target(moe_cubin_lib
+    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_export" 0)
 
-target_include_directories(moe_cubin_lib SYSTEM PRIVATE
-    ${CUTLASS_DIR}
-)
-
-target_compile_options(moe_cubin_lib PRIVATE
-    $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr>
-)
-
-target_link_libraries(moe_cubin_lib PRIVATE
-    CUDA::cudart
-    CUDA::cuda_driver
-)
-
-set_target_properties(moe_cubin_lib PROPERTIES
-    CUDA_ARCHITECTURES "100"
-    POSITION_INDEPENDENT_CODE ON
-)
+# MxFP4 (MxE2m1 × BF16, patchF2fp)
+add_moe_cubin_target(moe_mxfp4_cubin_lib
+    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_mxfp4_export" 1)
