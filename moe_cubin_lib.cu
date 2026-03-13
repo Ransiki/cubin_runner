@@ -294,6 +294,7 @@ int moe_cubin_autotune(
 
     int best_idx = -1;
     float best_us = 1e30f;
+    const int N_ROUNDS = 3;
 
     for (int v = 0; v < n_valid; v++) {
         int ci = valid_indices[v];
@@ -305,25 +306,31 @@ int moe_cubin_autotune(
 
         iface.runInitBeforeWorldSync(cfg, data, (void*)stream);
 
-        /* Warmup: includes first cuModuleLoadData (cached for subsequent calls) */
+        /* Warmup with L2 flush */
         for (int w = 0; w < n_warmup; w++) {
+            flush_l2_cache(stream);
             iface.run(cfg, g_workspace, data, (void*)stream, g_prop.multiProcessorCount,
                        true, nullptr, s_tune_cache);
         }
         cudaStreamSynchronize(stream);
 
-        /* Benchmark: steady-state latency (cubin module already loaded + cached) */
-        cudaEventRecord(ev_start, stream);
-        for (int b = 0; b < n_bench; b++) {
-            iface.run(cfg, g_workspace, data, (void*)stream, g_prop.multiProcessorCount,
-                       true, nullptr, s_tune_cache);
+        /* Multi-round benchmark: per-iteration L2 flush, take median across rounds */
+        float round_us[N_ROUNDS];
+        for (int r = 0; r < N_ROUNDS; r++) {
+            cudaEventRecord(ev_start, stream);
+            for (int b = 0; b < n_bench; b++) {
+                flush_l2_cache(stream);
+                iface.run(cfg, g_workspace, data, (void*)stream, g_prop.multiProcessorCount,
+                           true, nullptr, s_tune_cache);
+            }
+            cudaEventRecord(ev_stop, stream);
+            cudaEventSynchronize(ev_stop);
+            float elapsed_ms = 0;
+            cudaEventElapsedTime(&elapsed_ms, ev_start, ev_stop);
+            round_us[r] = (elapsed_ms * 1000.0f) / n_bench;
         }
-        cudaEventRecord(ev_stop, stream);
-        cudaEventSynchronize(ev_stop);
-
-        float elapsed_ms = 0;
-        cudaEventElapsedTime(&elapsed_ms, ev_start, ev_stop);
-        float us = (elapsed_ms * 1000.0f) / n_bench;
+        std::sort(round_us, round_us + N_ROUNDS);
+        float us = round_us[N_ROUNDS / 2];
 
         const char* sched = (opt.mTileScheduler == ::batchedGemm::gemm::TileScheduler::Persistent) ? "persistent" : "static";
 
