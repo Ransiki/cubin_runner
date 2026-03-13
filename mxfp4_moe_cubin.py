@@ -5,17 +5,30 @@ from pathlib import Path
 
 _lib = None
 
+
+def _get_mxfp4_lib_name():
+    """Select the correct MxFP4 .so based on GPU compute capability."""
+    cc = torch.cuda.get_device_capability()
+    sm = cc[0] * 10 + cc[1]
+    if sm >= 103:
+        return "libmoe_mxfp4_cubin_lib_sm103a.so"
+    else:
+        return "libmoe_mxfp4_cubin_lib_sm100a.so"
+
+
 def _load_lib():
     global _lib
     if _lib is not None:
         return _lib
-    for p in [Path(__file__).parent / "libmoe_mxfp4_cubin_lib.so",
-              Path(__file__).parent / "build" / "libmoe_mxfp4_cubin_lib.so"]:
+    lib_name = _get_mxfp4_lib_name()
+    for d in [Path(__file__).parent, Path(__file__).parent / "build"]:
+        p = d / lib_name
         if p.exists():
             _lib = ctypes.CDLL(str(p))
             _setup_signatures(_lib)
             return _lib
-    raise RuntimeError("libmoe_mxfp4_cubin_lib.so not found")
+    raise RuntimeError(f"{lib_name} not found. Build with cmake. "
+                       f"GPU compute capability: {torch.cuda.get_device_capability()}")
 
 def _setup_signatures(lib):
     lib.moe_cubin_autotune.argtypes = [

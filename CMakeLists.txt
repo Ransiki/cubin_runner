@@ -3,9 +3,10 @@
 # Build:
 #   mkdir -p build && cd build && cmake .. && make -j$(nproc)
 #
-# Builds two libraries:
-#   libmoe_cubin_lib.so      — NvFP4 (E2m1) cubins
-#   libmoe_mxfp4_cubin_lib.so — MxFP4 (MxE2m1) cubins with patchF2fp
+# Builds three libraries:
+#   libmoe_cubin_lib.so              — NvFP4 (E2m1) cubins (all Blackwell)
+#   libmoe_mxfp4_cubin_lib_sm100a.so — MxFP4 cubins for SM100/SM100a (GB200)
+#   libmoe_mxfp4_cubin_lib_sm103a.so — MxFP4 cubins for SM103/SM103a
 
 cmake_minimum_required(VERSION 3.18)
 project(trtllmgen_runner LANGUAGES CXX CUDA)
@@ -58,6 +59,9 @@ endfunction()
 add_moe_cubin_target(moe_cubin_lib
     "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_export" 0)
 
-# MxFP4 (MxE2m1 × BF16, patchF2fp)
-add_moe_cubin_target(moe_mxfp4_cubin_lib
-    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_mxfp4_export" 1)
+# MxFP4 (MxE2m1 × BF16, patchF2fp) — one .so per GPU arch variant
+add_moe_cubin_target(moe_mxfp4_cubin_lib_sm100a
+    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_mxfp4_export_sm100a" 1)
+
+add_moe_cubin_target(moe_mxfp4_cubin_lib_sm103a
+    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_mxfp4_export_sm103a" 1)
