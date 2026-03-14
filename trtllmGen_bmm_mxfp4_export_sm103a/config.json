@@ -50,7 +50,7 @@
     },
     "configs": [
         {
-            "_comment": "MxFp4_FC1_static",
+            "_comment": "=== BASE: FC1 static (24 cubins) ===",
             "_template": "BatchedGemmMxE2m1Bf16",
             "routeAct": "ldgsts",
             "fusedAct": true,
@@ -152,7 +152,7 @@
             ]
         },
         {
-            "_comment": "MxFp4_FC1_persistent",
+            "_comment": "=== BASE: FC1 persistent (24 cubins) ===",
             "_template": "BatchedGemmMxE2m1Bf16",
             "routeAct": "ldgsts",
             "fusedAct": true,
@@ -254,7 +254,7 @@
             ]
         },
         {
-            "_comment": "MxFp4_FC2_static",
+            "_comment": "=== BASE: FC2 static \u2014 expanded stages for tN=8 (16 cubins) ===",
             "_template": "BatchedGemmMxE2m1Bf16",
             "routeAct": false,
             "fusedAct": false,
@@ -273,6 +273,20 @@
                     8,
                     8,
                     128,
+                    3
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    4
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
                     5
                 ],
                 [
@@ -313,7 +327,7 @@
             ]
         },
         {
-            "_comment": "MxFp4_FC2_persistent",
+            "_comment": "=== BASE: FC2 persistent \u2014 expanded stages for tN=8 (16 cubins) ===",
             "_template": "BatchedGemmMxE2m1Bf16",
             "routeAct": false,
             "fusedAct": false,
@@ -332,6 +346,20 @@
                     8,
                     8,
                     128,
+                    3
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    4
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
                     5
                 ],
                 [
@@ -372,7 +400,53 @@
             ]
         },
         {
-            "_comment": "MxFp4_FC1_splitK2_tileN32",
+            "_comment": "=== SPLITK: FC1 splitK=2 tileN=8 (8 cubins) \u2014 critical for TP8 ===",
+            "_template": "BatchedGemmMxE2m1Bf16",
+            "routeAct": "ldgsts",
+            "fusedAct": true,
+            "sfLayoutB": "linear",
+            "tileScheduler": "persistent",
+            "numStagesMma": 2,
+            "numSlicesForSplitK": 2,
+            "clusterDimZ": 2,
+            "clusterDimX": 1,
+            "useUnrollLoop2xForMma": [
+                true,
+                false
+            ],
+            "mmaN,tileN,epilogueTileN,tileK,numStages": [
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    3
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    4
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    5
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    256,
+                    3
+                ]
+            ]
+        },
+        {
+            "_comment": "=== SPLITK: FC1 splitK=2 tileN=32 tK=256 (2 cubins) \u2014 kept from before ===",
             "_template": "BatchedGemmMxE2m1Bf16",
             "routeAct": "ldgsts",
             "fusedAct": true,
@@ -397,7 +471,83 @@
             ]
         },
         {
-            "_comment": "MxFp4_FC1_2CTA",
+            "_comment": "=== SPLITK: FC2 splitK=2 tileN=8 (6 cubins) \u2014 THE critical missing ones ===",
+            "_template": "BatchedGemmMxE2m1Bf16",
+            "routeAct": false,
+            "fusedAct": false,
+            "tileScheduler": "persistent",
+            "numStagesMma": 2,
+            "numSlicesForSplitK": 2,
+            "clusterDimZ": 2,
+            "clusterDimX": 1,
+            "useUnrollLoop2xForMma": [
+                true,
+                false
+            ],
+            "mmaN,tileN,epilogueTileN,tileK,numStages": [
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    3
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    4
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    5
+                ]
+            ]
+        },
+        {
+            "_comment": "=== SPLITK: FC2 splitK=2 tileN=16,32 (6 cubins) \u2014 coverage ===",
+            "_template": "BatchedGemmMxE2m1Bf16",
+            "routeAct": false,
+            "fusedAct": false,
+            "tileScheduler": "persistent",
+            "numStagesMma": 2,
+            "numSlicesForSplitK": 2,
+            "clusterDimZ": 2,
+            "clusterDimX": 1,
+            "useUnrollLoop2xForMma": [
+                true,
+                false
+            ],
+            "mmaN,tileN,epilogueTileN,tileK,numStages": [
+                [
+                    16,
+                    16,
+                    16,
+                    128,
+                    4
+                ],
+                [
+                    16,
+                    16,
+                    16,
+                    128,
+                    5
+                ],
+                [
+                    32,
+                    32,
+                    32,
+                    128,
+                    3
+                ]
+            ]
+        },
+        {
+            "_comment": "=== 2CTA: FC1 2CTA tileN=16,32 (8 cubins) ===",
             "_template": "BatchedGemmMxE2m1Bf16",
             "routeAct": "ldgsts",
             "fusedAct": true,
@@ -444,7 +594,7 @@
             ]
         },
         {
-            "_comment": "MxFp4_FC2_2CTA",
+            "_comment": "=== 2CTA: FC2 2CTA tileN=16 expanded (8 cubins) \u2014 NEW ===",
             "_template": "BatchedGemmMxE2m1Bf16",
             "routeAct": false,
             "fusedAct": false,
@@ -464,8 +614,47 @@
                     16,
                     16,
                     128,
+                    3
+                ],
+                [
+                    16,
+                    16,
+                    16,
+                    128,
+                    4
+                ],
+                [
+                    16,
+                    16,
+                    16,
+                    128,
                     5
                 ],
+                [
+                    16,
+                    16,
+                    16,
+                    256,
+                    3
+                ]
+            ]
+        },
+        {
+            "_comment": "=== 2CTA: FC2 2CTA tileN=32 (2 cubins) \u2014 kept ===",
+            "_template": "BatchedGemmMxE2m1Bf16",
+            "routeAct": false,
+            "fusedAct": false,
+            "tileScheduler": "persistent",
+            "numStagesMma": 2,
+            "mmaM": 256,
+            "clusterDimX": 2,
+            "numSlicesForSplitK": 1,
+            "clusterDimZ": 1,
+            "useUnrollLoop2xForMma": [
+                true,
+                false
+            ],
+            "mmaN,tileN,epilogueTileN,tileK,numStages": [
                 [
                     32,
                     32,
@@ -476,7 +665,7 @@
             ]
         },
         {
-            "_comment": "MxFp4_FC1_TMA_route",
+            "_comment": "=== TMA: FC1 TMA route tileN=8 expanded stages (8 cubins) ===",
             "_template": "BatchedGemmMxE2m1Bf16",
             "routeAct": "tma",
             "routeSfsAct": "tma",
@@ -497,6 +686,20 @@
                     8,
                     8,
                     128,
+                    3
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
+                    4
+                ],
+                [
+                    8,
+                    8,
+                    8,
+                    128,
                     5
                 ],
                 [
@@ -505,7 +708,26 @@
                     8,
                     256,
                     3
-                ],
+                ]
+            ]
+        },
+        {
+            "_comment": "=== TMA: FC1 TMA route tileN=16,32 (6 cubins) ===",
+            "_template": "BatchedGemmMxE2m1Bf16",
+            "routeAct": "tma",
+            "routeSfsAct": "tma",
+            "fusedAct": true,
+            "sfLayoutB": "linear",
+            "tileScheduler": "persistent",
+            "numStagesMma": 2,
+            "numSlicesForSplitK": 1,
+            "clusterDimX": 1,
+            "clusterDimZ": 1,
+            "useUnrollLoop2xForMma": [
+                true,
+                false
+            ],
+            "mmaN,tileN,epilogueTileN,tileK,numStages": [
                 [
                     16,
                     16,

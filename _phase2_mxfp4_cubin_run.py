@@ -1,5 +1,6 @@
-"""Phase 2: Load quantized weights and run cubin pipeline (NO TRT-LLM loaded)."""
+"""Phase 2: Load MxFP4 quantized weights and run cubin pipeline (NO TRT-LLM loaded)."""
 import sys, os, json
+os.environ["MXFP4_MULTI_TILE"] = "0"
 sys.path.insert(0, os.path.dirname(__file__))
 
 import torch
