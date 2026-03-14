@@ -41,6 +41,12 @@ def _setup_signatures(lib):
         ctypes.POINTER(ctypes.c_int), ctypes.c_int,
         ctypes.c_int, ctypes.c_int, ctypes.c_void_p]
     lib.moe_cubin_autotune.restype = ctypes.c_int
+    lib.moe_cubin_find_valid_configs.argtypes = [
+        ctypes.c_bool, ctypes.c_int,
+        ctypes.c_int, ctypes.c_int, ctypes.c_int,
+        ctypes.c_int, ctypes.c_int,
+        ctypes.POINTER(ctypes.c_int), ctypes.c_int]
+    lib.moe_cubin_find_valid_configs.restype = ctypes.c_int
     lib.routing_renormalize_run.argtypes = [
         ctypes.c_void_p,
         ctypes.c_int32, ctypes.c_int32, ctypes.c_int32, ctypes.c_int32,
@@ -127,6 +133,18 @@ def _select_tile_n(num_tokens, top_k, num_experts):
     avg = (num_tokens * top_k) / num_experts
     return max(8, min(64, 2 ** math.ceil(math.log2(max(1, avg)))))
 
+
+def _select_tile_n_candidates(num_tokens, top_k, num_experts):
+    primary = _select_tile_n(num_tokens, top_k, num_experts)
+    candidates = [primary]
+    if primary == 8:
+        candidates.append(16)
+    return candidates
+
+
+_best_tile_n_cache = {}
+
+
 def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_scale,
                      gemm2_weights, gemm2_weights_scale, num_experts, top_k, intermediate_size,
                      routing_bias=None, hidden_states_scale=None,
@@ -135,16 +153,96 @@ def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_
                      output2_scale_scalar=None, do_finalize=True, routing_method_type=1):
     lib = _load_lib()
     T = hidden_states.shape[0]; H = hidden_states.shape[1]; device = hidden_states.device
-    tile_n = _select_tile_n(T, top_k, num_experts)
     expanded = T * top_k; stream = torch.cuda.current_stream(device).cuda_stream
     fc1_M, fc1_K = 2 * intermediate_size, H
     fc2_M, fc2_K = H, intermediate_size
+    shape_key = (T, num_experts, top_k, H, intermediate_size)
+
+    if shape_key not in _best_tile_n_cache:
+        import sys, os
+        if os.environ.get("MXFP4_MULTI_TILE", "1") == "0":
+            candidates = [_select_tile_n(T, top_k, num_experts)]
+        else:
+            candidates = _select_tile_n_candidates(T, top_k, num_experts)
+        best_tile_n = candidates[0]
+        best_total_us = float('inf')
+
+        if not hasattr(lib, '_fused_setup'):
+            lib.moe_cubin_fused_run.argtypes = [
+                ctypes.c_int, ctypes.c_int, ctypes.c_void_p,
+                ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+                ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
+                ctypes.c_void_p, ctypes.c_void_p,
+                ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
+                ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
+                ctypes.c_int, ctypes.c_int] + [ctypes.c_void_p] * 12
+            lib.moe_cubin_fused_run.restype = ctypes.c_int
+            lib._fused_setup = True
+
+        for tn in candidates:
+            ck1 = (True, tn, fc1_M, fc1_K, num_experts, expanded)
+            ck2 = (False, tn, fc2_M, fc2_K, num_experts, expanded)
+            if ck1 not in _autotune_cache or ck2 not in _autotune_cache:
+                n_fc1 = lib.moe_cubin_find_valid_configs(
+                    True, tn, fc1_M, tn, fc1_K, num_experts, expanded, (ctypes.c_int * 1)(), 1)
+                n_fc2 = lib.moe_cubin_find_valid_configs(
+                    False, tn, fc2_M, tn, fc2_K, num_experts, expanded, (ctypes.c_int * 1)(), 1)
+                if n_fc1 == 0 or n_fc2 == 0:
+                    print(f"[multi-tile] tile_n={tn}: skip (FC1={n_fc1}, FC2={n_fc2})", file=sys.stderr)
+                    continue
+                meta = compute_routing_cuda(routing_logits, num_experts, top_k, tn, routing_method_type)
+                _get_best_config(lib, True, tn, fc1_M, fc1_K, num_experts, expanded, meta, device)
+                _get_best_config(lib, False, tn, fc2_M, fc2_K, num_experts, expanded, meta, device)
+            if ck1 not in _autotune_cache or ck2 not in _autotune_cache:
+                continue
+            fc1_c = _autotune_cache[ck1]; fc2_c = _autotune_cache[ck2]
+            mp = lib.routing_get_max_padded_tokens(T, top_k, num_experts, tn)
+            mc = lib.routing_get_max_ctas(T, top_k, num_experts, tn)
+            db = {
+                "ei": torch.empty(expanded, dtype=torch.int32, device=device),
+                "hist": torch.empty(2*num_experts, dtype=torch.int32, device=device),
+                "ps": torch.empty(1, dtype=torch.int32, device=device),
+                "e2p": torch.empty(expanded, dtype=torch.int32, device=device),
+                "p2e": torch.empty(mp, dtype=torch.int32, device=device),
+                "p2t": torch.empty(mp, dtype=torch.int32, device=device),
+                "ew": torch.empty(expanded, dtype=torch.bfloat16, device=device),
+                "cb": torch.empty(mc, dtype=torch.int32, device=device),
+                "cm": torch.empty(mc, dtype=torch.int32, device=device),
+                "ne": torch.empty(1, dtype=torch.int32, device=device),
+            }
+            f1 = torch.empty(mp, intermediate_size, dtype=torch.bfloat16, device=device)
+            f2 = torch.empty(mp, H, dtype=torch.bfloat16, device=device)
+            fargs = (fc1_c, fc2_c, _ptr(routing_logits.contiguous()),
+                T, num_experts, top_k, tn, routing_method_type,
+                _ptr(gemm1_weights), _ptr(gemm1_weights_scale),
+                _ptr(gemm2_weights), _ptr(gemm2_weights_scale),
+                _ptr(hidden_states), _ptr(f2),
+                _ptr(output1_scale_scalar), _ptr(output1_scale_gate_scalar), _ptr(output2_scale_scalar),
+                _ptr(gemm1_bias), _ptr(gemm1_alpha), _ptr(gemm1_beta), _ptr(gemm1_clamp_limit),
+                H, intermediate_size,
+                _ptr(db["ei"]), _ptr(db["hist"]), _ptr(db["ps"]), _ptr(db["e2p"]),
+                _ptr(db["p2e"]), _ptr(db["p2t"]), _ptr(db["ew"]),
+                _ptr(db["cb"]), _ptr(db["cm"]), _ptr(db["ne"]), _ptr(f1),
+                ctypes.c_void_p(stream))
+            for _ in range(3):
+                lib.moe_cubin_fused_run(*fargs)
+            torch.cuda.synchronize()
+            s = torch.cuda.Event(enable_timing=True); e = torch.cuda.Event(enable_timing=True)
+            s.record()
+            for _ in range(10):
+                lib.moe_cubin_fused_run(*fargs)
+            e.record(); torch.cuda.synchronize()
+            total_us = s.elapsed_time(e) / 10 * 1000
+            print(f"[multi-tile] tile_n={tn}: {total_us:.1f}us (FC1=config[{fc1_c}], FC2=config[{fc2_c}])",
+                  file=sys.stderr)
+            if total_us < best_total_us:
+                best_total_us = total_us; best_tile_n = tn
+        _best_tile_n_cache[shape_key] = best_tile_n
+        print(f"[multi-tile] BEST tile_n={best_tile_n} ({best_total_us:.1f}us)", file=sys.stderr)
+
+    tile_n = _best_tile_n_cache[shape_key]
     ck1 = (True, tile_n, fc1_M, fc1_K, num_experts, expanded)
     ck2 = (False, tile_n, fc2_M, fc2_K, num_experts, expanded)
-    if ck1 not in _autotune_cache or ck2 not in _autotune_cache:
-        meta = compute_routing_cuda(routing_logits, num_experts, top_k, tile_n, routing_method_type)
-        _get_best_config(lib, True, tile_n, fc1_M, fc1_K, num_experts, expanded, meta, device)
-        _get_best_config(lib, False, tile_n, fc2_M, fc2_K, num_experts, expanded, meta, device)
     fc1_cfg = _autotune_cache[ck1]; fc2_cfg = _autotune_cache[ck2]
     max_padded = lib.routing_get_max_padded_tokens(T, top_k, num_experts, tile_n)
     max_ctas = lib.routing_get_max_ctas(T, top_k, num_experts, tile_n)

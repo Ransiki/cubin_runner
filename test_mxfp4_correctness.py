@@ -36,7 +36,7 @@ def run_test(T, H, I, E, K, seed=42):
         print("  Phase 2: Running cubin pipeline...")
         r2 = subprocess.run(
             [sys.executable, PHASE2_SCRIPT, cfg_path],
-            capture_output=True, text=True, timeout=120)
+            capture_output=True, text=True, timeout=600)
         if r2.returncode != 0:
             print(f"  Phase 2 FAILED:\n{r2.stderr[-500:]}")
             return False
