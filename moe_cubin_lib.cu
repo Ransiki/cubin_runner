@@ -216,6 +216,7 @@ int moe_cubin_find_valid_configs(
         if (is_fc1 && (!has_route || !opt.mFusedAct)) continue;
         if (!is_fc1 && (has_route || opt.mFusedAct)) continue;
         if (opt.mTileN != tile_n) continue;
+        if (opt.mClusterDimX > 1 && opt.mClusterDimZ > 1) continue;
         if (iface.isValidConfig(configs[i], data)) {
             out_indices[found++] = (int)i;
         }

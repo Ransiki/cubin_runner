@@ -137,7 +137,8 @@ def _select_tile_n(num_tokens, top_k, num_experts):
 def _select_tile_n_candidates(num_tokens, top_k, num_experts):
     primary = _select_tile_n(num_tokens, top_k, num_experts)
     candidates = [primary]
-    if primary == 8:
+    avg = (num_tokens * top_k) / num_experts
+    if primary == 8 and avg >= 0.5:
         candidates.append(16)
     return candidates
 
