@@ -74,7 +74,7 @@ int routing_renormalize_run(
 
         moe::dev::routing::routingRenormalize::Data data;
 
-        data.mDtypeExpW = btg::Dtype::Bfloat16;
+        data.mDtypeExpW = btg::Dtype::Fp32;
         data.mUsePdl = true;
 
         /* routing_method:

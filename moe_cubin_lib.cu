@@ -471,7 +471,7 @@ int moe_cubin_fused_run(
     int* expanded_to_perm,       /* [T*K] */
     int* perm_to_expanded,       /* [max_padded] */
     int* perm_to_token,          /* [max_padded] */
-    void* expert_weights,        /* [T*K] bf16 */
+    void* expert_weights,        /* [T*K] float32 */
     int* cta_to_batch,           /* [max_ctas] */
     int* cta_to_mn,              /* [max_ctas] */
     int* num_non_exit,           /* [1] */
@@ -574,7 +574,7 @@ int moe_cubin_fused_run(
 int moe_cubin_finalize(
     void* fc2_output,              /* [max_padded, H] bf16 — input from FC2 */
     void* output,                  /* [T, H] bf16 — final output (pre-allocated) */
-    void* expert_weights,          /* [T*K] bf16 — routing weights */
+    void* expert_weights,          /* [T*K] float32 — routing weights */
     int* expanded_idx_to_permuted, /* [T*K] int32 */
     int* total_num_padded_tokens,  /* [1] int32 (GPU) */
     int num_tokens,
@@ -585,7 +585,7 @@ int moe_cubin_finalize(
 {
     ::moe::dev::finalize::Data fdata;
     fdata.mDtypeElt = tg::Dtype::Bfloat16;
-    fdata.mDtypeExpW = tg::Dtype::Bfloat16;
+    fdata.mDtypeExpW = tg::Dtype::Fp32;
     fdata.mUsePdl = false;
     fdata.mUseDeepSeekFp8 = false;
     fdata.inPtr = fc2_output;
@@ -619,6 +619,27 @@ void moe_cubin_get_config_info(int config_index,
     *out_numStagesMma = o.mNumStagesMma;
     *out_isPersistent = (o.mTileScheduler == ::batchedGemm::gemm::TileScheduler::Persistent) ? 1 : 0;
     *out_isUnroll2x = o.mUseUnrollLoop2xForMma ? 1 : 0;
+}
+
+void moe_cubin_get_config_info_ext(int config_index,
+    int* out_tileM, int* out_tileN, int* out_tileK,
+    int* out_numStages, int* out_numStagesMma,
+    int* out_isPersistent, int* out_isUnroll2x,
+    int* out_clusterDimX, int* out_splitK, int* out_mmaM)
+{
+    BatchedGemmInterface iface;
+    auto const* configs = iface.getBatchedGemmConfigs();
+    auto const& o = configs[config_index].mOptions;
+    *out_tileM = o.mTileM;
+    *out_tileN = o.mTileN;
+    *out_tileK = o.mTileK;
+    *out_numStages = o.mNumStages;
+    *out_numStagesMma = o.mNumStagesMma;
+    *out_isPersistent = (o.mTileScheduler == ::batchedGemm::gemm::TileScheduler::Persistent) ? 1 : 0;
+    *out_isUnroll2x = o.mUseUnrollLoop2xForMma ? 1 : 0;
+    *out_clusterDimX = o.mClusterDimX;
+    *out_splitK = o.mNumSlicesForSplitK;
+    *out_mmaM = o.mMmaM;
 }
 
 } /* extern "C" */

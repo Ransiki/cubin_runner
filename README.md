@@ -37,6 +37,8 @@ First call triggers autotuning (tries multiple tile_n values including 2CTA). Su
 
 ## Benchmark
 
+`bench_moe.py` measures **end-to-end MOE pipeline latency** (routing → FC1 → FC2 → finalize):
+
 ```bash
 # MxFP4 TP8 (default)
 python3 bench_moe.py
@@ -51,7 +53,6 @@ python3 bench_moe.py --tokens 128
 python3 bench_moe.py --model dsv3 --dtype mxfp4 --tp 8 --tokens 1,16,128 --iters 20 --warmup 5
 ```
 
-Options:
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--model` | `dsv3` | Model config: `dsv3` or `kimi_k2` |
@@ -60,42 +61,42 @@ Options:
 | `--tokens` | `1,16,128` | Comma-separated batch sizes |
 | `--iters` | `20` | Benchmark iterations |
 | `--warmup` | `5` | Warmup iterations (includes autotune) |
+| `--balanced` | off | Perfectly balanced routing across experts |
 | `--nsys` | off | Enable `cudaProfilerStart/Stop` for nsys capture |
+| `--force-fc1` | — | Force specific cubin config index for FC1 |
+| `--force-fc2` | — | Force specific cubin config index for FC2 |
+| `--list-configs` | — | List all valid cubin configs, then exit |
 
-## nsys Profiling
+## nsys Kernel Bandwidth
+
+`nsys_analyze.sh` profiles the MOE pipeline under nsys and computes **per-kernel achieved memory bandwidth** from real GPU kernel execution times. It accepts the same CLI as `bench_moe.py`:
 
 ```bash
-nsys profile --capture-range=cudaProfilerApi -o mxfp4_tp8_bs128 \
-  python3 bench_moe.py --nsys --dtype mxfp4 --tp 8 --tokens 128
+# Same args as bench_moe.py
+./nsys_analyze.sh --dtype mxfp4 --tp 8 --tokens 1,16,128
+./nsys_analyze.sh --dtype mxfp4 --tp 8 --tokens 128 --balanced
+./nsys_analyze.sh --dtype nvfp4 --tp 1 --tokens 128
 ```
 
-The `--nsys` flag inserts `cudaProfilerStart/Stop` around the profiled iterations. Combined with `--capture-range=cudaProfilerApi`, nsys only captures steady-state kernel execution (autotune excluded).
+Example output (B300, DSv3 TP8 MxFP4):
 
-## Performance (DSv3 TP8, B300 SM103, 80 SMs)
+```
+    BS     Active  Pipe(us) │  FC1(us)    FC1 BW  FC1% │  FC2(us)    FC2 BW  FC2%
+  ──── ────────── ───────── ┼ ──────── ───────── ───── ┼ ──────── ───────── ─────
+     1    8/256      126.5 │     11.5   1.372T/s   17% │     13.5   0.585T/s    7%
+    16  102/256      120.8 │     48.2   4.162T/s   52% │     33.1   3.060T/s   38%
+   128  251/256      207.3 │    104.7   4.817T/s   60% │     64.1   4.058T/s   51%
+```
 
-### MxFP4 (patchF2fp, 134 cubins, multi-tile_n autotune)
+**How bandwidth is computed:**
+- Kernel execution time comes from nsys `cuda_gpu_kern_sum` (real GPU time, no launch overhead)
+- FC1 data = `active × 2I × (H/2 + H/sf_block)` (weights) + `expanded × (H + I) × 2` (activations)
+- FC2 data = `active × H × (I/2 + I/sf_block)` (weights) + `expanded × (I + H) × 2` (activations)
+- `active` = experts with ≥1 token (only active experts' weights are loaded from HBM)
+- BW = total_bytes / kernel_time
 
-| BS | Pipeline | FC1 | FC1 BW | FC2 | FC2 BW | Strategy |
-|----|----------|-----|--------|-----|--------|----------|
-| 1 | 0.055ms | 10.8us | 1.46 TB/s (18%) | 13.9us | 0.57 TB/s (7%) | tile_n=8, splitK=2 |
-| 16 | 0.115ms | 61.4us | 3.36 TB/s (42%) | 38.4us | 2.72 TB/s (34%) | tile_n=16, 2CTA |
-| 128 | 0.170ms | 98.2us | 5.16 TB/s (65%) | 55.6us | 4.70 TB/s (59%) | tile_n=16, 2CTA |
+**Why nsys instead of CUDA events:** CUDA event timing wraps the Python→C→kernel launch loop, which includes CPU-side overhead. For short kernels (BS=1, kernel <15us), this gap dominates and inflates the measured time by 20-80us. nsys measures pure GPU execution time and gives accurate bandwidth at all batch sizes.
 
-### NvFP4 (baseline)
-
-| BS | Pipeline | FC1 | FC2 |
-|----|----------|-----|-----|
-| 1 | 0.088ms | 52.5us | 22.3us |
-| 16 | 0.418ms | 179.6us | 98.2us |
-| 128 | 0.838ms | 382.2us | 210.3us |
-
-### MxFP4 vs NvFP4 Speedup
-
-| BS | NvFP4 | MxFP4 | Speedup |
-|----|-------|-------|---------|
-| 1 | 0.088ms | 0.055ms | 1.6x |
-| 16 | 0.418ms | 0.115ms | 3.6x |
-| 128 | 0.838ms | 0.170ms | 4.9x |
 
 ## Correctness Tests
 
@@ -120,15 +121,3 @@ fp4, sf = torch.ops.trtllm.fp4_quantize(w, global_sf, 32, True, False)
 
 Both require `reorder_rows_for_gated_act_gemm` (FC1 only) and `shuffle_matrix_a/sf_a`.
 
-## Architecture
-
-| Component | Count | Source |
-|-----------|-------|--------|
-| NvFP4 cubins | 122 | trtllm-gen export |
-| MxFP4 cubins | 134 (per arch) | trtllm-gen + SASS patch |
-| Routing kernel | 1 | FlashInfer (cherry-picked) |
-| Finalize kernel | 1 | FlashInfer (cherry-picked) |
-| Cubin interface | — | trtllm-gen BatchedGemmInterface |
-| Autotuning + fused pipeline | — | This project |
-
-See `context.md` for full technical details.

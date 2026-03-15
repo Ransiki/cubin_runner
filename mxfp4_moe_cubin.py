@@ -92,6 +92,7 @@ def compute_routing_cuda(routing_logits, num_experts, top_k, tile_n, routing_met
     device = routing_logits.device
     T = routing_logits.shape[0]
     expanded = T * top_k
+    logits_f32 = routing_logits.float().contiguous()
     max_padded = lib.routing_get_max_padded_tokens(T, top_k, num_experts, tile_n)
     max_ctas = lib.routing_get_max_ctas(T, top_k, num_experts, tile_n)
     ei = torch.zeros(expanded, dtype=torch.int32, device=device)
@@ -100,13 +101,13 @@ def compute_routing_cuda(routing_logits, num_experts, top_k, tile_n, routing_met
     e2p = torch.full((expanded,), -1, dtype=torch.int32, device=device)
     p2e = torch.full((max_padded,), -1, dtype=torch.int32, device=device)
     p2t = torch.full((max_padded,), -1, dtype=torch.int32, device=device)
-    ew = torch.zeros(expanded, dtype=torch.bfloat16, device=device)
+    ew = torch.zeros(expanded, dtype=torch.float32, device=device)
     cb = torch.zeros(max_ctas, dtype=torch.int32, device=device)
     cm = torch.zeros(max_ctas, dtype=torch.int32, device=device)
     ne = torch.zeros(1, dtype=torch.int32, device=device)
     stream = torch.cuda.current_stream(device).cuda_stream
     rc = lib.routing_renormalize_run(
-        _ptr(routing_logits.contiguous()), T, num_experts, top_k, tile_n,
+        _ptr(logits_f32), T, num_experts, top_k, tile_n,
         0, num_experts, routing_method,
         _ptr(ei), _ptr(hist), _ptr(ps), _ptr(e2p), _ptr(p2e), _ptr(p2t),
         _ptr(ew), _ptr(cb), _ptr(cm), _ptr(ne), ctypes.c_void_p(stream))
@@ -206,14 +207,15 @@ def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_
                 "e2p": torch.empty(expanded, dtype=torch.int32, device=device),
                 "p2e": torch.empty(mp, dtype=torch.int32, device=device),
                 "p2t": torch.empty(mp, dtype=torch.int32, device=device),
-                "ew": torch.empty(expanded, dtype=torch.bfloat16, device=device),
+                "ew": torch.empty(expanded, dtype=torch.float32, device=device),
                 "cb": torch.empty(mc, dtype=torch.int32, device=device),
                 "cm": torch.empty(mc, dtype=torch.int32, device=device),
                 "ne": torch.empty(1, dtype=torch.int32, device=device),
             }
             f1 = torch.empty(mp, intermediate_size, dtype=torch.bfloat16, device=device)
             f2 = torch.empty(mp, H, dtype=torch.bfloat16, device=device)
-            fargs = (fc1_c, fc2_c, _ptr(routing_logits.contiguous()),
+            logits_f32_tn = routing_logits.float().contiguous()
+            fargs = (fc1_c, fc2_c, _ptr(logits_f32_tn),
                 T, num_experts, top_k, tn, routing_method_type,
                 _ptr(gemm1_weights), _ptr(gemm1_weights_scale),
                 _ptr(gemm2_weights), _ptr(gemm2_weights_scale),
@@ -256,7 +258,7 @@ def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_
             "e2p": torch.empty(expanded, dtype=torch.int32, device=device),
             "p2e": torch.empty(max_padded, dtype=torch.int32, device=device),
             "p2t": torch.empty(max_padded, dtype=torch.int32, device=device),
-            "ew": torch.empty(expanded, dtype=torch.bfloat16, device=device),
+            "ew": torch.empty(expanded, dtype=torch.float32, device=device),
             "cb": torch.empty(max_ctas, dtype=torch.int32, device=device),
             "cm": torch.empty(max_ctas, dtype=torch.int32, device=device),
             "ne": torch.empty(1, dtype=torch.int32, device=device),
@@ -274,9 +276,10 @@ def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_
             ctypes.c_int, ctypes.c_int] + [ctypes.c_void_p] * 12
         lib.moe_cubin_fused_run.restype = ctypes.c_int
     b = mxfp4_moe_cubin._bufs
+    logits_f32 = routing_logits.float().contiguous()
     torch.cuda.nvtx.range_push("mxfp4_fused")
     rc = lib.moe_cubin_fused_run(
-        fc1_cfg, fc2_cfg, _ptr(routing_logits.contiguous()),
+        fc1_cfg, fc2_cfg, _ptr(logits_f32),
         T, num_experts, top_k, tile_n, routing_method_type,
         _ptr(gemm1_weights), _ptr(gemm1_weights_scale),
         _ptr(gemm2_weights), _ptr(gemm2_weights_scale),
