@@ -519,23 +519,27 @@ int moe_cubin_fused_run(
     }
 
     /*
-     * ── Step 2: Build batched_n for max possible tokens per expert ──
+     * ── Step 2: Build batched_n to cover worst-case CTA count ──
      *
-     * The cubin with earlyExit+dynamic batch uses ctaIdxXyToBatchIdx/MnLimit
-     * at runtime, NOT mBatchedN. However, mBatchedN determines
-     * mMaxNumCtasInTokenDim which sets the GRID LAUNCH SIZE.
-     * We must set batched_n high enough to cover the worst-case CTA count.
+     * mBatchedN → mMaxNumCtasInTokenDim → GRID LAUNCH SIZE.
+     * Too small → multi-CTA experts lose data.
+     * Too large → wasted empty CTA launches.
      *
-     * With T tokens, K top_k, E experts, tile_n: any expert could get up to
-     * min(T*K, ceil(T*K/E)*2) tokens. Use T*K (all tokens to one expert)
-     * as the safe upper bound per expert.
+     * Use routing_get_max_ctas (tight upper bound), convert to per-expert
+     * batched_n, then round up to next power of 2.
      */
+    extern int routing_get_max_ctas(int, int, int, int);
+    int max_ctas = routing_get_max_ctas(
+        num_tokens / top_k, top_k, num_experts, tile_n);
+    int ctas_per_expert = (max_ctas + num_experts - 1) / num_experts;
+    int batched_n_val = tile_n;
+    while (batched_n_val < ctas_per_expert * tile_n) batched_n_val *= 2;
+
     static std::vector<int32_t> h_batched_n;
     if ((int)h_batched_n.size() != num_experts) {
         h_batched_n.resize(num_experts);
     }
-    int max_tokens_per_expert = num_tokens;  /* T*K, safe upper bound */
-    for (int e = 0; e < num_experts; e++) h_batched_n[e] = max_tokens_per_expert;
+    for (int e = 0; e < num_experts; e++) h_batched_n[e] = batched_n_val;
 
     /* ── Step 4: FC1 cubin (async) ── */
     if (!g_run_iface_init) { g_run_iface = BatchedGemmInterface(); g_run_iface_init = true; }

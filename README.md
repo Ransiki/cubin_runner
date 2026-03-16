@@ -69,17 +69,17 @@ Reports saved to `nsysrep/<model>_<dtype>_tp<N>_<timestamp>/`.
 ```
     BS     Active  Pipe(us) │  FC1(us)    FC1 BW  FC1% │  FC2(us)    FC2 BW  FC2%
   ──── ────────── ───────── ┼ ──────── ───────── ───── ┼ ──────── ───────── ─────
-     1    8/256       76.1 │     13.5   1.160T/s   14% │     13.4   0.590T/s    7%
-    16  102/256      106.9 │     50.7   3.959T/s   49% │     32.6   3.112T/s   39%
-   128  251/256      261.4 │    107.1   4.713T/s   59% │    119.1   2.182T/s   27%
+     1    8/256       74.7 │     13.6   1.158T/s   14% │     13.4   0.591T/s    7%
+    16  102/256      103.7 │     50.4   3.986T/s   50% │     31.3   3.236T/s   40%
+   128  251/256      204.1 │    107.0   4.716T/s   59% │     62.0   4.190T/s   52%
 ```
 
 **CUDA Graph effect on BS=1** (`bench_moe.py --cuda-graph`):
 ```
                default     --cuda-graph    speedup
     BS=1       57 us       40 us           -30%
-    BS=16      98 us       99 us           (same)
-    BS=128    256 us      256 us           (same)
+    BS=16      99 us       99 us           (same)
+    BS=128    199 us      199 us           (same)
 ```
 
 CUDA Graph eliminates per-kernel CPU launch overhead (~17us for 4 kernels). Significant for BS=1 where launch overhead is 30% of total; negligible for BS≥16 where GPU kernel time dominates.
