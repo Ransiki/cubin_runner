@@ -52,16 +52,12 @@ Both require `reorder_rows_for_gated_act_gemm` (FC1), `shuffle_matrix_a`, and `s
 ## Benchmark
 
 ```bash
-# End-to-end pipeline latency + bandwidth
+# End-to-end pipeline latency + bandwidth (CUDA events timing)
 python3 bench_moe.py                                       # MxFP4 TP8 DSv3
-python3 bench_moe.py --dtype nvfp4 --tp 1                  # NvFP4 TP1
-python3 bench_moe.py --tokens 128                           # single BS
+python3 bench_moe.py --cuda-graph                           # with CUDA Graph (faster BS=1)
 python3 bench_moe.py -v                                     # show autotune logs
 
-# CUDA Graph: eliminate kernel launch overhead (significant for BS=1)
-python3 bench_moe.py --cuda-graph --tokens 1,16,128
-
-# Per-kernel bandwidth via nsys
+# Per-kernel bandwidth via nsys (pure GPU time, L2 flush between iters)
 ./nsys_analyze.sh --dtype mxfp4 --tp 8 --tokens 1,16,128
 ```
 
@@ -69,34 +65,31 @@ Reports saved to `nsysrep/<model>_<dtype>_tp<N>_<timestamp>/`.
 
 ### Reference Performance (Blackwell 148 SMs, DSv3 TP8 MxFP4, F2FP patched)
 
-**bench_moe.py** (end-to-end, per-BS isolated runs):
-```
-    BS     Active  Pipe(us)        BW    Data  tN │ FC1 config                                  │ FC2 config
-  ──── ────────── ───────── ───────── ─────── ─── ┼ ──────────────────────────────────────────── ┼ ──────────────────────────────────────────
-     1    8/256       57.0   0.414T/s    24MB   8 │ t128x8x128 s5/2 persistent u2 splitK=2       │ t128x8x256 s3/2 persistent
-    16  102/256       98.8   3.058T/s   302MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
-   128  251/256      255.8   2.989T/s   764MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
-```
-
-**bench_moe.py --cuda-graph** (CUDA Graph replay, eliminates launch overhead):
-```
-    BS     Active  Pipe(us)        BW    Data  tN │ FC1 config                                  │ FC2 config
-  ──── ────────── ───────── ───────── ─────── ─── ┼ ──────────────────────────────────────────── ┼ ──────────────────────────────────────────
-     1    8/256       39.9   0.592T/s    24MB   8 │ t128x8x128 s5/2 persistent u2 splitK=2       │ t128x8x256 s3/2 persistent
-    16  102/256       98.6   3.065T/s   302MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
-   128  251/256      255.6   2.991T/s   764MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
-```
-
-CUDA Graph reduces BS=1 pipeline from 57us to 40us (**-30%**) by eliminating per-kernel CPU launch overhead. No effect on BS≥16 where kernel time dominates.
-
-**nsys_analyze.sh** (per-kernel):
+**nsys per-kernel** (pure GPU time with L2 flush, most accurate):
 ```
     BS     Active  Pipe(us) │  FC1(us)    FC1 BW  FC1% │  FC2(us)    FC2 BW  FC2%
   ──── ────────── ───────── ┼ ──────── ───────── ───── ┼ ──────── ───────── ─────
-     1    8/256       74.7 │     13.6   1.160T/s   14% │     13.4   0.591T/s    7%
-    16  102/256      107.2 │     50.5   3.978T/s   50% │     32.6   3.109T/s   39%
-   128  251/256      204.2 │    107.0   4.714T/s   59% │     62.0   4.191T/s   52%
+     1    8/256       76.1 │     13.5   1.160T/s   14% │     13.4   0.590T/s    7%
+    16  102/256      106.9 │     50.7   3.959T/s   49% │     32.6   3.112T/s   39%
+   128  251/256      261.4 │    107.1   4.713T/s   59% │    119.1   2.182T/s   27%
 ```
+
+**CUDA Graph effect on BS=1** (`bench_moe.py --cuda-graph`):
+```
+               default     --cuda-graph    speedup
+    BS=1       57 us       40 us           -30%
+    BS=16      98 us       99 us           (same)
+    BS=128    256 us      256 us           (same)
+```
+
+CUDA Graph eliminates per-kernel CPU launch overhead (~17us for 4 kernels). Significant for BS=1 where launch overhead is 30% of total; negligible for BS≥16 where GPU kernel time dominates.
+
+**How bandwidth is computed:**
+- Kernel time from nsys `cuda_gpu_kern_sum` (real GPU time, no launch overhead)
+- FC1 data = `active × 2I × (H/2 + H/sf_block)` + `expanded × (H + I) × 2`
+- FC2 data = `active × H × (I/2 + I/sf_block)` + `expanded × (I + H) × 2`
+- `active` = experts with ≥1 token, `expanded` = T × top_k
+- BW = total_bytes / kernel_time
 
 ## Correctness
 

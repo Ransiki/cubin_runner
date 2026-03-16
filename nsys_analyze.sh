@@ -87,8 +87,9 @@ for BS in "${BS_LIST[@]}"; do
             $BALANCED $FORCE_FC1 $FORCE_FC2 \
         > "$BENCH_OUTPUT" 2>&1
 
-    ACTIVE=$(grep -oP 'Active: \K[0-9]+' "$BENCH_OUTPUT" || echo "0")
-    PIPELINE_US=$(grep -oP 'Pipeline:\s+\K[0-9.]+(?= us)' "$BENCH_OUTPUT" || echo "0")
+    # Parse from table format: "  128  251/256      255.9 ..."
+    ACTIVE=$(grep -oP '\s+\d+/\d+' "$BENCH_OUTPUT" | head -1 | grep -oP '\d+(?=/)' || echo "0")
+    PIPELINE_US=$(grep -oP '\d+/\d+\s+\K[0-9.]+' "$BENCH_OUTPUT" | head -1 || echo "0")
 
     KERN_CSV="${TMPDIR}/kern_bs${BS}.csv"
     nsys stats -r cuda_gpu_kern_sum -f csv --timeunit nsec "${REPORT}.nsys-rep" \
