@@ -69,13 +69,13 @@ Reports saved to `nsysrep/<model>_<dtype>_tp<N>_<timestamp>/`.
 
 ### Reference Performance (Blackwell 148 SMs, DSv3 TP8 MxFP4, F2FP patched)
 
-**bench_moe.py** (end-to-end):
+**bench_moe.py** (end-to-end, per-BS isolated runs):
 ```
     BS     Active  Pipe(us)        BW    Data  tN │ FC1 config                                  │ FC2 config
   ──── ────────── ───────── ───────── ─────── ─── ┼ ──────────────────────────────────────────── ┼ ──────────────────────────────────────────
      1    8/256       57.0   0.414T/s    24MB   8 │ t128x8x128 s5/2 persistent u2 splitK=2       │ t128x8x256 s3/2 persistent
     16  102/256       98.8   3.058T/s   302MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
-   128  251/256      198.5   3.852T/s   764MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
+   128  251/256      255.8   2.989T/s   764MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
 ```
 
 **bench_moe.py --cuda-graph** (CUDA Graph replay, eliminates launch overhead):
@@ -84,7 +84,7 @@ Reports saved to `nsysrep/<model>_<dtype>_tp<N>_<timestamp>/`.
   ──── ────────── ───────── ───────── ─────── ─── ┼ ──────────────────────────────────────────── ┼ ──────────────────────────────────────────
      1    8/256       39.9   0.592T/s    24MB   8 │ t128x8x128 s5/2 persistent u2 splitK=2       │ t128x8x256 s3/2 persistent
     16  102/256       98.6   3.065T/s   302MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
-   128  251/256      256.4   2.981T/s   764MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
+   128  251/256      255.6   2.991T/s   764MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
 ```
 
 CUDA Graph reduces BS=1 pipeline from 57us to 40us (**-30%**) by eliminating per-kernel CPU launch overhead. No effect on BS≥16 where kernel time dominates.
