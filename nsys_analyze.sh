@@ -54,9 +54,10 @@ case "$DTYPE" in
     nvfp4) SF_BLOCK=16;;
 esac
 
-TMPDIR="/tmp/nsys_moe_$$"
-mkdir -p "$TMPDIR"
-trap 'rm -rf "$TMPDIR"' EXIT
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+OUTDIR="${SCRIPT_DIR}/nsysrep/${MODEL}_${DTYPE}_tp${TP}_${TIMESTAMP}"
+mkdir -p "$OUTDIR"
+TMPDIR="$OUTDIR"
 
 # ── Collect results per BS ──
 IFS=',' read -ra BS_LIST <<< "$TOKENS"
@@ -64,7 +65,7 @@ RESULTS_FILE="${TMPDIR}/results.jsonl"
 > "$RESULTS_FILE"
 
 for BS in "${BS_LIST[@]}"; do
-    REPORT="${TMPDIR}/${DTYPE}_tp${TP}_bs${BS}"
+    REPORT="${TMPDIR}/bs${BS}"
     BENCH_OUTPUT="${TMPDIR}/bench_bs${BS}.log"
 
     >&2 echo "  Profiling BS=${BS} ..."
@@ -141,7 +142,7 @@ for cat, w, act in [("fc1", fc1_w, fc1_act), ("fc2", fc2_w, fc2_act)]:
 print(json.dumps(r))
 PYEOF
 
-    rm -f "${REPORT}.nsys-rep" "${REPORT}.sqlite"
+    rm -f "${REPORT}.sqlite"
 done
 
 # ── Print summary table ──
@@ -207,3 +208,6 @@ for r in results:
           f"FC2: w={f2['w_mb']:.1f}+a={f2['act_mb']:.1f}={f2['total_mb']:.1f}MB")
 print()
 PYEOF
+
+echo "  Reports saved to: ${OUTDIR}/"
+ls -1 "${OUTDIR}"/*.nsys-rep 2>/dev/null | while read f; do echo "    $(basename $f)"; done

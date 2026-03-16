@@ -1,1 +1,1 @@
-../trtllmGen_bmm_export/BatchedGemmInterface.h
+../trtllmGen_bmm_nvfp4_export/BatchedGemmInterface.h

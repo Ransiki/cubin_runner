@@ -1,1 +1,1 @@
-../trtllmGen_bmm_export/BatchedGemmOptions.h
+../trtllmGen_bmm_nvfp4_export/BatchedGemmOptions.h

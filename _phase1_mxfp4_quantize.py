@@ -8,7 +8,10 @@ from tensorrt_llm.quantization.utils.fp4_utils import (
 
 
 def quant_fp4(a):
-    global_sf = (448.0 * 6.0) / a.float().abs().nan_to_num().max()
+    # MxFP4 (MxE2m1) uses gsf=1.0: the E8M0 block scales capture the full
+    # dynamic range.  trtllm-gen's own test confirms this — any other gsf
+    # value is silently ignored during MxE2m1 quantisation.
+    global_sf = torch.tensor(1.0, device=a.device)
     a_fp4, a_sf = torch.ops.trtllm.fp4_quantize(a.cuda(), global_sf.cuda(), 32, True, False)
     return a_fp4, a_sf, global_sf
 
@@ -20,8 +23,9 @@ def main():
     device = "cuda"
 
     torch.manual_seed(seed)
-    fc1_w = torch.randn(E, 2*I, H, device=device, dtype=torch.bfloat16) * 0.02
-    fc2_w = torch.randn(E, H, I, device=device, dtype=torch.bfloat16) * 0.02
+    w_scale = cfg.get("weight_scale", 0.5)
+    fc1_w = torch.randn(E, 2*I, H, device=device, dtype=torch.bfloat16) * w_scale
+    fc2_w = torch.randn(E, H, I, device=device, dtype=torch.bfloat16) * w_scale
     hidden = torch.randn(T, H, device=device, dtype=torch.bfloat16) * 0.5
     logits = torch.randn(T, E, device=device, dtype=torch.bfloat16)
 
@@ -68,24 +72,27 @@ def main():
     g2s_w = torch.stack(g2s_w).reshape(E, H, I//2)
     g2s_sf = torch.stack(g2s_sf).view(torch.uint8).reshape(E, H, I//32)
 
-    # Compute output scales (W4A16: hidden_states_scale_global = 1.0, c_global_sf = 1.0)
-    scale_c_fc1 = 1.0 * (1.0 / g1_gsf) * 1.0
-    scale_gate_fc1 = (1.0 / g1_gsf) * 1.0
-    scale_c_fc2 = 1.0 * (1.0 / g2_gsf)
+    # For MxFP4 W4A16: gsf=1.0 so all per-expert scales are 1.0.
+    # The E8M0 block scales already encode the full weight magnitude.
+    scale_c_fc1 = torch.ones(E, device=device, dtype=torch.float32)
+    scale_gate_fc1 = torch.ones(E, device=device, dtype=torch.float32)
+    scale_c_fc2 = torch.ones(E, device=device, dtype=torch.float32)
 
     # Dequantize the FP4 weights back to float for reference computation
     # This is the TRT-LLM approach: compare cubin vs dequant(quant(weights))
     # so quantization error is factored out — only GEMM numerical error remains
-    def dequant_mxfp4(fp4_bytes, sf_bytes, inv_gsf, rows=-1):
+    # mxfp4_dequantize_unswizzled already returns values at original scale
+    # (gsf is baked into the block scale factors by fp4_quantize).
+    # Do NOT multiply by inv_gsf — that was a double-scaling bug.
+    def dequant_mxfp4(fp4_bytes, sf_bytes, rows=-1):
         fp4_2d = fp4_bytes.cpu().reshape(rows, -1) if rows > 0 else fp4_bytes.cpu()
         sf_2d = sf_bytes.cpu().reshape(fp4_2d.shape[0], -1)
-        return torch.ops.trtllm.mxfp4_dequantize_unswizzled(
-            fp4_2d, sf_2d, 32).float() * inv_gsf
+        return torch.ops.trtllm.mxfp4_dequantize_unswizzled(fp4_2d, sf_2d, 32).float()
 
     fc1_deq_list, fc2_deq_list = [], []
     for i in range(E):
-        fc1_deq_list.append(dequant_mxfp4(g1_fp4_all[i], g1_sf_all[i], 1.0 / g1_gsf[i].item(), rows=I2).cuda())
-        fc2_deq_list.append(dequant_mxfp4(g2_fp4_all[i], g2_sf_all[i], 1.0 / g2_gsf[i].item(), rows=H).cuda())
+        fc1_deq_list.append(dequant_mxfp4(g1_fp4_all[i], g1_sf_all[i], rows=I2).cuda())
+        fc2_deq_list.append(dequant_mxfp4(g2_fp4_all[i], g2_sf_all[i], rows=H).cuda())
 
     fc1_deq = torch.stack(fc1_deq_list).reshape(E, 2*I, H)
     fc2_deq = torch.stack(fc2_deq_list).reshape(E, H, I)

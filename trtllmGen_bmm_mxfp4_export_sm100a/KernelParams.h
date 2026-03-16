@@ -1,1 +1,1 @@
-../trtllmGen_bmm_export/KernelParams.h
+../trtllmGen_bmm_nvfp4_export/KernelParams.h

@@ -68,6 +68,7 @@ static bool g_device_init = false;
 static cudaDeviceProp g_prop;
 static void* g_workspace = nullptr;
 static size_t g_workspace_size = 0;
+static int g_verbose = 0;
 
 /* L2 cache flush buffer (64MB, larger than B200's 50MB L2) */
 static void* g_l2_flush_buf = nullptr;
@@ -89,7 +90,8 @@ static int ensure_workspace(size_t needed) {
         auto err = cudaMalloc(&g_workspace, needed);
         if (err != cudaSuccess) { g_workspace = nullptr; g_workspace_size = 0; return -1; }
         g_workspace_size = needed;
-        fprintf(stderr, "[workspace] Allocated %zu bytes (%.1f MB)\n", needed, needed/1e6);
+        if (g_verbose)
+            fprintf(stderr, "[workspace] Allocated %zu bytes (%.1f MB)\n", needed, needed/1e6);
     }
     /* Only memset on first allocation; skip on subsequent calls for performance */
     return 0;
@@ -142,8 +144,8 @@ static BatchedGemmData make_gemm_data(
     data.mInputBuffers.mPtrB = input;
     data.mInputBuffers.mPtrSfB = nullptr;
     data.mInputBuffers.mPtrScaleC = scale_c;
-    data.mInputBuffers.mPtrScaleAct = scale_c;
     data.mInputBuffers.mPtrScaleGate = is_fc1 ? scale_gate : nullptr;
+    data.mInputBuffers.mPtrScaleAct = is_fc1 ? scale_gate : nullptr;
     data.mInputBuffers.mPtrBias = bias;
     data.mInputBuffers.mPtrGatedActAlpha = alpha;
     data.mInputBuffers.mPtrGatedActBeta = beta;
@@ -161,6 +163,9 @@ static BatchedGemmData make_gemm_data(
 }
 
 extern "C" {
+
+void moe_cubin_set_verbose(int level) { g_verbose = level; }
+int  moe_cubin_get_verbose() { return g_verbose; }
 
 int moe_cubin_get_sm_count() {
     if (ensure_device() != 0) return -1;
@@ -264,13 +269,15 @@ int moe_cubin_autotune(
         return -1;
     }
     if (n_valid == 1) {
-        fprintf(stderr, "[autotune] Only one valid %s cubin: config[%d]\n",
-                is_fc1 ? "FC1" : "FC2", valid_indices[0]);
+        if (g_verbose)
+            fprintf(stderr, "[autotune] Only one valid %s cubin: config[%d]\n",
+                    is_fc1 ? "FC1" : "FC2", valid_indices[0]);
         return valid_indices[0];
     }
 
-    fprintf(stderr, "[autotune] Benchmarking %d %s cubins (warmup=%d, bench=%d)...\n",
-            n_valid, is_fc1 ? "FC1" : "FC2", n_warmup, n_bench);
+    if (g_verbose)
+        fprintf(stderr, "[autotune] Benchmarking %d %s cubins (warmup=%d, bench=%d)...\n",
+                n_valid, is_fc1 ? "FC1" : "FC2", n_warmup, n_bench);
 
     /* Use persistent interface to cache loaded CUmodules across configs */
     static BatchedGemmInterface s_tune_iface;
@@ -335,11 +342,12 @@ int moe_cubin_autotune(
 
         const char* sched = (opt.mTileScheduler == ::batchedGemm::gemm::TileScheduler::Persistent) ? "persistent" : "static";
 
-        fprintf(stderr, "[autotune]   config[%2d] %7.1f us  tile=%dx%dx%d stages=%d/%d %s%s%s\n",
-                ci, us, opt.mTileM, opt.mTileN, opt.mTileK,
-                opt.mNumStages, opt.mNumStagesMma, sched,
-                opt.mUseUnrollLoop2xForMma ? " u2" : "",
-                (us < best_us) ? "  <-- new best" : "");
+        if (g_verbose)
+            fprintf(stderr, "[autotune]   config[%2d] %7.1f us  tile=%dx%dx%d stages=%d/%d %s%s%s\n",
+                    ci, us, opt.mTileM, opt.mTileN, opt.mTileK,
+                    opt.mNumStages, opt.mNumStagesMma, sched,
+                    opt.mUseUnrollLoop2xForMma ? " u2" : "",
+                    (us < best_us) ? "  <-- new best" : "");
 
         if (us < best_us) {
             best_us = us;
@@ -350,8 +358,9 @@ int moe_cubin_autotune(
     cudaEventDestroy(ev_start);
     cudaEventDestroy(ev_stop);
 
-    fprintf(stderr, "[autotune] Best %s: config[%d] = %.1f us\n",
-            is_fc1 ? "FC1" : "FC2", best_idx, best_us);
+    if (g_verbose)
+        fprintf(stderr, "[autotune] Best %s: config[%d] = %.1f us\n",
+                is_fc1 ? "FC1" : "FC2", best_idx, best_us);
     return best_idx;
 }
 
@@ -418,12 +427,14 @@ int moe_cubin_run(
 
     iface.runInitBeforeWorldSync(configs[config_index], data, (void*)stream);
 
-    static int call_count = 0;
-    call_count++;
-    if (call_count <= 5) {
-        fprintf(stderr, "[run] call %d: config_index=%d, cache size=%zu, func=%s\n",
-                call_count, config_index, g_module_cache.size(),
-                configs[config_index].mFunctionName);
+    if (g_verbose >= 2) {
+        static int call_count = 0;
+        call_count++;
+        if (call_count <= 5) {
+            fprintf(stderr, "[run] call %d: config_index=%d, cache size=%zu, func=%s\n",
+                    call_count, config_index, g_module_cache.size(),
+                    configs[config_index].mFunctionName);
+        }
     }
 
     return (int)iface.run(configs[config_index], g_workspace, data, (void*)stream,
@@ -508,19 +519,23 @@ int moe_cubin_fused_run(
     }
 
     /*
-     * ── Step 2: Build dummy batched_n (NO sync needed) ──
+     * ── Step 2: Build batched_n for max possible tokens per expert ──
      *
      * The cubin with earlyExit+dynamic batch uses ctaIdxXyToBatchIdx/MnLimit
-     * at runtime, NOT mBatchedN. mBatchedN is only consumed by
-     * getOptionsFromConfigAndData for validation and workspace sizing.
-     * Since autotune already validated the config and workspace is
-     * pre-allocated to max size, we can pass tile_n for all experts.
+     * at runtime, NOT mBatchedN. However, mBatchedN determines
+     * mMaxNumCtasInTokenDim which sets the GRID LAUNCH SIZE.
+     * We must set batched_n high enough to cover the worst-case CTA count.
+     *
+     * With T tokens, K top_k, E experts, tile_n: any expert could get up to
+     * min(T*K, ceil(T*K/E)*2) tokens. Use T*K (all tokens to one expert)
+     * as the safe upper bound per expert.
      */
     static std::vector<int32_t> h_batched_n;
     if ((int)h_batched_n.size() != num_experts) {
         h_batched_n.resize(num_experts);
     }
-    for (int e = 0; e < num_experts; e++) h_batched_n[e] = tile_n;
+    int max_tokens_per_expert = num_tokens;  /* T*K, safe upper bound */
+    for (int e = 0; e < num_experts; e++) h_batched_n[e] = max_tokens_per_expert;
 
     /* ── Step 4: FC1 cubin (async) ── */
     if (!g_run_iface_init) { g_run_iface = BatchedGemmInterface(); g_run_iface_init = true; }

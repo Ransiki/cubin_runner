@@ -32,6 +32,8 @@ parser.add_argument("--force-fc2", type=int, default=-1, metavar="IDX",
                     help="force a specific cubin config index for FC2 (bypass autotune)")
 parser.add_argument("--list-configs", action="store_true",
                     help="list all valid cubin configs for the first token count, then exit")
+parser.add_argument("--verbose", "-v", action="store_true",
+                    help="show autotune logs (default: suppressed)")
 args = parser.parse_args()
 
 MODELS = {
@@ -55,6 +57,7 @@ else:
     sf_block, sf_dtype = 32, torch.uint8
 
 lib = _load_lib()
+lib.moe_cubin_set_verbose(1 if args.verbose else 0)
 device = "cuda"
 
 
@@ -165,10 +168,19 @@ def bench_one(T):
     fc1_info = get_kernel_info_ext(fc1_idx) if fc1_idx >= 0 else "N/A"
     fc2_info = get_kernel_info_ext(fc2_idx) if fc2_idx >= 0 else "N/A"
 
+    # Data volume for bandwidth estimation (same formula as nsys_analyze.sh)
+    fc1_w_bytes = active * (2*I) * (H // 2) + active * (2*I) * (H // sf_block)
+    fc1_act_bytes = expanded * H * 2 + expanded * I * 2
+    fc2_w_bytes = active * H * (I // 2) + active * H * (I // sf_block)
+    fc2_act_bytes = expanded * I * 2 + expanded * H * 2
+    total_bytes = fc1_w_bytes + fc1_act_bytes + fc2_w_bytes + fc2_act_bytes
+    pipe_bw = (total_bytes / 1e12) / (pipeline_us / 1e6) if pipeline_us > 0 else 0
+
     return {
         "T": T, "pipeline_us": pipeline_us, "active": active, "tile_n": tile_n,
         "fc1_info": fc1_info, "fc1_idx": fc1_idx,
         "fc2_info": fc2_info, "fc2_idx": fc2_idx,
+        "total_mb": total_bytes / 1e6, "pipe_bw": pipe_bw,
     }
 
 
@@ -204,14 +216,23 @@ def main():
     print(f"  Iters:   {args.iters} (warmup={args.warmup})")
     print()
 
+    results = []
     for T in token_list:
         r = bench_one(T)
-        print(f"  BS={r['T']:>4}:")
-        print(f"    Pipeline:  {r['pipeline_us']:.1f} us  ({r['pipeline_us']/1000:.3f} ms)")
-        print(f"    FC1[{r['fc1_idx']:>3}]:  {r['fc1_info']}")
-        print(f"    FC2[{r['fc2_idx']:>3}]:  {r['fc2_info']}")
-        print(f"    Active: {r['active']}/{E}  tile_n={r['tile_n']}")
-        print()
+        results.append(r)
+
+    # Print results table
+    print(f"  {'BS':>4} {'Active':>10} {'Pipe(us)':>9} {'BW':>9} {'Data':>7} {'tN':>3}"
+          f" │ {'FC1 config':<42} │ {'FC2 config':<42}")
+    print(f"  {'────':>4} {'──────────':>10} {'─────────':>9} {'─────────':>9} {'───────':>7} {'───':>3}"
+          f" ┼ {'──────────────────────────────────────────':<42} ┼ {'──────────────────────────────────────────':<42}")
+    for r in results:
+        fc1_tag = f"[{r['fc1_idx']:>3}] {r['fc1_info']}" if r['fc1_idx'] >= 0 else "N/A"
+        fc2_tag = f"[{r['fc2_idx']:>3}] {r['fc2_info']}" if r['fc2_idx'] >= 0 else "N/A"
+        print(f"  {r['T']:>4} {r['active']:>4}/{E:<4} {r['pipeline_us']:>9.1f}"
+              f" {r['pipe_bw']:>7.3f}T/s {r['total_mb']:>5.0f}MB {r['tile_n']:>3}"
+              f" │ {fc1_tag:<42} │ {fc2_tag:<42}")
+    print()
 
 
 if __name__ == "__main__":

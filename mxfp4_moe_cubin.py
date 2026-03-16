@@ -1,9 +1,15 @@
 """MxFP4 × BF16 MOE using trtllm-gen BatchedGemm exported cubins."""
-import ctypes, math, torch
+import ctypes, math, sys, torch
 from typing import Optional, List
 from pathlib import Path
 
 _lib = None
+
+def _is_verbose():
+    """Check C-level verbose flag."""
+    if _lib is not None and hasattr(_lib, 'moe_cubin_get_verbose'):
+        return _lib.moe_cubin_get_verbose() > 0
+    return True  # default to verbose if lib not loaded
 
 
 def _get_mxfp4_lib_name():
@@ -69,7 +75,7 @@ def _get_best_config(lib, is_fc1, tile_n, M, K, num_experts, num_tokens, meta, d
         return _autotune_cache[cache_key]
     ap = meta["max_padded"]
     w = torch.zeros(num_experts, M, K // 2, device=device, dtype=torch.uint8)
-    w_sf = torch.ones(num_experts, M, K // 16, device=device, dtype=torch.float8_e4m3fn)
+    w_sf = torch.ones(num_experts, M, K // 32, device=device, dtype=torch.uint8)
     inp = torch.zeros(num_tokens if is_fc1 else ap, K, device=device, dtype=torch.bfloat16)
     out = torch.zeros(ap, M // 2 if is_fc1 else M, device=device, dtype=torch.bfloat16)
     sc = torch.ones(num_experts, device=device, dtype=torch.float32)
@@ -190,7 +196,7 @@ def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_
                 n_fc2 = lib.moe_cubin_find_valid_configs(
                     False, tn, fc2_M, tn, fc2_K, num_experts, expanded, (ctypes.c_int * 1)(), 1)
                 if n_fc1 == 0 or n_fc2 == 0:
-                    print(f"[multi-tile] tile_n={tn}: skip (FC1={n_fc1}, FC2={n_fc2})", file=sys.stderr)
+                    if _is_verbose(): print(f"[multi-tile] tile_n={tn}: skip (FC1={n_fc1}, FC2={n_fc2})", file=sys.stderr)
                     continue
                 meta = compute_routing_cuda(routing_logits, num_experts, top_k, tn, routing_method_type)
                 _get_best_config(lib, True, tn, fc1_M, fc1_K, num_experts, expanded, meta, device)
@@ -236,12 +242,12 @@ def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_
                 lib.moe_cubin_fused_run(*fargs)
             e.record(); torch.cuda.synchronize()
             total_us = s.elapsed_time(e) / 10 * 1000
-            print(f"[multi-tile] tile_n={tn}: {total_us:.1f}us (FC1=config[{fc1_c}], FC2=config[{fc2_c}])",
+            if _is_verbose(): print(f"[multi-tile] tile_n={tn}: {total_us:.1f}us (FC1=config[{fc1_c}], FC2=config[{fc2_c}])",
                   file=sys.stderr)
             if total_us < best_total_us:
                 best_total_us = total_us; best_tile_n = tn
         _best_tile_n_cache[shape_key] = best_tile_n
-        print(f"[multi-tile] BEST tile_n={best_tile_n} ({best_total_us:.1f}us)", file=sys.stderr)
+        if _is_verbose(): print(f"[multi-tile] BEST tile_n={best_tile_n} ({best_total_us:.1f}us)", file=sys.stderr)
 
     tile_n = _best_tile_n_cache[shape_key]
     ck1 = (True, tile_n, fc1_M, fc1_K, num_experts, expanded)

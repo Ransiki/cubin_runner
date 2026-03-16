@@ -57,7 +57,7 @@ endfunction()
 
 # NvFP4 (E2m1 × BF16)
 add_moe_cubin_target(moe_cubin_lib
-    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_export" 0)
+    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_nvfp4_export" 0)
 
 # MxFP4 (MxE2m1 × BF16, patchF2fp) — one .so per GPU arch variant
 add_moe_cubin_target(moe_mxfp4_cubin_lib_sm100a
