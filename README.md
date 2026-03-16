@@ -58,22 +58,36 @@ python3 bench_moe.py --dtype nvfp4 --tp 1                  # NvFP4 TP1
 python3 bench_moe.py --tokens 128                           # single BS
 python3 bench_moe.py -v                                     # show autotune logs
 
+# CUDA Graph: eliminate kernel launch overhead (significant for BS=1)
+python3 bench_moe.py --cuda-graph --tokens 1,16,128
+
 # Per-kernel bandwidth via nsys
 ./nsys_analyze.sh --dtype mxfp4 --tp 8 --tokens 1,16,128
 ```
 
 Reports saved to `nsysrep/<model>_<dtype>_tp<N>_<timestamp>/`.
 
-### Reference Performance (B200 148 SMs, DSv3 TP8 MxFP4, F2FP patched)
+### Reference Performance (Blackwell 148 SMs, DSv3 TP8 MxFP4, F2FP patched)
 
 **bench_moe.py** (end-to-end):
 ```
     BS     Active  Pipe(us)        BW    Data  tN │ FC1 config                                  │ FC2 config
   ──── ────────── ───────── ───────── ─────── ─── ┼ ──────────────────────────────────────────── ┼ ──────────────────────────────────────────
-     1    8/256       57.7   0.410T/s    24MB   8 │ t128x8x128 s5/2 persistent u2 splitK=2       │ t128x8x256 s3/2 persistent
-    16  102/256      100.4   3.009T/s   302MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
+     1    8/256       57.0   0.414T/s    24MB   8 │ t128x8x128 s5/2 persistent u2 splitK=2       │ t128x8x256 s3/2 persistent
+    16  102/256       98.8   3.058T/s   302MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
    128  251/256      198.5   3.852T/s   764MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
 ```
+
+**bench_moe.py --cuda-graph** (CUDA Graph replay, eliminates launch overhead):
+```
+    BS     Active  Pipe(us)        BW    Data  tN │ FC1 config                                  │ FC2 config
+  ──── ────────── ───────── ───────── ─────── ─── ┼ ──────────────────────────────────────────── ┼ ──────────────────────────────────────────
+     1    8/256       39.9   0.592T/s    24MB   8 │ t128x8x128 s5/2 persistent u2 splitK=2       │ t128x8x256 s3/2 persistent
+    16  102/256       98.6   3.065T/s   302MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
+   128  251/256      256.4   2.981T/s   764MB  16 │ t128x16x256 s3/2 mma256 persistent u2 c2     │ t128x16x256 s3/2 persistent
+```
+
+CUDA Graph reduces BS=1 pipeline from 57us to 40us (**-30%**) by eliminating per-kernel CPU launch overhead. No effect on BS≥16 where kernel time dominates.
 
 **nsys_analyze.sh** (per-kernel):
 ```
