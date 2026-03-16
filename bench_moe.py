@@ -34,6 +34,8 @@ parser.add_argument("--list-configs", action="store_true",
                     help="list all valid cubin configs for the first token count, then exit")
 parser.add_argument("--verbose", "-v", action="store_true",
                     help="show autotune logs (default: suppressed)")
+parser.add_argument("--cuda-graph", action="store_true",
+                    help="use CUDA Graph capture+replay to eliminate launch overhead")
 args = parser.parse_args()
 
 MODELS = {
@@ -130,11 +132,26 @@ def bench_one(T):
     # End-to-end pipeline timing
     if args.nsys:
         ctypes.CDLL('libcudart.so').cudaProfilerStart()
-    s = torch.cuda.Event(enable_timing=True); e = torch.cuda.Event(enable_timing=True)
-    s.record()
-    for _ in range(args.iters):
-        moe_fn(**kw)
-    e.record(); torch.cuda.synchronize()
+
+    if args.cuda_graph:
+        # CUDA Graph: capture once, replay many times
+        # All buffers already allocated by warmup; pointers are stable
+        graph = torch.cuda.CUDAGraph()
+        with torch.cuda.graph(graph):
+            moe_fn(**kw)
+        torch.cuda.synchronize()
+        s = torch.cuda.Event(enable_timing=True); e = torch.cuda.Event(enable_timing=True)
+        s.record()
+        for _ in range(args.iters):
+            graph.replay()
+        e.record(); torch.cuda.synchronize()
+    else:
+        s = torch.cuda.Event(enable_timing=True); e = torch.cuda.Event(enable_timing=True)
+        s.record()
+        for _ in range(args.iters):
+            moe_fn(**kw)
+        e.record(); torch.cuda.synchronize()
+
     if args.nsys:
         ctypes.CDLL('libcudart.so').cudaProfilerStop()
     pipeline_us = s.elapsed_time(e) / args.iters * 1000  # microseconds
