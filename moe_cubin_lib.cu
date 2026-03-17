@@ -482,7 +482,7 @@ int moe_cubin_fused_run(
     int* expanded_to_perm,       /* [T*K] */
     int* perm_to_expanded,       /* [max_padded] */
     int* perm_to_token,          /* [max_padded] */
-    void* expert_weights,        /* [T*K] float32 */
+    void* expert_weights,        /* [T*K] bf16 */
     int* cta_to_batch,           /* [max_ctas] */
     int* cta_to_mn,              /* [max_ctas] */
     int* num_non_exit,           /* [1] */
@@ -593,7 +593,7 @@ int moe_cubin_fused_run(
 int moe_cubin_finalize(
     void* fc2_output,              /* [max_padded, H] bf16 — input from FC2 */
     void* output,                  /* [T, H] bf16 — final output (pre-allocated) */
-    void* expert_weights,          /* [T*K] float32 — routing weights */
+    void* expert_weights,          /* [T*K] bf16 — routing weights */
     int* expanded_idx_to_permuted, /* [T*K] int32 */
     int* total_num_padded_tokens,  /* [1] int32 (GPU) */
     int num_tokens,
@@ -604,7 +604,7 @@ int moe_cubin_finalize(
 {
     ::moe::dev::finalize::Data fdata;
     fdata.mDtypeElt = tg::Dtype::Bfloat16;
-    fdata.mDtypeExpW = tg::Dtype::Fp32;
+    fdata.mDtypeExpW = tg::Dtype::Bfloat16;
     fdata.mUsePdl = false;
     fdata.mUseDeepSeekFp8 = false;
     fdata.inPtr = fc2_output;

@@ -50,7 +50,7 @@ function(add_moe_cubin_target TARGET_NAME EXPORT_DIR DTYPE_MODE_VAL)
     )
     target_link_libraries(${TARGET_NAME} PRIVATE CUDA::cudart CUDA::cuda_driver)
     set_target_properties(${TARGET_NAME} PROPERTIES
-        CUDA_ARCHITECTURES "100"
+        CUDA_ARCHITECTURES "100a"
         POSITION_INDEPENDENT_CODE ON
     )
 endfunction()

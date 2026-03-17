@@ -174,15 +174,15 @@ def compute_routing_cuda(
     expanded_to_perm  = torch.full((expanded,), -1, dtype=torch.int32, device=device)
     perm_to_expanded  = torch.full((max_padded,), -1, dtype=torch.int32, device=device)
     perm_to_token     = torch.full((max_padded,), -1, dtype=torch.int32, device=device)
-    expert_weights    = torch.zeros(expanded, dtype=torch.float32, device=device)
+    expert_weights    = torch.zeros(expanded, dtype=torch.bfloat16, device=device)
     cta_to_batch      = torch.zeros(max_ctas, dtype=torch.int32, device=device)
     cta_to_mn         = torch.zeros(max_ctas, dtype=torch.int32, device=device)
     num_non_exit      = torch.zeros(1, dtype=torch.int32, device=device)
 
-    logits_f32 = routing_logits.float().contiguous()
+    logits_bf16 = routing_logits.bfloat16().contiguous()
     stream = torch.cuda.current_stream(device).cuda_stream
     rc = lib.routing_renormalize_run(
-        _ptr(logits_f32), T, num_experts, top_k, tile_n,
+        _ptr(logits_bf16), T, num_experts, top_k, tile_n,
         0, num_experts, routing_method,
         _ptr(expert_indexes), _ptr(expert_count_hist), _ptr(permuted_idx_size),
         _ptr(expanded_to_perm), _ptr(perm_to_expanded), _ptr(perm_to_token),
@@ -300,7 +300,7 @@ def nvfp4_moe_cubin(
             "e2p": torch.empty(expanded, dtype=torch.int32, device=device),
             "p2e": torch.empty(max_padded, dtype=torch.int32, device=device),
             "p2t": torch.empty(max_padded, dtype=torch.int32, device=device),
-            "ew": torch.empty(expanded, dtype=torch.float32, device=device),
+            "ew": torch.empty(expanded, dtype=torch.bfloat16, device=device),
             "cb": torch.empty(max_ctas, dtype=torch.int32, device=device),
             "cm": torch.empty(max_ctas, dtype=torch.int32, device=device),
             "ne": torch.empty(1, dtype=torch.int32, device=device),
@@ -325,11 +325,11 @@ def nvfp4_moe_cubin(
     b = nvfp4_moe_cubin._bufs
 
     # Fused call: routing → FC1 → FC2 (one ctypes call, minimal CPU sync)
-    logits_f32 = routing_logits.float().contiguous()
+    logits_bf16 = routing_logits.bfloat16().contiguous()
     torch.cuda.nvtx.range_push("fused_routing_fc1_fc2")
     rc = lib.moe_cubin_fused_run(
         fc1_config, fc2_config,
-        _ptr(logits_f32),
+        _ptr(logits_bf16),
         num_tokens, num_experts, top_k, tile_n, routing_method_type,
         _ptr(gemm1_weights), _ptr(gemm1_weights_scale),
         _ptr(gemm2_weights), _ptr(gemm2_weights_scale),
