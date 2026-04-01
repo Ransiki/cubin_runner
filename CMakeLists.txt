@@ -3,10 +3,10 @@
 # Build:
 #   mkdir -p build && cd build && cmake .. && make -j$(nproc)
 #
-# Builds three libraries:
-#   libmoe_cubin_lib.so              — NvFP4 (E2m1) cubins (all Blackwell)
-#   libmoe_mxfp4_cubin_lib_sm100a.so — MxFP4 cubins for SM100/SM100a (GB200)
-#   libmoe_mxfp4_cubin_lib_sm103a.so — MxFP4 cubins for SM103/SM103a
+# Libraries:
+#   libmoe_mxfp4_cubin_lib_sm100a.so        — MxFP4 fused (172 cubins: route + SwiGLU)
+#   libmoe_mxfp4_nofuse_cubin_lib_sm100a.so — MxFP4 nofuse (106 cubins: route, no SwiGLU)
+#   libmoe_mxfp4_cubin_lib_sm103a.so        — MxFP4 fused for SM103
 
 cmake_minimum_required(VERSION 3.18)
 project(trtllmgen_runner LANGUAGES CXX CUDA)
@@ -55,13 +55,15 @@ function(add_moe_cubin_target TARGET_NAME EXPORT_DIR DTYPE_MODE_VAL)
     )
 endfunction()
 
-# NvFP4 (E2m1 × BF16)
-add_moe_cubin_target(moe_cubin_lib
-    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_nvfp4_export" 0)
-
-# MxFP4 (MxE2m1 × BF16, patchF2fp) — one .so per GPU arch variant
+# MxFP4 fused (route + SwiGLU) — 172 cubins
 add_moe_cubin_target(moe_mxfp4_cubin_lib_sm100a
     "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_mxfp4_export_sm100a" 1)
 
+# MxFP4 nofuse (route, NO SwiGLU) — 106 cubins
+add_moe_cubin_target(moe_mxfp4_nofuse_cubin_lib_sm100a
+    "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_mxfp4_nofuse_export_sm100a" 1)
+target_compile_definitions(moe_mxfp4_nofuse_cubin_lib_sm100a PRIVATE NOFUSE_MODE)
+
+# MxFP4 fused for SM103
 add_moe_cubin_target(moe_mxfp4_cubin_lib_sm103a
     "${CMAKE_CURRENT_SOURCE_DIR}/trtllmGen_bmm_mxfp4_export_sm103a" 1)

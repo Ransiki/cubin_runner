@@ -22,8 +22,8 @@ namespace routingRenormalize {
 
 static constexpr int NumThreads = 1024;
 static constexpr int NumWarps = NumThreads / WarpSize;
-static constexpr int MaxNumTopExperts = 10;
-static constexpr int NumExpertsLimit = 512;
+static constexpr int MaxNumTopExperts = 16;
+static constexpr int NumExpertsLimit = 1024;
 static constexpr int MaxNumTokensSingleCluster = NumBlocksPerCluster * NumThreads;
 static constexpr int MaxNumTokensSingleClusterScores = NumBlocksPerCluster * NumWarps;
 static constexpr int BlockKernelMaxNumTokens = 4;

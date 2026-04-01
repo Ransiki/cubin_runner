@@ -32,7 +32,7 @@ namespace cg = cooperative_groups;
 
 static constexpr int WarpSize = 32;
 static constexpr int MaxNumExpertsUnit = 128;
-static constexpr int MaxNumTopK = 10;
+static constexpr int MaxNumTopK = 16;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -202,7 +202,7 @@ __forceinline__ __device__ void reduceTopK(cg::thread_block_tile<WarpSize> const
   static_assert(K > 0, "Top K must have K > 0");
   static_assert(K < WarpSize, "Top K must have K < WarpSize");
   static_assert(N > 0, "Top K must have N > 0");
-  static_assert(N <= 16, "Only support candidates number less than or equal to 16*32=512");
+  static_assert(N <= 32, "Only support candidates number less than or equal to 32*32=1024");
   using RedType = TopKRedType<Type>;
 
   if constexpr (N <= 4) {
@@ -230,14 +230,17 @@ __forceinline__ __device__ void reduceTopK(cg::thread_block_tile<WarpSize> const
         inIdx[i] = idx[start + i];
       }
       reduceTopKFunc<K, Type, 4>(warp, topKValue, topKIdx, inValue, inIdx, minValue, actualK);
-      int inOffset = laneIdx % K;
-      if (laneIdx >= loop * K && laneIdx < (loop + 1) * K) {
-        topKBufferValue[0] = topKValue[inOffset];
-        topKBufferIdx[0] = topKIdx[inOffset];
-      }
-      if (loop == numLoops - 1 && (laneIdx < (numLoops * K - WarpSize))) {
-        topKBufferValue[1] = topKValue[inOffset];
-        topKBufferIdx[1] = topKIdx[inOffset];
+      // Pack the K winners from each 128-expert chunk into a flattened
+      // [numLoops * K] candidate list distributed across (buffer, lane) pairs.
+      // The previous logic only filled the first 1-2 buffers, which works for
+      // K<=8 but drops candidates when K=16 and numLoops*K > 64.
+      for (int buf = 0; buf < numResults; ++buf) {
+        int const globalSlot = buf * WarpSize + laneIdx;
+        if (globalSlot >= loop * K && globalSlot < (loop + 1) * K) {
+          int const inOffset = globalSlot - loop * K;
+          topKBufferValue[buf] = topKValue[inOffset];
+          topKBufferIdx[buf] = topKIdx[inOffset];
+        }
       }
     }
 

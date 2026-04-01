@@ -4,29 +4,26 @@ from typing import Optional, List
 from pathlib import Path
 
 _lib = None
+_nofuse_lib = None
 
 def _is_verbose():
     """Check C-level verbose flag."""
     if _lib is not None and hasattr(_lib, 'moe_cubin_get_verbose'):
         return _lib.moe_cubin_get_verbose() > 0
-    return True  # default to verbose if lib not loaded
+    return True
 
 
-def _get_mxfp4_lib_name():
-    """Select the correct MxFP4 .so based on GPU compute capability."""
+def _get_sm_suffix():
     cc = torch.cuda.get_device_capability()
     sm = cc[0] * 10 + cc[1]
-    if sm >= 103:
-        return "libmoe_mxfp4_cubin_lib_sm103a.so"
-    else:
-        return "libmoe_mxfp4_cubin_lib_sm100a.so"
+    return "sm103a" if sm >= 103 else "sm100a"
 
 
 def _load_lib():
     global _lib
     if _lib is not None:
         return _lib
-    lib_name = _get_mxfp4_lib_name()
+    lib_name = f"libmoe_mxfp4_cubin_lib_{_get_sm_suffix()}.so"
     for d in [Path(__file__).parent, Path(__file__).parent / "build"]:
         p = d / lib_name
         if p.exists():
@@ -35,6 +32,21 @@ def _load_lib():
             return _lib
     raise RuntimeError(f"{lib_name} not found. Build with cmake. "
                        f"GPU compute capability: {torch.cuda.get_device_capability()}")
+
+
+def _load_nofuse_lib():
+    """Load the nofuse .so (routeAct=true, fusedAct=false cubins)."""
+    global _nofuse_lib
+    if _nofuse_lib is not None:
+        return _nofuse_lib
+    lib_name = f"libmoe_mxfp4_nofuse_cubin_lib_{_get_sm_suffix()}.so"
+    for d in [Path(__file__).parent, Path(__file__).parent / "build"]:
+        p = d / lib_name
+        if p.exists():
+            _nofuse_lib = ctypes.CDLL(str(p))
+            _setup_signatures(_nofuse_lib)
+            return _nofuse_lib
+    raise RuntimeError(f"{lib_name} not found. Build nofuse target with cmake.")
 
 def _setup_signatures(lib):
     lib.moe_cubin_autotune.argtypes = [
@@ -69,7 +81,8 @@ def _host_int_array(t):
 
 _autotune_cache = {}
 
-def _get_best_config(lib, is_fc1, tile_n, M, K, num_experts, num_tokens, meta, device):
+def _get_best_config(lib, is_fc1, tile_n, M, K, num_experts, num_tokens, meta, device,
+                     top_k=None):
     cache_key = (is_fc1, tile_n, M, K, num_experts, num_tokens)
     if cache_key in _autotune_cache:
         return _autotune_cache[cache_key]
@@ -79,7 +92,20 @@ def _get_best_config(lib, is_fc1, tile_n, M, K, num_experts, num_tokens, meta, d
     inp = torch.zeros(num_tokens if is_fc1 else ap, K, device=device, dtype=torch.bfloat16)
     out = torch.zeros(ap, M // 2 if is_fc1 else M, device=device, dtype=torch.bfloat16)
     sc = torch.ones(num_experts, device=device, dtype=torch.float32)
-    bn = _host_int_array(meta["batched_n"])
+
+    # Use worst-case batched_n matching fused_run, so autotune evaluates
+    # the same cubin variant that fused_run will actually launch.
+    if top_k is not None and top_k > 0:
+        T_local = num_tokens // top_k
+        max_ctas = lib.routing_get_max_ctas(T_local, top_k, num_experts, tile_n)
+        cpe = (max_ctas + num_experts - 1) // num_experts
+        bn_val = tile_n
+        while bn_val < cpe * tile_n:
+            bn_val *= 2
+        bn = (ctypes.c_int * num_experts)(*([bn_val] * num_experts))
+    else:
+        bn = _host_int_array(meta["batched_n"])
+
     stream = torch.cuda.current_stream(device).cuda_stream
     best = lib.moe_cubin_autotune(
         is_fc1, tile_n, M, K, num_experts, num_tokens,
@@ -199,8 +225,8 @@ def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_
                     if _is_verbose(): print(f"[multi-tile] tile_n={tn}: skip (FC1={n_fc1}, FC2={n_fc2})", file=sys.stderr)
                     continue
                 meta = compute_routing_cuda(routing_logits, num_experts, top_k, tn, routing_method_type)
-                _get_best_config(lib, True, tn, fc1_M, fc1_K, num_experts, expanded, meta, device)
-                _get_best_config(lib, False, tn, fc2_M, fc2_K, num_experts, expanded, meta, device)
+                _get_best_config(lib, True, tn, fc1_M, fc1_K, num_experts, expanded, meta, device, top_k=top_k)
+                _get_best_config(lib, False, tn, fc2_M, fc2_K, num_experts, expanded, meta, device, top_k=top_k)
             if ck1 not in _autotune_cache or ck2 not in _autotune_cache:
                 continue
             fc1_c = _autotune_cache[ck1]; fc2_c = _autotune_cache[ck2]
@@ -252,6 +278,8 @@ def mxfp4_moe_cubin(routing_logits, hidden_states, gemm1_weights, gemm1_weights_
     tile_n = _best_tile_n_cache[shape_key]
     ck1 = (True, tile_n, fc1_M, fc1_K, num_experts, expanded)
     ck2 = (False, tile_n, fc2_M, fc2_K, num_experts, expanded)
+    if ck1 not in _autotune_cache or ck2 not in _autotune_cache:
+        raise RuntimeError(f"No valid cubins for tile_n={tile_n} M={fc1_M}/{fc2_M} K={fc1_K}/{fc2_K} E={num_experts}")
     fc1_cfg = _autotune_cache[ck1]; fc2_cfg = _autotune_cache[ck2]
     max_padded = lib.routing_get_max_padded_tokens(T, top_k, num_experts, tile_n)
     max_ctas = lib.routing_get_max_ctas(T, top_k, num_experts, tile_n)

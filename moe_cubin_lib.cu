@@ -70,9 +70,9 @@ static void* g_workspace = nullptr;
 static size_t g_workspace_size = 0;
 static int g_verbose = 0;
 
-/* L2 cache flush buffer (64MB, larger than B200's 50MB L2) */
+/* L2 cache flush buffer (256MB, must exceed B200's 96MB L2) */
 static void* g_l2_flush_buf = nullptr;
-static const size_t L2_FLUSH_SIZE = 64 * 1024 * 1024;
+static const size_t L2_FLUSH_SIZE = 256 * 1024 * 1024;
 
 static int ensure_device() {
     if (!g_device_init) {
@@ -218,8 +218,19 @@ int moe_cubin_find_valid_configs(
         if (!opt.mTransposeMmaOutput) continue;
         if (!opt.mUseShuffledMatrix) continue;
         bool has_route = !bg::doesRouteImplUseNoRoute(opt.mRouteImpl);
+#ifdef NOFUSE_MODE
+        /* Nofuse .so: cubins have routeAct=true, fusedAct=false.
+         * is_fc1=true selects nofuse FC1 (route + no SwiGLU, output=2I).
+         * is_fc1=false selects nofuse FC2 (no route + no SwiGLU). */
+        if (is_fc1 && (!has_route || opt.mFusedAct)) continue;
+        if (!is_fc1 && (has_route || opt.mFusedAct)) continue;
+#else
+        /* Fused .so: standard MoE cubins.
+         * is_fc1=true selects fused FC1 (route + SwiGLU, output=I).
+         * is_fc1=false selects FC2 (no route, no SwiGLU). */
         if (is_fc1 && (!has_route || !opt.mFusedAct)) continue;
         if (!is_fc1 && (has_route || opt.mFusedAct)) continue;
+#endif
         if (opt.mTileN != tile_n) continue;
         if (opt.mClusterDimX > 1 && opt.mClusterDimZ > 1) continue;
         if (iface.isValidConfig(configs[i], data)) {
@@ -345,7 +356,7 @@ int moe_cubin_autotune(
         if (g_verbose)
             fprintf(stderr, "[autotune]   config[%2d] %7.1f us  tile=%dx%dx%d stages=%d/%d %s%s%s\n",
                     ci, us, opt.mTileM, opt.mTileN, opt.mTileK,
-                    opt.mNumStages, opt.mNumStagesMma, sched,
+                    opt.mNumStagesA, opt.mNumStagesMma, sched,
                     opt.mUseUnrollLoop2xForMma ? " u2" : "",
                     (us < best_us) ? "  <-- new best" : "");
 
@@ -375,14 +386,21 @@ static BatchedGemmInterface g_run_iface;
 static BatchedGemmInterface::ModuleCache g_module_cache;
 static bool g_run_iface_init = false;
 
-int moe_cubin_run(
+/*
+ * Launch a single GEMM cubin. Grid-safe: rounds up batched_n to match
+ * BatchedGemmInterface::run()'s grid calculation (same as moe_run).
+ *
+ * M, K: GEMM dimensions (caller specifies, not derived from is_fc1).
+ * is_fc1: controls route map and scale_gate usage.
+ */
+int single_gemm_run(
     int config_index,
     bool is_fc1,
+    int M, int K,
     void* weights, void* weights_sf,
     void* input, void* output,
     float* scale_c, float* scale_gate,
     float* bias, float* alpha, float* beta, float* clamp_limit,
-    int hidden_size, int intermediate_size,
     int num_experts, int num_tokens,
     int* permuted_idx_to_token_idx,
     int* cta_idx_xy_to_batch_idx,
@@ -390,6 +408,7 @@ int moe_cubin_run(
     int* num_non_exiting_ctas,
     int* total_num_padded_tokens,
     int* batched_n_host, int n_batched_n,
+    int top_k,
     void* cuda_stream)
 {
     if (ensure_device() != 0) return -1;
@@ -404,14 +423,25 @@ int moe_cubin_run(
     size_t num_configs = iface.getNumBatchedGemmConfigs();
 
     if (config_index < 0 || config_index >= (int)num_configs) {
-        fprintf(stderr, "[moe_cubin] Invalid config_index %d (have %zu)\n",
+        fprintf(stderr, "[single_gemm_run] Invalid config_index %d (have %zu)\n",
                 config_index, num_configs);
         return -1;
     }
 
-    int M = is_fc1 ? 2 * intermediate_size : hidden_size;
-    int K = is_fc1 ? hidden_size : intermediate_size;
     int tile_n = configs[config_index].mOptions.mTileN;
+
+    /* Round up batched_n to match moe_run's grid calculation. */
+    extern int routing_get_max_ctas(int, int, int, int);
+    int T_for_routing = (top_k > 0) ? num_tokens / top_k : num_tokens;
+    int K_for_routing = (top_k > 0) ? top_k : 1;
+    int max_ctas = routing_get_max_ctas(T_for_routing, K_for_routing, n_batched_n, tile_n);
+    int cpe = (max_ctas + n_batched_n - 1) / n_batched_n;
+    int bn_val = tile_n;
+    while (bn_val < cpe * tile_n) bn_val *= 2;
+
+    static std::vector<int32_t> h_bn_rounded;
+    if ((int)h_bn_rounded.size() != n_batched_n) h_bn_rounded.resize(n_batched_n);
+    for (int i = 0; i < n_batched_n; i++) h_bn_rounded[i] = bn_val;
 
     auto data = make_gemm_data(is_fc1, M, K, tile_n, num_experts, num_tokens,
                                 weights, weights_sf, input, output,
@@ -420,27 +450,42 @@ int moe_cubin_run(
                                 permuted_idx_to_token_idx,
                                 cta_idx_xy_to_batch_idx, cta_idx_xy_to_mn_limit,
                                 num_non_exiting_ctas, total_num_padded_tokens,
-                                batched_n_host, n_batched_n);
+                                h_bn_rounded.data(), n_batched_n);
 
     size_t ws = iface.getWorkspaceSizeInBytes(configs[config_index], data);
     if (ensure_workspace(ws) != 0) return -1;
 
     iface.runInitBeforeWorldSync(configs[config_index], data, (void*)stream);
 
-    if (g_verbose >= 2) {
-        static int call_count = 0;
-        call_count++;
-        if (call_count <= 5) {
-            fprintf(stderr, "[run] call %d: config_index=%d, cache size=%zu, func=%s\n",
-                    call_count, config_index, g_module_cache.size(),
-                    configs[config_index].mFunctionName);
-        }
-    }
-
     return (int)iface.run(configs[config_index], g_workspace, data, (void*)stream,
                            g_prop.multiProcessorCount,
                            /*usePdl=*/true, /*pinnedHostBuffer=*/nullptr,
                            g_module_cache);
+}
+
+/* Backward-compat wrapper: old moe_cubin_run API */
+int moe_cubin_run(
+    int config_index, bool is_fc1,
+    void* weights, void* weights_sf, void* input, void* output,
+    float* scale_c, float* scale_gate,
+    float* bias, float* alpha, float* beta, float* clamp_limit,
+    int hidden_size, int intermediate_size,
+    int num_experts, int num_tokens,
+    int* permuted_idx_to_token_idx,
+    int* cta_idx_xy_to_batch_idx, int* cta_idx_xy_to_mn_limit,
+    int* num_non_exiting_ctas, int* total_num_padded_tokens,
+    int* batched_n_host, int n_batched_n,
+    void* cuda_stream)
+{
+    int M = is_fc1 ? 2 * intermediate_size : hidden_size;
+    int K = is_fc1 ? hidden_size : intermediate_size;
+    return single_gemm_run(config_index, is_fc1, M, K,
+        weights, weights_sf, input, output, scale_c, scale_gate,
+        bias, alpha, beta, clamp_limit,
+        num_experts, num_tokens,
+        permuted_idx_to_token_idx, cta_idx_xy_to_batch_idx, cta_idx_xy_to_mn_limit,
+        num_non_exiting_ctas, total_num_padded_tokens,
+        batched_n_host, n_batched_n, /*top_k=*/0, cuda_stream);
 }
 
 /*
@@ -452,6 +497,7 @@ int moe_cubin_run(
  * All routing metadata stays on GPU. No host readback. No Python overhead.
  * The only CPU→GPU boundary is this single ctypes call.
  */
+/* Backward compat alias */
 int moe_cubin_fused_run(
     int fc1_config_index,
     int fc2_config_index,
@@ -521,16 +567,13 @@ int moe_cubin_fused_run(
     /*
      * ── Step 2: Build batched_n to cover worst-case CTA count ──
      *
-     * mBatchedN → mMaxNumCtasInTokenDim → GRID LAUNCH SIZE.
-     * Too small → multi-CTA experts lose data.
-     * Too large → wasted empty CTA launches.
-     *
-     * Use routing_get_max_ctas (tight upper bound), convert to per-expert
-     * batched_n, then round up to next power of 2.
+     * mBatchedN affects how BatchedGemmInterface::run() sizes the grid and
+     * selects cubin variants (e.g. u2 unroll). The autotune must use the
+     * same batched_n so it evaluates the same cubin variant that will run here.
      */
     extern int routing_get_max_ctas(int, int, int, int);
     int max_ctas = routing_get_max_ctas(
-        num_tokens / top_k, top_k, num_experts, tile_n);
+        num_tokens, top_k, num_experts, tile_n);
     int ctas_per_expert = (max_ctas + num_experts - 1) / num_experts;
     int batched_n_val = tile_n;
     while (batched_n_val < ctas_per_expert * tile_n) batched_n_val *= 2;
@@ -541,17 +584,21 @@ int moe_cubin_fused_run(
     }
     for (int e = 0; e < num_experts; e++) h_batched_n[e] = batched_n_val;
 
-    /* ── Step 4: FC1 cubin (async) ── */
+    /* ── Step 3: FC1 cubin (async) ── */
     if (!g_run_iface_init) { g_run_iface = BatchedGemmInterface(); g_run_iface_init = true; }
 
     int fc1_M = 2 * intermediate_size;
     int fc1_K = hidden_size;
     {
-        auto data = make_gemm_data(true, fc1_M, fc1_K, tile_n, num_experts, expanded,
+        /* Determine FC1 type from the cubin config itself (supports both fused and nofuse). */
+        auto const& fc1_opt = g_run_iface.getBatchedGemmConfigs()[fc1_config_index].mOptions;
+        bool fc1_is_fused = fc1_opt.mFusedAct;
+        auto data = make_gemm_data(fc1_is_fused, fc1_M, fc1_K, tile_n, num_experts, expanded,
                                     fc1_weights, fc1_weights_sf, hidden_states, fc1_output,
-                                    scale_c_fc1, scale_gate_fc1,
+                                    scale_c_fc1, fc1_is_fused ? scale_gate_fc1 : nullptr,
                                     fc1_bias, fc1_alpha, fc1_beta, fc1_clamp,
-                                    perm_to_token, cta_to_batch, cta_to_mn,
+                                    fc1_is_fused ? perm_to_token : nullptr,
+                                    cta_to_batch, cta_to_mn,
                                     num_non_exit, permuted_idx_size,
                                     h_batched_n.data(), num_experts);
         auto& cfg = g_run_iface.getBatchedGemmConfigs()[fc1_config_index];
@@ -624,6 +671,7 @@ int moe_cubin_finalize(
     return 0;
 }
 
+
 void moe_cubin_get_config_info(int config_index,
     int* out_tileM, int* out_tileN, int* out_tileK,
     int* out_numStages, int* out_numStagesMma, int* out_isPersistent, int* out_isUnroll2x)
@@ -634,7 +682,7 @@ void moe_cubin_get_config_info(int config_index,
     *out_tileM = o.mTileM;
     *out_tileN = o.mTileN;
     *out_tileK = o.mTileK;
-    *out_numStages = o.mNumStages;
+    *out_numStages = o.mNumStagesA;
     *out_numStagesMma = o.mNumStagesMma;
     *out_isPersistent = (o.mTileScheduler == ::batchedGemm::gemm::TileScheduler::Persistent) ? 1 : 0;
     *out_isUnroll2x = o.mUseUnrollLoop2xForMma ? 1 : 0;
@@ -652,7 +700,7 @@ void moe_cubin_get_config_info_ext(int config_index,
     *out_tileM = o.mTileM;
     *out_tileN = o.mTileN;
     *out_tileK = o.mTileK;
-    *out_numStages = o.mNumStages;
+    *out_numStages = o.mNumStagesA;
     *out_numStagesMma = o.mNumStagesMma;
     *out_isPersistent = (o.mTileScheduler == ::batchedGemm::gemm::TileScheduler::Persistent) ? 1 : 0;
     *out_isUnroll2x = o.mUseUnrollLoop2xForMma ? 1 : 0;
