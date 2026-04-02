@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-RUNNER_DIR="$REPO_ROOT/trtllmgen_runner"
+RUNNER_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+WORKSPACE_ROOT="$(cd "$RUNNER_DIR/.." && pwd)"
 
 cd "$RUNNER_DIR"
 
@@ -13,7 +13,7 @@ export FLASHINFER_CUBIN_DIR="$FLASHINFER_WORKSPACE_BASE/cubins"
 export TORCH_EXTENSIONS_DIR="$TRTLLMGEN_BENCH_CACHE_BASE/torch_extensions"
 export XDG_CACHE_HOME="$TRTLLMGEN_BENCH_CACHE_BASE"
 
-OUT_ROOT="${1:-$REPO_ROOT/benchmark_results/$(date +%Y%m%d_%H%M%S)_example}"
+OUT_ROOT="${1:-$WORKSPACE_ROOT/benchmark_results/$(date +%Y%m%d_%H%M%S)_example}"
 OUT_DIR="$OUT_ROOT/dsv3"
 mkdir -p "$OUT_DIR"
 
